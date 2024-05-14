@@ -1,9 +1,10 @@
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
 ignore = ["D203"]
-show-source = true
 
 [tool.ruff.lint.isort]
 known-first-party = ["fastapi_app"]

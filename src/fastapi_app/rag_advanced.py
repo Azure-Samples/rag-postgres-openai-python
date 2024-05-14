@@ -17,7 +17,6 @@ from .query_rewriter import build_search_function, extract_search_arguments
 
 
 class AdvancedRAGChat:
-
     def __init__(
         self,
         *,
@@ -26,7 +25,8 @@ class AdvancedRAGChat:
         chat_model: str,
         chat_deployment: str | None,  # Not needed for non-Azure OpenAI
         openai_embed_client: AsyncOpenAI,
-        embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
+        embed_deployment: str
+        | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
         embed_dimensions: int,
     ):
@@ -46,7 +46,6 @@ class AdvancedRAGChat:
     async def run(
         self, messages: list[dict], overrides: dict[str, Any] = {}
     ) -> dict[str, Any] | AsyncGenerator[dict[str, Any], None]:
-
         text_search = overrides.get("retrieval_mode") in ["text", "hybrid", None]
         vector_search = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
         top = overrides.get("top", 3)
@@ -61,7 +60,8 @@ class AdvancedRAGChat:
             system_prompt=self.query_prompt_template,
             new_user_content=original_user_query,
             past_messages=past_messages,
-            max_tokens=self.chat_token_limit - query_response_token_limit,  # TODO: count functions
+            max_tokens=self.chat_token_limit
+            - query_response_token_limit,  # TODO: count functions
             fallback_to_default=True,
         )
 
@@ -70,7 +70,7 @@ class AdvancedRAGChat:
             # Azure OpenAI takes the deployment name as the model name
             model=self.chat_deployment if self.chat_deployment else self.chat_model,
             temperature=0.0,  # Minimize creativity for search query generation
-            max_tokens=query_response_token_limit,  # Setting too low risks malformed JSON, setting too high may affect performance
+            max_tokens=query_response_token_limit,  # Setting too low risks malformed JSON, too high risks performance
             n=1,
             tools=build_search_function(),
             tool_choice="auto",
@@ -93,14 +93,17 @@ class AdvancedRAGChat:
 
         results = await self.searcher.search(query_text, vector, top, filters)
 
-        sources_content = [f"[{(item.id)}]:{item.to_str_for_rag()}\n\n" for item in results]
+        sources_content = [
+            f"[{(item.id)}]:{item.to_str_for_rag()}\n\n" for item in results
+        ]
         content = "\n".join(sources_content)
 
         # Generate a contextual and content specific answer using the search results and chat history
         response_token_limit = 1024
         messages = build_messages(
             model=self.chat_model,
-            system_prompt=overrides.get("prompt_template") or self.answer_prompt_template,
+            system_prompt=overrides.get("prompt_template")
+            or self.answer_prompt_template,
             new_user_content=original_user_query + "\n\nSources:\n" + content,
             past_messages=past_messages,
             max_tokens=self.chat_token_limit - response_token_limit,
