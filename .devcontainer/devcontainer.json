@@ -29,7 +29,6 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"charliermarsh.ruff",
-				"ms-python.black-formatter",
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
 				"ms-vscode.vscode-node-azure-pack",
@@ -45,7 +44,7 @@
 					"editor.codeActionsOnSave": {
 						"source.fixAll": "explicit"
 					},
-					"editor.defaultFormatter": "ms-python.black-formatter"
+					"editor.defaultFormatter": "charliermarsh.ruff"
 				},
 				"files.exclude": {
 					".ruff_cache": true,

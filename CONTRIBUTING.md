@@ -93,7 +93,7 @@ Compile the JavaScript:
 This codebase includes several languages: TypeScript, Python, Bicep, Powershell, and Bash.
 Code should follow the standard conventions of each language.
 
-For Python, you can enforce the conventions using `ruff` and `black`.
+For Python, you can enforce the conventions using `ruff`.
 
 Install the development dependencies:
 
@@ -104,13 +104,13 @@ python3 -m pip install -r requirements-dev.txt
 Run `ruff` to lint a file:
 
 ```
-python3 -m ruff <path-to-file>
+python3 -m ruff check <path-to-file>
 ```
 
-Run `black` to format a file:
+Run `ruff` to format a file:
 
 ```
-python3 -m black <path-to-file>
+python3 -m ruff format <path-to-file>
 ```
 
-If you followed the steps above to install the pre-commit hooks, then you can just wait for those hooks to run `ruff` and `black` for you.
+If you followed the steps above to install the pre-commit hooks, then you can just wait for those hooks to run `ruff` for you.

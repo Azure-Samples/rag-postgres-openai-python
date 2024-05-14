@@ -11,7 +11,6 @@ router = fastapi.APIRouter()
 
 @router.post("/chat")
 async def chat_handler(chat_request: ChatRequest):
-
     messages = [message.model_dump() for message in chat_request.messages]
     overrides = chat_request.context.get("overrides", {})
 

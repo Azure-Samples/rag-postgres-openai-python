@@ -27,9 +27,7 @@ async def seed_data(engine):
             )
         )
         if not result.scalar():
-            logger.error(
-                "Items table does not exist. Please run the database setup script first."
-            )
+            logger.error("Items table does not exist. Please run the database setup script first.")
             return
 
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
@@ -38,9 +36,7 @@ async def seed_data(engine):
         with open(os.path.join(current_dir, "seed_data.json")) as f:
             catalog_items = json.load(f)
             for catalog_item in catalog_items:
-                item = await session.execute(
-                    select(Item).filter(Item.id == catalog_item["Id"])
-                )
+                item = await session.execute(select(Item).filter(Item.id == catalog_item["Id"]))
                 if item.scalars().first():
                     continue
                 item = Item(

@@ -38,7 +38,6 @@ async def create_openai_chat_client(azure_credential):
 
 
 async def create_openai_embed_client(azure_credential):
-
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     if OPENAI_EMBED_HOST == "azure":
         token_provider = azure.identity.aio.get_bearer_token_provider(

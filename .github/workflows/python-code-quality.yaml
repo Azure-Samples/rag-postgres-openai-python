@@ -21,5 +21,5 @@ jobs:
             pip install -r requirements-dev.txt
         - name: Lint with ruff
           run: ruff check .
-        - name: Check formatting with black
-          run: black . --check --verbose
+        - name: Check formatting with ruff
+          run: ruff format --check .

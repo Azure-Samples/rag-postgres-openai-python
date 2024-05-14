@@ -6,7 +6,6 @@ from .postgres_models import Item
 
 
 class PostgresSearcher:
-
     def __init__(self, engine):
         self.async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -30,7 +29,6 @@ class PostgresSearcher:
         query_top: int = 5,
         filters: list[dict] | None = None,
     ):
-
         filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
 
         vector_query = f"""
