@@ -14,12 +14,13 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-20.04"]
-        python_version: ["3.9", "3.10", "3.11", "3.12"]
+        python_version: ["3.10", "3.11", "3.12"]
     services:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USERNAME: admin
+          POSTGRES_PASSWORD: LocalPasswordOnly
         ports:
         - 5432:5432
         # needed because the postgres container does not provide a healthcheck
