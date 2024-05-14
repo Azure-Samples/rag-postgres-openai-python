@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-python3 -m gunicorn fastapi_app:create_app()
+python3 -m gunicorn "fastapi_app:create_app()"
