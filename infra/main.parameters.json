@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "name": {
+        "value": "${AZURE_ENV_NAME}"
+      },
+      "location": {
+        "value": "${AZURE_LOCATION}"
+      },
+      "principalId": {
+        "value": "${AZURE_PRINCIPAL_ID}"
+      },
+      "webAppExists": {
+        "value": "${SERVICE_WEB_RESOURCE_EXISTS=false}"
+      },
+      "runningOnGh": {
+        "value": "${GITHUB_ACTIONS}"
+      },
+      "deployAzureOpenAI": {
+        "value": "${DEPLOY_AZURE_OPENAI=true}"
+      },
+      "chatModelName":{
+        "value": "${AZURE_OPENAI_CHAT_MODEL}"
+      },
+      "chatDeploymentName": {
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT}"
+      },
+      "chatDeploymentVersion":{
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION}"
+      },
+      "chatDeploymentCapacity":{
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY}"
+      },
+      "embedModelName":{
+        "value": "${AZURE_OPENAI_EMBED_MODEL}"
+      },
+      "embedDeploymentName": {
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT}"
+      },
+      "embedDeploymentVersion":{
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION}"
+      },
+      "embedDeploymentCapacity":{
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY}"
+      },
+      "embedDimensions": {
+        "value": "${AZURE_OPENAI_EMBED_DIMENSIONS}"
+      }
+    }
+}

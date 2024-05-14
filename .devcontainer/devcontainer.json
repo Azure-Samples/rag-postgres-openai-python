@@ -1,0 +1,61 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.0/containers/python-3
+{
+	"name": "RAG on database",
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	"forwardPorts": [5432],
+	"portsAttributes": {
+		"5432": {"label": "PostgreSQL port", "onAutoForward": "silent"},
+		"8000": {"label": "Backend port", "onAutoForward": "openBrowser"},
+		"5173": {"label": "Frontend port", "onAutoForward": "openBrowser"}
+	},
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "18",
+            "nodeGypDependencies": false
+        },
+        "ghcr.io/azure/azure-dev/azd:latest": {},
+        // Required for azd to package the app to ACA
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    },
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"charliermarsh.ruff",
+				"ms-python.black-formatter",
+				"mtxr.sqltools",
+				"mtxr.sqltools-driver-pg",
+				"ms-vscode.vscode-node-azure-pack",
+                "esbenp.prettier-vscode"
+			],
+			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"python.defaultInterpreterPath": "/usr/local/bin/python",
+				"python.testing.unittestEnabled": false,
+				"python.testing.pytestEnabled": false,
+				"[python]": {
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.fixAll": "explicit"
+					},
+					"editor.defaultFormatter": "ms-python.black-formatter"
+				},
+				"files.exclude": {
+					".ruff_cache": true,
+					".pytest_cache": true
+				}
+			}
+		}
+	},
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "pip install -r requirements-dev.txt && pip install -e src && cp .env.sample .env && python ./src/fastapi_app/setup_postgres_database.py && python ./src/fastapi_app/setup_postgres_seeddata.py",
+	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
+}

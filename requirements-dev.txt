@@ -1,0 +1,5 @@
+-r src/requirements.txt
+ruff
+black
+pre-commit
+pip-tools

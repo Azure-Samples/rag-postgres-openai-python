@@ -1,0 +1,36 @@
+name: Python check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_package:
+    name: Test ${{ matrix.os }} Python ${{ matrix.python_version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04"]
+        python_version: ["3.9", "3.10", "3.11", "3.12"]
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+        - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+        - uses: actions/checkout@v3
+        - name: Setup python
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python_version }}
+            architecture: x64
+        - name: Install dependencies
+          run: |
+            python3 -m pip install -e src

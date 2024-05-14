@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+name: azure-rag-postgres-python
+metadata:
+    template: azure-rag-postgres-python@0.0.1
+services:
+    web:
+        project: ./src
+        language: py
+        module: web
+        host: containerapp
+        hooks:
+            prepackage:
+                windows:
+                    shell: pwsh
+                    run:  cd frontend;npm install;npm run build
+                    interactive: false
+                    continueOnError: false
+                posix:
+                    shell: sh
+                    run:  cd frontend;npm install;npm run build
+                    interactive: false
+                    continueOnError: false
+hooks:
+    postprovision:
+        windows:
+            shell: pwsh
+            run: .\scripts\setup_postgres_database.ps1;.\scripts\setup_postgres_azurerole.ps1;.\scripts\setup_postgres_seeddata.ps1
+            interactive: true
+            continueOnError: false
+        posix:
+            shell: sh
+            run: ./scripts/setup_postgres_database.sh;./scripts/setup_postgres_azurerole.sh;./scripts/setup_postgres_seeddata.sh
+            interactive: true
+            continueOnError: false
