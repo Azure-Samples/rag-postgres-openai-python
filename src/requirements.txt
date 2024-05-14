@@ -46,7 +46,7 @@ distro==1.9.0
     # via openai
 environs==11.0.0
     # via fastapi_app (pyproject.toml)
-fastapi==0.110.3
+fastapi==0.111.0
     # via fastapi_app (pyproject.toml)
 frozenlist==1.4.1
     # via
