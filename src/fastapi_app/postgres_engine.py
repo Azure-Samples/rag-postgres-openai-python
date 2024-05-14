@@ -15,7 +15,7 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
         token = await azure_credential.get_token("https://ossrdbms-aad.database.windows.net/.default")
         password = token.token
     else:
-        logger.info("Authenticating to PostgreSQL using password...")
+        logger.info("Authenticating to PostgreSQL using password...%s", password)
 
     DATABASE_URI = f"postgresql+asyncpg://{username}:{password}@{host}/{database}"
     # Specify SSL mode if needed
