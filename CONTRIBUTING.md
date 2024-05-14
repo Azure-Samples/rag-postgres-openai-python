@@ -1,4 +1,4 @@
-# Contributing to [project-title]
+# Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -15,7 +15,9 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
  - [Code of Conduct](#coc)
  - [Issues and Bugs](#issue)
  - [Feature Requests](#feature)
- - [Submission Guidelines](#submit)
+ - [Submitting a PR](#submit-pr)
+ - [Running Tests](#tests)
+ - [Code Style](#style)
 
 ## <a name="coc"></a> Code of Conduct
 Help us keep this project open and inclusive. Please read and follow our [Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
@@ -51,26 +53,64 @@ chances of your issue being dealt with quickly:
 * **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be
   causing the problem (line of code or commit)
 
-You can file new issues by providing the above information at the corresponding repository's issues link: https://github.com/Azure-Samples/rag-postgres-openai-python/issues/new].
+You can file new issues by providing the above information at the corresponding repository's issues link: https://github.com/Azure-samples/rag-postgres-openai-python/issues/new].
 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-* Search the repository (https://github.com/Azure-Samples/rag-postgres-openai-python/pulls) for an open or closed PR
+* Search the repository (https://github.com/Azure-samples/rag-postgres-openai-python/pulls) for an open or closed PR
   that relates to your submission. You don't want to duplicate effort.
-
 * Make your changes in a new git fork
+* Follow [Code style conventions](#style)
+* [Run the tests](#tests) (and write new ones, if needed)
 * Commit your changes using a descriptive commit message
 * Push your fork to GitHub
-* In GitHub, create a pull request
-* If we suggest changes then:
-  * Make the required updates.
-  * Rebase your fork and force push to your GitHub repository (this will update your Pull Request):
+* In GitHub, create a pull request to the `main` branch of the repository
+* Ask a maintainer to review your PR and address any comments they might have
 
-    ```shell
-    git rebase master -i
-    git push -f
-    ```
+## <a name="tests"></a> Setting up the development environment
 
-That's it! Thank you for your contribution!
+Install the development dependencies:
 
+```
+python3 -m pip install -r requirements-dev.txt
+```
+
+Install the pre-commit hooks:
+
+```
+pre-commit install
+```
+
+Compile the JavaScript:
+
+```
+( cd ./app/frontend ; npm install ; npm run build )
+```
+
+## <a name="style"></a> Code Style
+
+This codebase includes several languages: TypeScript, Python, Bicep, Powershell, and Bash.
+Code should follow the standard conventions of each language.
+
+For Python, you can enforce the conventions using `ruff`.
+
+Install the development dependencies:
+
+```
+python3 -m pip install -r requirements-dev.txt
+```
+
+Run `ruff` to lint a file:
+
+```
+python3 -m ruff check <path-to-file>
+```
+
+Run `ruff` to format a file:
+
+```
+python3 -m ruff format <path-to-file>
+```
+
+If you followed the steps above to install the pre-commit hooks, then you can just wait for those hooks to run `ruff` for you.

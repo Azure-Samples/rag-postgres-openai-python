@@ -17,7 +17,6 @@ from .query_rewriter import build_search_function, extract_search_arguments
 
 
 class AdvancedRAGChat:
-
     def __init__(
         self,
         *,
@@ -46,7 +45,6 @@ class AdvancedRAGChat:
     async def run(
         self, messages: list[dict], overrides: dict[str, Any] = {}
     ) -> dict[str, Any] | AsyncGenerator[dict[str, Any], None]:
-
         text_search = overrides.get("retrieval_mode") in ["text", "hybrid", None]
         vector_search = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
         top = overrides.get("top", 3)
@@ -70,7 +68,7 @@ class AdvancedRAGChat:
             # Azure OpenAI takes the deployment name as the model name
             model=self.chat_deployment if self.chat_deployment else self.chat_model,
             temperature=0.0,  # Minimize creativity for search query generation
-            max_tokens=query_response_token_limit,  # Setting too low risks malformed JSON, setting too high may affect performance
+            max_tokens=query_response_token_limit,  # Setting too low risks malformed JSON, too high risks performance
             n=1,
             tools=build_search_function(),
             tool_choice="auto",

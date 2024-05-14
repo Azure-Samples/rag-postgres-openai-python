@@ -246,7 +246,6 @@ module web 'web.bicep' = {
   }
 }
 
-
 resource openAiResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing =
   if (!empty(openAiResourceGroupName)) {
     name: !empty(openAiResourceGroupName) ? openAiResourceGroupName : resourceGroup.name
@@ -293,15 +292,16 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
 }
 
 // USER ROLES
-module openAiRoleUser 'core/security/role.bicep' = if (empty(runningOnGh)) {
-  scope: openAiResourceGroup
-  name: 'openai-role-user'
-  params: {
-    principalId: principalId
-    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
-    principalType: 'User'
+module openAiRoleUser 'core/security/role.bicep' =
+  if (empty(runningOnGh)) {
+    scope: openAiResourceGroup
+    name: 'openai-role-user'
+    params: {
+      principalId: principalId
+      roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+      principalType: 'User'
+    }
   }
-}
 
 // Backend roles
 module openAiRoleBackend 'core/security/role.bicep' = {
@@ -313,7 +313,6 @@ module openAiRoleBackend 'core/security/role.bicep' = {
     principalType: 'ServicePrincipal'
   }
 }
-
 
 output AZURE_LOCATION string = location
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName

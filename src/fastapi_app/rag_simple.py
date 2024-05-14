@@ -13,7 +13,6 @@ from .postgres_searcher import PostgresSearcher
 
 
 class SimpleRAGChat:
-
     def __init__(
         self,
         *,
@@ -41,7 +40,6 @@ class SimpleRAGChat:
     async def run(
         self, messages: list[dict], overrides: dict[str, Any] = {}
     ) -> dict[str, Any] | AsyncGenerator[dict[str, Any], None]:
-
         text_search = overrides.get("retrieval_mode") in ["text", "hybrid", None]
         vector_search = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
         top = overrides.get("top", 3)

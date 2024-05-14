@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.245.0/containers/python-3
 {
-	"name": "RAG on database",
+	"name": "rag-postgres-openai-python",
 	"dockerComposeFile": "docker-compose.yaml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
@@ -29,7 +29,6 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"charliermarsh.ruff",
-				"ms-python.black-formatter",
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
 				"ms-vscode.vscode-node-azure-pack",
@@ -45,7 +44,7 @@
 					"editor.codeActionsOnSave": {
 						"source.fixAll": "explicit"
 					},
-					"editor.defaultFormatter": "ms-python.black-formatter"
+					"editor.defaultFormatter": "charliermarsh.ruff"
 				},
 				"files.exclude": {
 					".ruff_cache": true,

@@ -36,25 +36,35 @@ cffi==1.16.0
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
-    # via uvicorn
-cryptography==42.0.6
+    # via
+    #   typer
+    #   uvicorn
+cryptography==42.0.7
     # via
     #   azure-identity
     #   msal
     #   pyjwt
 distro==1.9.0
     # via openai
+dnspython==2.6.1
+    # via email-validator
+email-validator==2.1.1
+    # via fastapi
 environs==11.0.0
     # via fastapi_app (pyproject.toml)
-fastapi==0.110.3
-    # via fastapi_app (pyproject.toml)
+fastapi==0.111.0
+    # via
+    #   fastapi-cli
+    #   fastapi_app (pyproject.toml)
+fastapi-cli==0.0.3
+    # via fastapi
 frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
 greenlet==3.0.3
     # via sqlalchemy
-gunicorn==20.1.0
+gunicorn==22.0.0
     # via fastapi_app (pyproject.toml)
 h11==0.14.0
     # via
@@ -65,15 +75,22 @@ httpcore==1.0.5
 httptools==0.6.1
     # via uvicorn
 httpx==0.27.0
-    # via openai
+    # via
+    #   fastapi
+    #   openai
 idna==3.7
     # via
     #   anyio
+    #   email-validator
     #   httpx
     #   requests
     #   yarl
+jinja2==3.1.4
+    # via fastapi
 markdown-it-py==3.0.0
     # via rich
+markupsafe==2.1.5
+    # via jinja2
 marshmallow==3.21.2
     # via environs
 mdurl==0.1.2
@@ -90,14 +107,17 @@ multidict==6.0.5
     #   yarl
 numpy==1.26.4
     # via pgvector
-openai==1.25.2
+openai==1.30.1
     # via
     #   fastapi_app (pyproject.toml)
     #   openai-messages-token-helper
-openai-messages-token-helper==0.1.3
+openai-messages-token-helper==0.1.4
     # via fastapi_app (pyproject.toml)
+orjson==3.10.3
+    # via fastapi
 packaging==24.0
     # via
+    #   gunicorn
     #   marshmallow
     #   msal-extensions
 pgvector==0.2.5
@@ -125,9 +145,11 @@ python-dotenv==1.0.1
     #   environs
     #   fastapi_app (pyproject.toml)
     #   uvicorn
+python-multipart==0.0.9
+    # via fastapi
 pyyaml==6.0.1
     # via uvicorn
-regex==2024.4.28
+regex==2024.5.10
     # via tiktoken
 requests==2.31.0
     # via
@@ -135,7 +157,9 @@ requests==2.31.0
     #   msal
     #   tiktoken
 rich==13.7.1
-    # via fastapi_app (pyproject.toml)
+    # via typer
+shellingham==1.5.4
+    # via typer
 six==1.16.0
     # via azure-core
 sniffio==1.3.1
@@ -147,12 +171,14 @@ sqlalchemy[asyncio]==2.0.30
     # via fastapi_app (pyproject.toml)
 starlette==0.37.2
     # via fastapi
-tiktoken==0.6.0
+tiktoken==0.7.0
     # via
     #   fastapi_app (pyproject.toml)
     #   openai-messages-token-helper
 tqdm==4.66.4
     # via openai
+typer==0.12.3
+    # via fastapi-cli
 typing-extensions==4.11.0
     # via
     #   azure-core
@@ -161,10 +187,16 @@ typing-extensions==4.11.0
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
+    #   typer
+ujson==5.10.0
+    # via fastapi
 urllib3==2.2.1
     # via requests
-uvicorn[standard]==0.23.2
-    # via fastapi_app (pyproject.toml)
+uvicorn[standard]==0.29.0
+    # via
+    #   fastapi
+    #   fastapi-cli
+    #   fastapi_app (pyproject.toml)
 uvloop==0.19.0
     # via uvicorn
 watchfiles==0.21.0
@@ -173,6 +205,3 @@ websockets==12.0
     # via uvicorn
 yarl==1.9.4
     # via aiohttp
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools

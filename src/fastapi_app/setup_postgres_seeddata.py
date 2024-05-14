@@ -9,19 +9,21 @@ from dotenv import load_dotenv
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from fastapi_app.postgres_engine import create_postgres_engine_from_args, create_postgres_engine_from_env
+from fastapi_app.postgres_engine import (
+    create_postgres_engine_from_args,
+    create_postgres_engine_from_env,
+)
 from fastapi_app.postgres_models import Item
 
 logger = logging.getLogger("ragapp")
 
 
 async def seed_data(engine):
-
     # Check if Item table exists
     async with engine.begin() as conn:
         result = await conn.execute(
             text(
-                "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'items')"
+                "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'items')"  # noqa
             )
         )
         if not result.scalar():
@@ -29,7 +31,6 @@ async def seed_data(engine):
             return
 
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
-
         # Insert the items from the JSON file into the database
         current_dir = os.path.dirname(os.path.realpath(__file__))
         with open(os.path.join(current_dir, "seed_data.json")) as f:
@@ -57,7 +58,6 @@ async def seed_data(engine):
 
 
 async def main():
-
     parser = argparse.ArgumentParser(description="Create database schema")
     parser.add_argument("--host", type=str, help="Postgres host")
     parser.add_argument("--username", type=str, help="Postgres username")
@@ -78,7 +78,6 @@ async def main():
 
 
 if __name__ == "__main__":
-
     logging.basicConfig(level=logging.WARNING)
     logger.setLevel(logging.INFO)
     load_dotenv(override=True)

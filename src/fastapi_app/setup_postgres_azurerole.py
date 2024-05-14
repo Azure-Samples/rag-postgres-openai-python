@@ -11,7 +11,6 @@ logger = logging.getLogger("ragapp")
 
 
 async def assign_role_for_webapp(engine, app_identity_name):
-
     async with engine.begin() as conn:
         identities = await conn.execute(
             text(f"select * from pgaadauth_list_principals(false) WHERE rolname = '{app_identity_name}'")
@@ -39,7 +38,6 @@ async def assign_role_for_webapp(engine, app_identity_name):
 
 
 async def main():
-
     parser = argparse.ArgumentParser(description="Create database schema")
     parser.add_argument("--host", type=str, help="Postgres host")
     parser.add_argument("--username", type=str, help="Postgres username")
@@ -64,7 +62,6 @@ async def main():
 
 
 if __name__ == "__main__":
-
     logging.basicConfig(level=logging.WARNING)
     logger.setLevel(logging.INFO)
     load_dotenv(override=True)

@@ -22,7 +22,6 @@ async def create_db_schema(engine):
 
 
 async def main():
-
     parser = argparse.ArgumentParser(description="Create database schema")
     parser.add_argument("--host", type=str, help="Postgres host")
     parser.add_argument("--username", type=str, help="Postgres username")
@@ -45,7 +44,6 @@ async def main():
 
 
 if __name__ == "__main__":
-
     logging.basicConfig(level=logging.WARNING)
     logger.setLevel(logging.INFO)
     load_dotenv(override=True)

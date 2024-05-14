@@ -1,7 +1,7 @@
 # RAG on PostgreSQL
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](placeholder)
-[![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](placeholder)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/rag-postgres-openai-python)
+[![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/rag-postgres-openai-python)
 
 This project creates a web-based chat application with an API backend that can use OpenAI chat models to answer questions about the items in a PostgreSQL database table. The frontend is built with React and FluentUI, while the backend is written with Python and FastAPI.
 
@@ -42,7 +42,7 @@ You can run this template virtually by using GitHub Codespaces. The button will 
 3. Sign in to your Azure account:
 
     ```shell
-    azd auth login --use-device-code
+    azd auth login
     ```
 
 4. Provision the resources and deploy the code:

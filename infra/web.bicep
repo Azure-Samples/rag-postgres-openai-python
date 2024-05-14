@@ -9,12 +9,10 @@ param identityName string
 param serviceName string = 'web'
 param environmentVariables array = []
 
-
 resource webIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: identityName
   location: location
 }
-
 
 module app 'core/host/container-app-upsert.bicep' = {
   name: '${serviceName}-container-app-module'
@@ -26,7 +24,8 @@ module app 'core/host/container-app-upsert.bicep' = {
     exists: exists
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
-    env: union(environmentVariables,
+    env: union(
+      environmentVariables,
       [
         {
           name: 'APP_IDENTITY_ID'

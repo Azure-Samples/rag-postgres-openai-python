@@ -8,7 +8,6 @@ logger = logging.getLogger("ragapp")
 
 
 async def create_postgres_engine(*, host, username, database, password, sslmode, azure_credential) -> AsyncEngine:
-
     if host.endswith(".database.azure.com"):
         logger.info("Authenticating to Azure Database for PostgreSQL using Azure Identity...")
         if azure_credential is None:
