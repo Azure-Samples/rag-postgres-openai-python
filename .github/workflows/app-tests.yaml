@@ -19,7 +19,6 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USERNAME: admin
           POSTGRES_PASSWORD: postgres
         ports:
         - 5432:5432
