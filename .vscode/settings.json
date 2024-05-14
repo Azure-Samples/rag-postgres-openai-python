@@ -7,8 +7,8 @@
             "driver": "PostgreSQL",
             "name": "local",
             "database": "postgres",
-            "username": "admin",
-            "password": "LocalPasswordOnly"
+            "username": "postgres",
+            "password": "postgres"
         },
         {
             "name": "Azure database",
