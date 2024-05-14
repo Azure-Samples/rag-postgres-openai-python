@@ -17,25 +17,12 @@ param principalId string = ''
 
 @minLength(1)
 @description('Location for the OpenAI resource')
+// Look for gpt-35-turbo 0125 on the availability table:
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#standard-deployment-model-availability
 @allowed([
-  'australiaeast'
-  'brazilsouth'
   'canadaeast'
-  'eastus'
-  'eastus2'
-  'francecentral'
-  'japaneast'
   'northcentralus'
-  'norwayeast'
-  'southafricanorth'
   'southcentralus'
-  'southindia'
-  'swedencentral'
-  'switzerlandnorth'
-  'uksouth'
-  'westeurope'
-  'westus'
 ])
 @metadata({
   azd: {

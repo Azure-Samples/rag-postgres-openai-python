@@ -40,7 +40,7 @@ async def create_postgres_engine_from_env(azure_credential=None) -> AsyncEngine:
         host=os.environ["POSTGRES_HOST"],
         username=os.environ["POSTGRES_USERNAME"],
         database=os.environ["POSTGRES_DATABASE"],
-        password=os.environ["POSTGRES_PASSWORD"],
+        password=os.environ.get("POSTGRES_PASSWORD"),
         sslmode=os.environ.get("POSTGRES_SSL"),
         azure_credential=azure_credential,
     )

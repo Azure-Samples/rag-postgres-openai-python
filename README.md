@@ -142,7 +142,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 2. Run the FastAPI backend:
 
     ```shell
-    fastapi dev src/api/main.py
+    python3 -m uvicorn fastapi_app:create_app --factory --reload
     ```
 
     Or you can run "Backend" in the VS Code Run & Debug menu.

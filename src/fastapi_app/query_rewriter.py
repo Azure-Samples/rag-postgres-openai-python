@@ -68,7 +68,7 @@ def extract_search_arguments(chat_completion: ChatCompletion):
             if function.name == "search_database":
                 arg = json.loads(function.arguments)
                 search_query = arg.get("search_query")
-                if "price_filter" in arg:
+                if "price_filter" in arg and arg["price_filter"]:
                     price_filter = arg["price_filter"]
                     filters.append(
                         {
@@ -77,7 +77,7 @@ def extract_search_arguments(chat_completion: ChatCompletion):
                             "value": price_filter["value"],
                         }
                     )
-                if "brand_filter" in arg:
+                if "brand_filter" in arg and arg["brand_filter"]:
                     brand_filter = arg["brand_filter"]
                     filters.append(
                         {
