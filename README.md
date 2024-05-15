@@ -51,7 +51,7 @@ You can run this template virtually by using GitHub Codespaces. The button will 
     azd up
     ```
 
-    This project uses gpt-3.5-turbo and text-embedding-ada-002 which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region during deployment accordingly.
+    You will be asked to select two locations, first a region for most of the resources (Container Apps, PostgreSQL), then a region specifically for the Azure OpenAI models. This project uses the gpt-3.5-turbo (version 0125) and text-embedding-ada-002 models which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region accordingly.
 
 ### VS Code Dev Containers
 
