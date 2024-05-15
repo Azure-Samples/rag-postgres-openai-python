@@ -1,13 +1,26 @@
+from openai import AsyncOpenAI
 from pgvector.utils import to_db
 from sqlalchemy import Float, Integer, select, text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from .postgres_models import Item
+from fastapi_app.embeddings import compute_text_embedding
+from fastapi_app.postgres_models import Item
 
 
 class PostgresSearcher:
-    def __init__(self, engine):
+    def __init__(
+        self,
+        engine,
+        openai_embed_client: AsyncOpenAI,
+        embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
+        embed_model: str,
+        embed_dimensions: int,
+    ):
         self.async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+        self.openai_embed_client = openai_embed_client
+        self.embed_model = embed_model
+        self.embed_deployment = embed_deployment
+        self.embed_dimensions = embed_dimensions
 
     def build_filter_clause(self, filters) -> tuple[str, str]:
         if filters is None:
@@ -26,7 +39,7 @@ class PostgresSearcher:
         self,
         query_text: str | None,
         query_vector: list[float] | list,
-        query_top: int = 5,
+        top: int = 5,
         filters: list[dict] | None = None,
     ):
         filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
@@ -83,7 +96,32 @@ class PostgresSearcher:
 
             # Convert results to Item models
             items = []
-            for id, _ in results[:query_top]:
+            for id, _ in results[:top]:
                 item = await session.execute(select(Item).where(Item.id == id))
                 items.append(item.scalar())
             return items
+
+    async def search_and_embed(
+        self,
+        query_text: str,
+        top: int = 5,
+        enable_vector_search: bool = False,
+        enable_text_search: bool = False,
+        filters: list[dict] | None = None,
+    ) -> list[Item]:
+        """
+        Search items by query text. Optionally converts the query text to a vector if enable_vector_search is True.
+        """
+        vector: list[float] = []
+        if enable_vector_search:
+            vector = await compute_text_embedding(
+                query_text,
+                self.openai_embed_client,
+                self.embed_model,
+                self.embed_deployment,
+                self.embed_dimensions,
+            )
+        if not enable_text_search:
+            query_text = None
+
+        return await self.search(query_text, vector, top, filters)

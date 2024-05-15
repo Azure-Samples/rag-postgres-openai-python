@@ -36,32 +36,47 @@ async def similar_handler(id: int, n: int = 5):
         return [item.to_dict() | {"distance": round(distance, 2)} for item, distance in closest]
 
 
+@router.get("/search")
+async def search_handler(query: str, top: int = 5, enable_vector_search: bool = True, enable_text_search: bool = True):
+    """A search API to find items based on a query."""
+    searcher = PostgresSearcher(
+        global_storage.engine,
+        openai_embed_client=global_storage.openai_embed_client,
+        embed_deployment=global_storage.openai_embed_deployment,
+        embed_model=global_storage.openai_embed_model,
+        embed_dimensions=global_storage.openai_embed_dimensions,
+    )
+    results = await searcher.search_and_embed(
+        query, top=top, enable_vector_search=enable_vector_search, enable_text_search=enable_text_search
+    )
+    return [item.to_dict() for item in results]
+
+
 @router.post("/chat")
 async def chat_handler(chat_request: ChatRequest):
     messages = [message.model_dump() for message in chat_request.messages]
     overrides = chat_request.context.get("overrides", {})
 
+    searcher = PostgresSearcher(
+        global_storage.engine,
+        openai_embed_client=global_storage.openai_embed_client,
+        embed_deployment=global_storage.openai_embed_deployment,
+        embed_model=global_storage.openai_embed_model,
+        embed_dimensions=global_storage.openai_embed_dimensions,
+    )
     if overrides.get("use_advanced_flow"):
         ragchat = AdvancedRAGChat(
-            searcher=PostgresSearcher(global_storage.engine),
+            searcher=searcher,
             openai_chat_client=global_storage.openai_chat_client,
             chat_model=global_storage.openai_chat_model,
             chat_deployment=global_storage.openai_chat_deployment,
-            openai_embed_client=global_storage.openai_embed_client,
-            embed_deployment=global_storage.openai_embed_deployment,
-            embed_model=global_storage.openai_embed_model,
-            embed_dimensions=global_storage.openai_embed_dimensions,
         )
     else:
         ragchat = SimpleRAGChat(
-            searcher=PostgresSearcher(global_storage.engine),
+            searcher=searcher,
             openai_chat_client=global_storage.openai_chat_client,
             chat_model=global_storage.openai_chat_model,
             chat_deployment=global_storage.openai_chat_deployment,
-            openai_embed_client=global_storage.openai_embed_client,
-            embed_deployment=global_storage.openai_embed_deployment,
-            embed_model=global_storage.openai_embed_model,
-            embed_dimensions=global_storage.openai_embed_dimensions,
         )
 
     response = await ragchat.run(messages, overrides=overrides)

@@ -8,7 +8,6 @@ from openai import AsyncOpenAI
 from openai_messages_token_helper import build_messages, get_token_limit
 
 from .api_models import ThoughtStep
-from .embeddings import compute_text_embedding
 from .postgres_searcher import PostgresSearcher
 
 
@@ -20,19 +19,11 @@ class SimpleRAGChat:
         openai_chat_client: AsyncOpenAI,
         chat_model: str,
         chat_deployment: str | None,  # Not needed for non-Azure OpenAI
-        openai_embed_client: AsyncOpenAI,
-        embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
-        embed_model: str,
-        embed_dimensions: int,
     ):
         self.searcher = searcher
         self.openai_chat_client = openai_chat_client
         self.chat_model = chat_model
         self.chat_deployment = chat_deployment
-        self.openai_embed_client = openai_embed_client
-        self.embed_deployment = embed_deployment
-        self.embed_model = embed_model
-        self.embed_dimensions = embed_dimensions
         self.chat_token_limit = get_token_limit(chat_model, default_to_minimum=True)
         current_dir = pathlib.Path(__file__).parent
         self.answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
@@ -48,20 +39,9 @@ class SimpleRAGChat:
         past_messages = messages[:-1]
 
         # Retrieve relevant items from the database
-        vector: list[float] = []
-        query_text = None
-        if vector_search:
-            vector = await compute_text_embedding(
-                original_user_query,
-                self.openai_embed_client,
-                self.embed_model,
-                self.embed_deployment,
-                self.embed_dimensions,
-            )
-        if text_search:
-            query_text = original_user_query
-
-        results = await self.searcher.search(query_text, vector, top)
+        results = await self.searcher.search_and_embed(
+            original_user_query, top=top, enable_vector_search=vector_search, enable_text_search=text_search
+        )
 
         sources_content = [f"[{(item.id)}]:{item.to_str_for_rag()}\n\n" for item in results]
         content = "\n".join(sources_content)
@@ -92,7 +72,7 @@ class SimpleRAGChat:
             "thoughts": [
                 ThoughtStep(
                     title="Search query for database",
-                    description=query_text,
+                    description=original_user_query if text_search else None,
                     props={
                         "top": top,
                         "vector_search": vector_search,
