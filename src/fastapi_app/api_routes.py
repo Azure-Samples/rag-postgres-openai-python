@@ -1,12 +1,39 @@
 import fastapi
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from .api_models import ChatRequest
-from .globals import global_storage
-from .postgres_searcher import PostgresSearcher
-from .rag_advanced import AdvancedRAGChat
-from .rag_simple import SimpleRAGChat
+from fastapi_app.api_models import ChatRequest
+from fastapi_app.globals import global_storage
+from fastapi_app.postgres_models import Item
+from fastapi_app.postgres_searcher import PostgresSearcher
+from fastapi_app.rag_advanced import AdvancedRAGChat
+from fastapi_app.rag_simple import SimpleRAGChat
 
 router = fastapi.APIRouter()
+
+
+@router.get("/items/{id}")
+async def item_handler(id: int):
+    """A simple API to get an item by ID."""
+    async_session_maker = async_sessionmaker(global_storage.engine, expire_on_commit=False)
+    async with async_session_maker() as session:
+        item = (await session.scalars(select(Item).where(Item.id == id))).first()
+        return item.to_dict()
+
+
+@router.get("/similar")
+async def similar_handler(id: int, n: int = 5):
+    """A similarity API to find items similar to items with given ID."""
+    async_session_maker = async_sessionmaker(global_storage.engine, expire_on_commit=False)
+    async with async_session_maker() as session:
+        item = (await session.scalars(select(Item).where(Item.id == id))).first()
+        closest = await session.execute(
+            select(Item, Item.embedding.l2_distance(item.embedding))
+            .filter(Item.id != id)
+            .order_by(Item.embedding.l2_distance(item.embedding))
+            .limit(n)
+        )
+        return [item.to_dict() | {"distance": round(distance, 2)} for item, distance in closest]
 
 
 @router.post("/chat")

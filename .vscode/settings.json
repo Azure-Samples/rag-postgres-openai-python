@@ -7,7 +7,7 @@
             "driver": "PostgreSQL",
             "name": "local",
             "database": "postgres",
-            "username": "postgres",
+            "username": "admin",
             "password": "postgres"
         },
         {
