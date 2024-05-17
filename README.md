@@ -55,22 +55,29 @@ A related option is VS Code Dev Containers, which will open the project in your 
 
 ### Local Environment
 
-#### Prerequisites
+1. Make sure the following tools are installed:
 
-* [Azure Developer CLI (azd)](https://aka.ms/install-azd)
-* [Python 3.10+](https://www.python.org/downloads/)
-* [PostgreSQL 14+](https://www.postgresql.org/download/)
-* [pgvector](https://github.com/pgvector/pgvector)
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [Git](https://git-scm.com/downloads)
+    * [Azure Developer CLI (azd)](https://aka.ms/install-azd)
+    * [Python 3.10+](https://www.python.org/downloads/)
+    * [PostgreSQL 14+](https://www.postgresql.org/download/)
+    * [pgvector](https://github.com/pgvector/pgvector)
+    * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+    * [Git](https://git-scm.com/downloads)
 
-#### Installation
+2. Download the project code:
 
-Install required packages:
+    ```shell
+    azd init -t rag-postgres-openai-python
+    ```
 
-```shell
-pip install -r requirements-dev.txt
-```
+3. Open the project folder
+4. Install required Python packages:
+
+    ```shell
+    pip install -r requirements-dev.txt
+    ```
+
+5. Continue with the [deployment steps](#deployment)
 
 ## Deployment
 
