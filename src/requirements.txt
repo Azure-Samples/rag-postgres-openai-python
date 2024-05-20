@@ -149,7 +149,7 @@ python-multipart==0.0.9
     # via fastapi
 pyyaml==6.0.1
     # via uvicorn
-regex==2024.5.10
+regex==2024.5.15
     # via tiktoken
 requests==2.31.0
     # via
