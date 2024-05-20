@@ -56,7 +56,7 @@ fastapi==0.111.0
     # via
     #   fastapi-cli
     #   fastapi_app (pyproject.toml)
-fastapi-cli==0.0.3
+fastapi-cli==0.0.4
     # via fastapi
 frozenlist==1.4.1
     # via
