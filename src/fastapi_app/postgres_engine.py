@@ -1,19 +1,25 @@
 import logging
 import os
 
-from azure.identity.aio import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 logger = logging.getLogger("ragapp")
 
 
 async def create_postgres_engine(*, host, username, database, password, sslmode, azure_credential) -> AsyncEngine:
+    def get_password_from_azure_credential():
+        token = azure_credential.get_token("https://ossrdbms-aad.database.windows.net/.default")
+        return token.token
+
+    token_based_password = False
     if host.endswith(".database.azure.com"):
+        token_based_password = True
         logger.info("Authenticating to Azure Database for PostgreSQL using Azure Identity...")
         if azure_credential is None:
             raise ValueError("Azure credential must be provided for Azure Database for PostgreSQL")
-        token = await azure_credential.get_token("https://ossrdbms-aad.database.windows.net/.default")
-        password = token.token
+        password = get_password_from_azure_credential()
     else:
         logger.info("Authenticating to PostgreSQL using password...")
 
@@ -27,16 +33,20 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
         echo=False,
     )
 
+    @event.listens_for(engine.sync_engine, "do_connect")
+    def update_password_token(dialect, conn_rec, cargs, cparams):
+        if token_based_password:
+            logger.info("Updating password token for Azure Database for PostgreSQL")
+            cparams["password"] = get_password_from_azure_credential()
+
     return engine
 
 
 async def create_postgres_engine_from_env(azure_credential=None) -> AsyncEngine:
-    must_close = False
     if azure_credential is None and os.environ["POSTGRES_HOST"].endswith(".database.azure.com"):
         azure_credential = DefaultAzureCredential()
-        must_close = True
 
-    engine = await create_postgres_engine(
+    return await create_postgres_engine(
         host=os.environ["POSTGRES_HOST"],
         username=os.environ["POSTGRES_USERNAME"],
         database=os.environ["POSTGRES_DATABASE"],
@@ -45,19 +55,12 @@ async def create_postgres_engine_from_env(azure_credential=None) -> AsyncEngine:
         azure_credential=azure_credential,
     )
 
-    if must_close:
-        await azure_credential.close()
-
-    return engine
-
 
 async def create_postgres_engine_from_args(args, azure_credential=None) -> AsyncEngine:
-    must_close = False
     if azure_credential is None and args.host.endswith(".database.azure.com"):
         azure_credential = DefaultAzureCredential()
-        must_close = True
 
-    engine = await create_postgres_engine(
+    return await create_postgres_engine(
         host=args.host,
         username=args.username,
         database=args.database,
@@ -65,8 +68,3 @@ async def create_postgres_engine_from_args(args, azure_credential=None) -> Async
         sslmode=args.sslmode,
         azure_credential=azure_credential,
     )
-
-    if must_close:
-        await azure_credential.close()
-
-    return engine

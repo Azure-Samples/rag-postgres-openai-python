@@ -26,7 +26,7 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
-                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '=='",  # noqa
+                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa
                                 },
                                 "value": {
                                     "type": "number",
@@ -40,7 +40,7 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
-                                    "description": "Operator to compare the column value, either '==' or '!='",
+                                    "description": "Operator to compare the column value, either '=' or '!='",
                                 },
                                 "value": {
                                     "type": "string",

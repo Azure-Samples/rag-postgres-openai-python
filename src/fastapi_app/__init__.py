@@ -2,7 +2,7 @@ import contextlib
 import logging
 import os
 
-import azure.identity.aio
+import azure.identity
 from dotenv import load_dotenv
 from environs import Env
 from fastapi import FastAPI
@@ -27,9 +27,9 @@ async def lifespan(app: FastAPI):
                 "Using managed identity for client ID %s",
                 client_id,
             )
-            azure_credential = azure.identity.aio.ManagedIdentityCredential(client_id=client_id)
+            azure_credential = azure.identity.ManagedIdentityCredential(client_id=client_id)
         else:
-            azure_credential = azure.identity.aio.DefaultAzureCredential()
+            azure_credential = azure.identity.DefaultAzureCredential()
     except Exception as e:
         logger.warning("Failed to authenticate to Azure: %s", e)
 
