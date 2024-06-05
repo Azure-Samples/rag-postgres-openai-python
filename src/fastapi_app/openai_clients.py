@@ -1,7 +1,7 @@
 import logging
 import os
 
-import azure.identity.aio
+import azure.identity
 import openai
 
 logger = logging.getLogger("ragapp")
@@ -12,7 +12,7 @@ async def create_openai_chat_client(azure_credential):
     if OPENAI_CHAT_HOST == "azure":
         logger.info("Authenticating to OpenAI using Azure Identity...")
 
-        token_provider = azure.identity.aio.get_bearer_token_provider(
+        token_provider = azure.identity.get_bearer_token_provider(
             azure_credential, "https://cognitiveservices.azure.com/.default"
         )
         openai_chat_client = openai.AsyncAzureOpenAI(
@@ -40,7 +40,7 @@ async def create_openai_chat_client(azure_credential):
 async def create_openai_embed_client(azure_credential):
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     if OPENAI_EMBED_HOST == "azure":
-        token_provider = azure.identity.aio.get_bearer_token_provider(
+        token_provider = azure.identity.get_bearer_token_provider(
             azure_credential, "https://cognitiveservices.azure.com/.default"
         )
         openai_embed_client = openai.AsyncAzureOpenAI(
