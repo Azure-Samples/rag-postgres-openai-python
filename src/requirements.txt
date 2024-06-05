@@ -105,7 +105,7 @@ multidict==6.0.5
     #   yarl
 numpy==1.26.4
     # via pgvector
-openai==1.30.4
+openai==1.31.0
     # via
     #   fastapi_app (pyproject.toml)
     #   openai-messages-token-helper
