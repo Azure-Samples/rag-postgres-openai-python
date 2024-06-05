@@ -149,7 +149,7 @@ pyyaml==6.0.1
     # via uvicorn
 regex==2024.5.15
     # via tiktoken
-requests==2.32.2
+requests==2.32.3
     # via
     #   azure-core
     #   msal
