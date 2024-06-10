@@ -1,17 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { Panel, DefaultButton, TextField, SpinButton, Slider, Checkbox } from "@fluentui/react";
 import { SparkleFilled } from "@fluentui/react-icons";
+import { AIChatMessage, AIChatProtocolClient } from "@microsoft/ai-chat-protocol";
 
 import styles from "./Chat.module.css";
 
-import {
-    chatApi,
-    RetrievalMode,
-    ChatAppResponse,
-    ChatAppResponseOrError,
-    ChatAppRequest,
-    ResponseMessage
-} from "../../api";
+import {RetrievalMode, RAGChatCompletion} from "../../api";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -33,15 +27,13 @@ const Chat = () => {
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isStreaming, setIsStreaming] = useState<boolean>(false);
     const [error, setError] = useState<unknown>();
 
     const [activeCitation, setActiveCitation] = useState<string>();
     const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
 
     const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
-    const [answers, setAnswers] = useState<[user: string, response: ChatAppResponse][]>([]);
-    const [streamedAnswers, setStreamedAnswers] = useState<[user: string, response: ChatAppResponse][]>([]);
+    const [answers, setAnswers] = useState<[user: string, response: RAGChatCompletion][]>([]);
 
     const makeApiRequest = async (question: string) => {
         lastQuestionRef.current = question;
@@ -52,13 +44,12 @@ const Chat = () => {
         setActiveAnalysisPanelTab(undefined);
 
         try {
-            const messages: ResponseMessage[] = answers.flatMap(a => [
-                { content: a[0], role: "user" },
-                { content: a[1].choices[0].message.content, role: "assistant" }
+            const messages: AIChatMessage[] = answers.flatMap(answer => [
+                { content: answer[0], role: "user" },
+                { content: answer[1].message.content, role: "assistant" }
             ]);
-
-            const request: ChatAppRequest = {
-                messages: [...messages, { content: question, role: "user" }],
+            const allMessages: AIChatMessage[] = [...messages, { content: question, role: "user" }];
+            const options = {
                 context: {
                     overrides: {
                         use_advanced_flow: useAdvancedFlow,
@@ -67,17 +58,11 @@ const Chat = () => {
                         prompt_template: promptTemplate.length === 0 ? undefined : promptTemplate,
                         temperature: temperature
                     }
-                },
+                }
             };
-            const response = await chatApi(request);
-            if (!response.body) {
-                throw Error("No response body");
-            }
-            const parsedResponse: ChatAppResponseOrError = await response.json();
-            if (response.status > 299 || !response.ok) {
-                throw Error(parsedResponse.error || "Unknown error");
-            }
-            setAnswers([...answers, [question, parsedResponse as ChatAppResponse]]);
+            const chatClient: AIChatProtocolClient = new AIChatProtocolClient("/chat");
+            const result = await chatClient.getCompletion(allMessages, options) as RAGChatCompletion;
+            setAnswers([...answers, [question, result]]);
         } catch (e) {
             setError(e);
         } finally {
@@ -91,13 +76,10 @@ const Chat = () => {
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
         setAnswers([]);
-        setStreamedAnswers([]);
         setIsLoading(false);
-        setIsStreaming(false);
     };
 
     useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
-    useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" }), [streamedAnswers]);
 
     const onPromptTemplateChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
         setPromptTemplate(newValue || "");
@@ -161,26 +143,7 @@ const Chat = () => {
                         </div>
                     ) : (
                         <div className={styles.chatMessageStream}>
-                            {isStreaming &&
-                                streamedAnswers.map((streamedAnswer, index) => (
-                                    <div key={index}>
-                                        <UserChatMessage message={streamedAnswer[0]} />
-                                        <div className={styles.chatMessageGpt}>
-                                            <Answer
-                                                isStreaming={true}
-                                                key={index}
-                                                answer={streamedAnswer[1]}
-                                                isSelected={false}
-                                                onCitationClicked={c => onShowCitation(c, index)}
-                                                onThoughtProcessClicked={() => onToggleTab(AnalysisPanelTabs.ThoughtProcessTab, index)}
-                                                onSupportingContentClicked={() => onToggleTab(AnalysisPanelTabs.SupportingContentTab, index)}
-                                                onFollowupQuestionClicked={q => makeApiRequest(q)}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            {!isStreaming &&
-                                answers.map((answer, index) => (
+                            {answers.map((answer, index) => (
                                     <div key={index}>
                                         <UserChatMessage message={answer[0]} />
                                         <div className={styles.chatMessageGpt}>

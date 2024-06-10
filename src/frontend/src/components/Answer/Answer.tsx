@@ -4,12 +4,12 @@ import DOMPurify from "dompurify";
 
 import styles from "./Answer.module.css";
 
-import { ChatAppResponse } from "../../api";
+import { RAGChatCompletion } from "../../api/models";
 import { parseAnswerToHtml } from "./AnswerParser";
 import { AnswerIcon } from "./AnswerIcon";
 
 interface Props {
-    answer: ChatAppResponse;
+    answer: RAGChatCompletion;
     isSelected?: boolean;
     isStreaming: boolean;
     onCitationClicked: (filePath: string) => void;
@@ -29,8 +29,8 @@ export const Answer = ({
     onFollowupQuestionClicked,
     showFollowupQuestions
 }: Props) => {
-    const followupQuestions = answer.choices[0].context.followup_questions;
-    const messageContent = answer.choices[0].message.content;
+    const followupQuestions = answer.context.followup_questions;
+    const messageContent = answer.message.content;
     const parsedAnswer = useMemo(() => parseAnswerToHtml(messageContent, isStreaming, onCitationClicked), [answer]);
 
     const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
@@ -47,15 +47,7 @@ export const Answer = ({
                             title="Show thought process"
                             ariaLabel="Show thought process"
                             onClick={() => onThoughtProcessClicked()}
-                            disabled={!answer.choices[0].context.thoughts?.length}
-                        />
-                        <IconButton
-                            style={{ color: "black" }}
-                            iconProps={{ iconName: "ClipboardList" }}
-                            title="Show supporting content"
-                            ariaLabel="Show supporting content"
-                            onClick={() => onSupportingContentClicked()}
-                            disabled={!answer.choices[0].context.data_points}
+                            disabled={!answer.context.thoughts?.length}
                         />
                     </div>
                 </Stack>
@@ -68,14 +60,21 @@ export const Answer = ({
             {!!parsedAnswer.citations.length && (
                 <Stack.Item>
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
-                        <span className={styles.citationLearnMore}>Citations:</span>
-                        {parsedAnswer.citations.map((x, i) => {
+                        <span className={styles.citationLearnMore}>References:</span>
+                        <ol>
+                        {parsedAnswer.citations.map((rowId, ind) => {
+                            const citation = answer.context.data_points[rowId];
+                            if (!citation) return null;
                             return (
-                                <a key={i} className={styles.citation} title={x}>
-                                    {`${++i}. ${x}`}
-                                </a>
+                                <li key={rowId}>
+                                    <h4>{citation.name}</h4>
+                                    <p className={styles.referenceMetadata}>Brand: {citation.brand}</p>
+                                    <p className={styles.referenceMetadata}>Price: {citation.price}</p>
+                                    <p>{citation.description}</p>
+                                </li>
                             );
                         })}
+                        </ol>
                     </Stack>
                 </Stack.Item>
             )}

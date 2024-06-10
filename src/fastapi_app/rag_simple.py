@@ -66,32 +66,34 @@ class SimpleRAGChat:
             n=1,
             stream=False,
         )
-        chat_resp = chat_completion_response.model_dump()
-        chat_resp["choices"][0]["context"] = {
-            "data_points": {"text": sources_content},
-            "thoughts": [
-                ThoughtStep(
-                    title="Search query for database",
-                    description=original_user_query if text_search else None,
-                    props={
-                        "top": top,
-                        "vector_search": vector_search,
-                        "text_search": text_search,
-                    },
-                ),
-                ThoughtStep(
-                    title="Search results",
-                    description=[result.to_dict() for result in results],
-                ),
-                ThoughtStep(
-                    title="Prompt to generate answer",
-                    description=[str(message) for message in messages],
-                    props=(
-                        {"model": self.chat_model, "deployment": self.chat_deployment}
-                        if self.chat_deployment
-                        else {"model": self.chat_model}
+        first_choice = chat_completion_response.model_dump()["choices"][0]
+        return {
+            "message": first_choice["message"],
+            "context": {
+                "data_points": {item.id: item.to_dict() for item in results},
+                "thoughts": [
+                    ThoughtStep(
+                        title="Search query for database",
+                        description=original_user_query if text_search else None,
+                        props={
+                            "top": top,
+                            "vector_search": vector_search,
+                            "text_search": text_search,
+                        },
                     ),
-                ),
-            ],
+                    ThoughtStep(
+                        title="Search results",
+                        description=[result.to_dict() for result in results],
+                    ),
+                    ThoughtStep(
+                        title="Prompt to generate answer",
+                        description=[str(message) for message in messages],
+                        props=(
+                            {"model": self.chat_model, "deployment": self.chat_deployment}
+                            if self.chat_deployment
+                            else {"model": self.chat_model}
+                        ),
+                    ),
+                ],
+            },
         }
-        return chat_resp
