@@ -177,7 +177,7 @@ tqdm==4.66.4
     # via openai
 typer==0.12.3
     # via fastapi-cli
-typing-extensions==4.12.0
+typing-extensions==4.12.2
     # via
     #   azure-core
     #   fastapi
