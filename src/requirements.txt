@@ -89,7 +89,7 @@ markdown-it-py==3.0.0
     # via rich
 markupsafe==2.1.5
     # via jinja2
-marshmallow==3.21.2
+marshmallow==3.21.3
     # via environs
 mdurl==0.1.2
     # via markdown-it-py
