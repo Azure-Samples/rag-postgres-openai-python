@@ -113,7 +113,7 @@ openai-messages-token-helper==0.1.4
     # via fastapi_app (pyproject.toml)
 orjson==3.10.3
     # via fastapi
-packaging==24.0
+packaging==24.1
     # via
     #   gunicorn
     #   marshmallow
