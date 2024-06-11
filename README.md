@@ -48,7 +48,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 1. Start Docker Desktop (install it if not already installed)
 2. Open the project:
 
-    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](placeholder)
+    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/rag-postgres-openai-python)
 
 3. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window.
 4. Continue with the [deployment steps](#deployment)
@@ -135,7 +135,17 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 
     If you opened the project in Codespaces or a Dev Container, these commands will already have been run for you.
 
-2. Run the FastAPI backend:
+2. Build the frontend:
+
+    ```bash
+    cd src/frontend
+    npm install
+    npm run build
+    ```
+
+    There must be an initial build of static assets before running the backend, since the backend serves static files from the `src/static` directory.
+
+3. Run the FastAPI backend (with hot reloading):
 
     ```shell
     python3 -m uvicorn fastapi_app:create_app --factory --reload
@@ -143,7 +153,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 
     Or you can run "Backend" in the VS Code Run & Debug menu.
 
-3. Run the frontend:
+4. Run the frontend (with hot reloading):
 
     ```bash
     cd src/frontend
@@ -152,7 +162,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 
     Or you can run "Frontend" or "Frontend & Backend" in the VS Code Run & Debug menu.
 
-4. Open the browser at `http://localhost:5173/` and you will see the frontend.
+5. Open the browser at `http://localhost:5173/` and you will see the frontend.
 
 ## Costs
 
@@ -161,6 +171,7 @@ You may try the [Azure pricing calculator](https://azure.microsoft.com/pricing/c
 
 * Azure Container Apps: Pay-as-you-go tier. Costs based on vCPU and memory used. [Pricing](https://azure.microsoft.com/pricing/details/container-apps/)
 * Azure OpenAI: Standard tier, GPT and Ada models. Pricing per 1K tokens used, and at least 1K tokens are used per question. [Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/)
+* Azure PostgreSQL Flexible Server: Burstable Tier with 1 CPU core, 32GB storage. Pricing is hourly. [Pricing](https://azure.microsoft.com/pricing/details/postgresql/flexible-server/)
 * Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
 
 ## Security Guidelines

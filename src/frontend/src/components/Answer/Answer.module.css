@@ -35,6 +35,11 @@
     outline: 2px solid rgba(115, 118, 225, 1);
 }
 
+.referenceMetadata {
+    margin-top: -16px;
+    font-style: italic;
+}
+
 .citationLearnMore {
     margin-right: 5px;
     font-weight: 600;
