@@ -52,7 +52,7 @@ async def search_handler(query: str, top: int = 5, enable_vector_search: bool = 
     return [item.to_dict() for item in results]
 
 
-@router.post("/chat/")
+@router.post("/chat")
 async def chat_handler(chat_request: ChatRequest):
     messages = [message.model_dump() for message in chat_request.messages]
     overrides = chat_request.context.get("overrides", {})
