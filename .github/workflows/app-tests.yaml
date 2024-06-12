@@ -26,7 +26,7 @@ jobs:
         - name: Install pgvector on Windows using install-pgvector.bat
           if: matrix.os == 'windows-latest'
           shell: cmd
-          run: .\install-pgvector.bat
+          run: .github\workflows\install-pgvector.bat
         - name: Setup postgres
           uses: ikalnytskyi/action-setup-postgres@v6
           with:
