@@ -5,7 +5,7 @@ description = "Create a relecloud demo application with fastapi and postgres-fle
 dependencies = [
     "fastapi",
     "gunicorn",
-    "uvicorn[standard]",
+    "uvicorn",
     "python-dotenv",
     "environs",
     "azure-identity",
