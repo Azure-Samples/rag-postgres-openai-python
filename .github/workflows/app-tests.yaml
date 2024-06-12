@@ -23,6 +23,9 @@ jobs:
         - name: Check for MacOS Runner
           if: matrix.os == 'macos-latest-xlarge'
           run: brew install postgresql@14
+        - name: Install pgvector on Windows using install-pgvector.bat
+          if: matrix.os == 'windows-latest'
+          run: .\install-pgvector.bat
         - name: Setup postgres
           uses: ikalnytskyi/action-setup-postgres@v6
           with:
