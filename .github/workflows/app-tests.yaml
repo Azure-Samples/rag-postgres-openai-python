@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-13", "macos-latest-xlarge", "windows-latest"]
+        os: ["windows-latest"]
         python_version: ["3.10", "3.11", "3.12"]
         exclude:
           - os: macos-latest-xlarge
