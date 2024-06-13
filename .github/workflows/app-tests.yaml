@@ -31,7 +31,7 @@ jobs:
           if: matrix.os == 'ubuntu-latest'
           run: |
             sudo apt update
-            sudo apt install postgresql-server-dev-16
+            sudo apt install postgresql-server-dev-14
         - name: Install pgvector on MacOS/Linux using install-pgvector.sh
           if: matrix.os != 'windows-latest'
           run: .github/workflows/install-pgvector.sh
