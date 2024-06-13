@@ -27,6 +27,9 @@ jobs:
           if: matrix.os == 'windows-latest'
           shell: cmd
           run: .github\workflows\install-pgvector.bat
+        - name: Install PostgreSQL development libraries
+          if: matrix.os == 'ubuntu-latest'
+          run: sudo apt install postgresql-server-dev-16
         - name: Install pgvector on MacOS/Linux using install-pgvector.sh
           if: matrix.os != 'windows-latest'
           run: .github/workflows/install-pgvector.sh
