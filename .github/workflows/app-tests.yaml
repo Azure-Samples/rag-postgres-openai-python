@@ -57,3 +57,12 @@ jobs:
             cp .env.sample .env
             python ./src/fastapi_app/setup_postgres_database.py
             python ./src/fastapi_app/setup_postgres_seeddata.py
+        - name: Setup node
+          uses: actions/setup-node@v4
+          with:
+            node-version: 18
+        - name: Build frontend
+          run: |
+            cd ./src/frontend
+            npm install
+            npm run build
