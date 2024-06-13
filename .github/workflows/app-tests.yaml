@@ -29,6 +29,7 @@ jobs:
           run: .github\workflows\install-pgvector.bat
         - name: Install pgvector on MacOS/Linux using install-pgvector.sh
           if: matrix.os != 'windows-latest'
+          shell: bash
           run: .github/workflows/install-pgvector.sh
         - name: Setup postgres
           uses: ikalnytskyi/action-setup-postgres@v6
