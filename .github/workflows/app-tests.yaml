@@ -32,15 +32,15 @@ jobs:
           run: |
             sudo apt update
             sudo apt install postgresql-server-dev-14
-        - name: Install pgvector on MacOS/Linux using install-pgvector.sh
-          if: matrix.os != 'windows-latest'
-          run: .github/workflows/install-pgvector.sh
         - name: Setup postgres
           uses: ikalnytskyi/action-setup-postgres@v6
           with:
             username: admin
             password: postgres
             database: postgres
+        - name: Install pgvector on MacOS/Linux using install-pgvector.sh
+          if: matrix.os != 'windows-latest'
+          run: .github/workflows/install-pgvector.sh
         - name: Setup python
           uses: actions/setup-python@v5
           with:
