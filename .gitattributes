@@ -1,0 +1,2 @@
+*.sh text eol=lf
+*.jsonlines text eol=lf

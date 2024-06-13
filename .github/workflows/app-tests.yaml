@@ -13,20 +13,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-20.04"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest-xlarge", "macos-13"]
         python_version: ["3.10", "3.11", "3.12"]
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: postgres
-        ports:
-        - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        exclude:
+          - os: macos-latest-xlarge
+            python_version: "3.10"
     steps:
         - uses: actions/checkout@v4
+        - name: Check for MacOS Runner
+          if: matrix.os == 'macos-latest-xlarge'
+          run: brew install postgresql@14
+        - name: Install pgvector on Windows using install-pgvector.bat
+          if: matrix.os == 'windows-latest'
+          shell: cmd
+          run: .github\workflows\install-pgvector.bat
+        - name: Install PostgreSQL development libraries
+          if: matrix.os == 'ubuntu-latest'
+          run: |
+            sudo apt update
+            sudo apt install postgresql-server-dev-14
+        - name: Setup postgres
+          uses: ikalnytskyi/action-setup-postgres@v6
+          with:
+            username: admin
+            password: postgres
+            database: postgres
+        - name: Install pgvector on MacOS/Linux using install-pgvector.sh
+          if: matrix.os != 'windows-latest'
+          run: .github/workflows/install-pgvector.sh
         - name: Setup python
           uses: actions/setup-python@v5
           with:
@@ -43,3 +57,12 @@ jobs:
             cp .env.sample .env
             python ./src/fastapi_app/setup_postgres_database.py
             python ./src/fastapi_app/setup_postgres_seeddata.py
+        - name: Setup node
+          uses: actions/setup-node@v4
+          with:
+            node-version: 18
+        - name: Build frontend
+          run: |
+            cd ./src/frontend
+            npm install
+            npm run build
