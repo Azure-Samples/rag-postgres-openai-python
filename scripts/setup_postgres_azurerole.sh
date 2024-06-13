@@ -7,4 +7,6 @@ if [ -z "$POSTGRES_HOST" ] || [ -z "$POSTGRES_USERNAME" ] || [ -z "$APP_IDENTITY
     exit 1
 fi
 
-python ./src/fastapi_app/setup_postgres_azurerole.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --app-identity-name $APP_IDENTITY_NAME
+. ./scripts/load_python_env.sh
+
+.venv/bin/python ./src/fastapi_app/setup_postgres_azurerole.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --app-identity-name $APP_IDENTITY_NAME
