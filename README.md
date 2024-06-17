@@ -130,7 +130,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     ```bash
     python3 -m pip install -e src
     python ./src/fastapi_app/setup_postgres_database.py
-    python ./src/fastapi_app/setup_postgres_seeddata.p
+    python ./src/fastapi_app/setup_postgres_seeddata.py
     ```
 
     If you opened the project in Codespaces or a Dev Container, these commands will already have been run for you.
