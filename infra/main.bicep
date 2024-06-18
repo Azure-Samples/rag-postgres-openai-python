@@ -242,7 +242,7 @@ module web 'web.bicep' = {
       }
     ]
     secrets: {
-      'azure-openai-key': azureOpenAIKey
+      'azure-openai-key': empty(azureOpenAIKey) ? 'no-key-provided' : azureOpenAIKey
     }
   }
 }
