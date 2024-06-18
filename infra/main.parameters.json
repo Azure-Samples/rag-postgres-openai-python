@@ -20,6 +20,12 @@
       "deployAzureOpenAI": {
         "value": "${DEPLOY_AZURE_OPENAI=true}"
       },
+      "azureOpenAIKey": {
+        "value": "${AZURE_OPENAI_KEY}"
+      },
+      "azureOpenAIEndpoint": {
+        "value": "${AZURE_OPENAI_ENDPOINT}"
+      },
       "chatModelName":{
         "value": "${AZURE_OPENAI_CHAT_MODEL}"
       },
