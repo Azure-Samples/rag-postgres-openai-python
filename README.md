@@ -145,7 +145,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 
     There must be an initial build of static assets before running the backend, since the backend serves static files from the `src/static` directory.
 
-3. Run the FastAPI backend (with hot reloading):
+3. Run the FastAPI backend (with hot reloading). This should be run from the root of the project:
 
     ```shell
     python3 -m uvicorn fastapi_app:create_app --factory --reload
