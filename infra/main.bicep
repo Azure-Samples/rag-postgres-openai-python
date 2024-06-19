@@ -152,6 +152,91 @@ module containerApps 'core/host/container-apps.bicep' = {
 // Web frontend
 var webAppName = replace('${take(prefix, 19)}-ca', '--', '-')
 var webAppIdentityName = '${prefix}-id-web'
+var webAppEnv = [
+  {
+    name: 'POSTGRES_HOST'
+    value: postgresServer.outputs.POSTGRES_DOMAIN_NAME
+  }
+  {
+    name: 'POSTGRES_USERNAME'
+    value: webAppIdentityName
+  }
+  {
+    name: 'POSTGRES_DATABASE'
+    value: postgresDatabaseName
+  }
+  {
+    name: 'POSTGRES_SSL'
+    value: 'require'
+  }
+  {
+    name: 'RUNNING_IN_PRODUCTION'
+    value: 'true'
+  }
+  {
+    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+    value: monitoring.outputs.applicationInsightsConnectionString
+  }
+  {
+    name: 'OPENAI_CHAT_HOST'
+    value: useAzureOpenAI ? 'azure' : 'openaicom'
+  }
+  {
+    name: 'AZURE_OPENAI_CHAT_DEPLOYMENT'
+    value: useAzureOpenAI ? chatConfig.deploymentName : ''
+  }
+  {
+    name: 'AZURE_OPENAI_CHAT_MODEL'
+    value: useAzureOpenAI ? chatConfig.modelName : ''
+  }
+  {
+    name: 'OPENAICOM_CHAT_MODEL'
+    value: useAzureOpenAI ? '' : 'gpt-3.5-turbo'
+  }
+  {
+    name: 'OPENAI_EMBED_HOST'
+    value: useAzureOpenAI ? 'azure' : 'openaicom'
+  }
+  {
+    name: 'OPENAICOM_EMBED_MODEL_DIMENSIONS'
+    value: useAzureOpenAI ? '' : '1536'
+  }
+  {
+    name: 'OPENAICOM_EMBED_MODEL'
+    value: useAzureOpenAI ? '' : 'text-embedding-ada-002'
+  }
+  {
+    name: 'AZURE_OPENAI_EMBED_MODEL'
+    value: useAzureOpenAI ? embedConfig.modelName : ''
+  }
+  {
+    name: 'AZURE_OPENAI_EMBED_DEPLOYMENT'
+    value: useAzureOpenAI ? embedConfig.deploymentName : ''
+  }
+  {
+    name: 'AZURE_OPENAI_EMBED_MODEL_DIMENSIONS'
+    value: useAzureOpenAI ? string(embedConfig.dimensions) : ''
+  }
+  {
+    name: 'AZURE_OPENAI_ENDPOINT'
+    value: useAzureOpenAI ? (deployAzureOpenAI ? openAI.outputs.endpoint : azureOpenAIEndpoint) : ''
+  }
+  {
+    name: 'AZURE_OPENAI_VERSION'
+    value: useAzureOpenAI ? azureOpenAIAPIVersion : ''
+  }
+]
+var webAppEnvWithSecret = !empty(azureOpenAIKey) ? union(webAppEnv, [
+  {
+    name: 'AZURE_OPENAI_KEY'
+    secretRef: 'azure-openai-key'
+  }
+]) : webAppEnv
+
+var secrets = !empty(azureOpenAIKey) ? {
+  'azure-openai-key': azureOpenAIKey
+} : {}
+
 module web 'web.bicep' = {
   name: 'web'
   scope: resourceGroup
@@ -163,87 +248,8 @@ module web 'web.bicep' = {
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
     exists: webAppExists
-    environmentVariables: [
-      {
-        name: 'POSTGRES_HOST'
-        value: postgresServer.outputs.POSTGRES_DOMAIN_NAME
-      }
-      {
-        name: 'POSTGRES_USERNAME'
-        value: webAppIdentityName
-      }
-      {
-        name: 'POSTGRES_DATABASE'
-        value: postgresDatabaseName
-      }
-      {
-        name: 'POSTGRES_SSL'
-        value: 'require'
-      }
-      {
-        name: 'RUNNING_IN_PRODUCTION'
-        value: 'true'
-      }
-      {
-        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-        value: monitoring.outputs.applicationInsightsConnectionString
-      }
-      {
-        name: 'OPENAI_CHAT_HOST'
-        value: useAzureOpenAI ? 'azure' : 'openaicom'
-      }
-      {
-        name: 'AZURE_OPENAI_CHAT_DEPLOYMENT'
-        value: useAzureOpenAI ? chatConfig.deploymentName : ''
-      }
-      {
-        name: 'AZURE_OPENAI_CHAT_MODEL'
-        value: useAzureOpenAI ? chatConfig.modelName : ''
-      }
-      {
-        name: 'OPENAICOM_CHAT_MODEL'
-        value: useAzureOpenAI ? '' : 'gpt-3.5-turbo'
-      }
-      {
-        name: 'OPENAI_EMBED_HOST'
-        value: useAzureOpenAI ? 'azure' : 'openaicom'
-      }
-      {
-        name: 'OPENAICOM_EMBED_MODEL_DIMENSIONS'
-        value: useAzureOpenAI ? '' : '1536'
-      }
-      {
-        name: 'OPENAICOM_EMBED_MODEL'
-        value: useAzureOpenAI ? '' : 'text-embedding-ada-002'
-      }
-      {
-        name: 'AZURE_OPENAI_EMBED_MODEL'
-        value: useAzureOpenAI ? embedConfig.modelName : ''
-      }
-      {
-        name: 'AZURE_OPENAI_EMBED_DEPLOYMENT'
-        value: useAzureOpenAI ? embedConfig.deploymentName : ''
-      }
-      {
-        name: 'AZURE_OPENAI_EMBED_MODEL_DIMENSIONS'
-        value: useAzureOpenAI ? string(embedConfig.dimensions) : ''
-      }
-      {
-        name: 'AZURE_OPENAI_ENDPOINT'
-        value: useAzureOpenAI ? (deployAzureOpenAI ? openAI.outputs.endpoint : azureOpenAIEndpoint) : ''
-      }
-      {
-        name: 'AZURE_OPENAI_VERSION'
-        value: useAzureOpenAI ? azureOpenAIAPIVersion : ''
-      }
-      {
-        name: 'AZURE_OPENAI_KEY'
-        secretRef: 'azure-openai-key'
-      }
-    ]
-    secrets: {
-      'azure-openai-key': empty(azureOpenAIKey) ? 'no-key-provided' : azureOpenAIKey
-    }
+    environmentVariables: webAppEnvWithSecret
+    secrets: secrets
   }
 }
 
