@@ -6,6 +6,7 @@ import azure.identity
 from dotenv import load_dotenv
 from environs import Env
 from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from .globals import global_storage
 from .openai_clients import create_openai_chat_client, create_openai_embed_client
@@ -62,6 +63,9 @@ def create_app():
         logging.basicConfig(level=logging.WARNING)
 
     app = FastAPI(docs_url="/docs", lifespan=lifespan)
+
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+        FastAPIInstrumentor.instrument_app(app)
 
     from . import api_routes  # noqa
     from . import frontend_routes  # noqa
