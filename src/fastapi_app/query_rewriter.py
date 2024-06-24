@@ -18,7 +18,7 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                     "properties": {
                         "search_query": {
                             "type": "string",
-                            "description": "Query string to use for full text search, e.g. 'red shoes'.",
+                            "description": "Query string to use for full text search, e.g. 'red shoes'",
                         },
                         "price_filter": {
                             "type": "object",
