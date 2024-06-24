@@ -133,8 +133,6 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     python ./src/fastapi_app/setup_postgres_seeddata.py
     ```
 
-    If you opened the project in Codespaces or a Dev Container, these commands will already have been run for you.
-
 2. Build the frontend:
 
     ```bash

@@ -54,7 +54,7 @@
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip install -r requirements-dev.txt && pip install -e src && cp .env.sample .env && python ./src/fastapi_app/setup_postgres_database.py && python ./src/fastapi_app/setup_postgres_seeddata.py",
+	"postCreateCommand": "pip install -r requirements-dev.txt && pip install -e src",
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }
