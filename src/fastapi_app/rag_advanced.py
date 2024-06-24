@@ -65,7 +65,7 @@ class AdvancedRAGChat:
             tool_choice="auto",
         )
 
-        query_text, filters = extract_search_arguments(chat_completion)
+        query_text, filters = extract_search_arguments(original_user_query, chat_completion)
 
         # Retrieve relevant items from the database with the GPT optimized query
         results = await self.searcher.search_and_embed(
