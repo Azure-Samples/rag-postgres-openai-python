@@ -139,7 +139,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     cd src/frontend
     npm install
     npm run build
-    cd ..
+    cd ../..
     ```
 
     There must be an initial build of static assets before running the backend, since the backend serves static files from the `src/static` directory.
