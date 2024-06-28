@@ -103,7 +103,7 @@ class PostgresSearcher:
 
     async def search_and_embed(
         self,
-        query_text: str,
+        query_text: str | None = None,
         top: int = 5,
         enable_vector_search: bool = False,
         enable_text_search: bool = False,
