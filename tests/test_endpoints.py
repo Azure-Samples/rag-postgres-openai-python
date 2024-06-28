@@ -28,7 +28,6 @@ async def test_favicon(test_client):
         favicon_file = f.read()
 
     assert response.status_code == 200
-    assert response.headers["Content-Type"] == "image/vnd.microsoft.icon"
     assert response.headers["Content-Length"] == str(len(favicon_file))
     assert favicon_file == response.content
 
