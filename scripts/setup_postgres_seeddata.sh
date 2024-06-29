@@ -4,4 +4,4 @@ POSTGRES_DATABASE=$(azd env get-values | grep POSTGRES_DATABASE | sed 's/="/=/' 
 
 . ./scripts/load_python_env.sh
 
-.venv/bin/python ./src/fastapi_app/setup_postgres_seeddata.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --database $POSTGRES_DATABASE
+.venv/bin/python ./src/backend/fastapi_app/setup_postgres_seeddata.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --database $POSTGRES_DATABASE

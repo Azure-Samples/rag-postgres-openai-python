@@ -4,7 +4,7 @@ metadata:
     template: rag-postgres-openai-python@0.0.1
 services:
     web:
-        project: ./src
+        project: ./src/backend
         language: py
         module: web
         host: containerapp

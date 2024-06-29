@@ -7,4 +7,4 @@ if ([string]::IsNullOrEmpty($POSTGRES_HOST) -or [string]::IsNullOrEmpty($POSTGRE
     exit 1
 }
 
-python ./src/fastapi_app/setup_postgres_seeddata.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --password $POSTGRES_PASSWORD
+python ./src/backend/fastapi_app/setup_postgres_seeddata.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --password $POSTGRES_PASSWORD
