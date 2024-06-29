@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any
 
 from pydantic import BaseModel
@@ -20,15 +19,13 @@ class ThoughtStep(BaseModel):
     props: dict = {}
 
 
-@dataclass
-class RAGContext:
+class RAGContext(BaseModel):
     data_points: dict[int, dict[str, Any]]
     thoughts: list[ThoughtStep]
     followup_questions: list[str] | None = None
 
 
-@dataclass
-class RetrievalResponse:
+class RetrievalResponse(BaseModel):
     message: Message
     context: RAGContext
     session_state: Any | None = None

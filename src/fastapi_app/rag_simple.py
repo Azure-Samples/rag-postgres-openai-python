@@ -8,7 +8,7 @@ from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletion, ChatCompletionMessageParam
 from openai_messages_token_helper import build_messages, get_token_limit
 
-from .api_models import RAGContext, RetrievalResponse, ThoughtStep
+from .api_models import Message, RAGContext, RetrievalResponse, ThoughtStep
 from .postgres_searcher import PostgresSearcher
 
 
@@ -69,7 +69,7 @@ class SimpleRAGChat:
         )
         first_choice = chat_completion_response.choices[0]
         return RetrievalResponse(
-            message=first_choice.message,
+            message=Message(content=first_choice.message.content, role=first_choice.message.role),
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
                 thoughts=[
