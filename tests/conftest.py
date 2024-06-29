@@ -31,6 +31,12 @@ def setup_database():
         pytest.skip(f"Unable to connect to the database: {e}")
 
 
+@pytest.fixture(scope="session")
+def app():
+    """Create a FastAPI app."""
+    return create_app()
+
+
 @pytest.fixture(scope="function")
 def db_session(setup_database):
     """Create a new database session with a rollback at the end of the test."""
@@ -44,7 +50,7 @@ def db_session(setup_database):
 
 
 @pytest.fixture(scope="function")
-def test_db_client(db_session):
+def test_db_client(app, db_session):
     """Create a test client that uses the override_get_db fixture to return a session."""
 
     def override_db_session():
@@ -53,15 +59,13 @@ def test_db_client(db_session):
         finally:
             db_session.close()
 
-    app = create_app()
     app.router.lifespan = override_db_session
     with TestClient(app) as test_client:
         yield test_client
 
 
-@pytest.fixture(scope="function")
-def test_client():
+@pytest.fixture(scope="session")
+def test_client(app):
     """Create a test client."""
-    app = create_app()
     with TestClient(app) as test_client:
         yield test_client
