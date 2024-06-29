@@ -1,4 +1,4 @@
--r src/requirements.txt
+-r src/backend/requirements.txt
 ruff
 pre-commit
 pip-tools
