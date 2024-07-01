@@ -52,11 +52,12 @@ async def lifespan(app: FastAPI):
     await engine.dispose()
 
 
-def create_app():
+def create_app(is_testing: bool = False):
     env = Env()
 
     if not os.getenv("RUNNING_IN_PRODUCTION"):
-        env.read_env(".env")
+        if not is_testing:
+            env.read_env(".env")
         logging.basicConfig(level=logging.INFO)
     else:
         logging.basicConfig(level=logging.WARNING)

@@ -1,71 +1,65 @@
+import os
+from pathlib import Path
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from fastapi_app import create_app
-from fastapi_app.postgres_models import Base
+from fastapi_app.globals import global_storage
 
-POSTGRESQL_DATABASE_URL = "postgresql://admin:postgres@localhost:5432/postgres"
-
-
-# Create a SQLAlchemy engine
-engine = create_engine(
-    POSTGRESQL_DATABASE_URL,
-    poolclass=StaticPool,
+POSTGRES_HOST = "localhost"
+POSTGRES_USERNAME = "admin"
+POSTGRES_DATABASE = "postgres"
+POSTGRES_PASSWORD = "postgres"
+POSTGRES_SSL = "prefer"
+POSTGRESQL_DATABASE_URL = (
+    f"postgresql+asyncpg://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{POSTGRES_DATABASE}"
 )
 
-# Create a sessionmaker to manage sessions
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@pytest.fixture(scope="session")
+def setup_env():
+    os.environ["POSTGRES_HOST"] = POSTGRES_HOST
+    os.environ["POSTGRES_USERNAME"] = POSTGRES_USERNAME
+    os.environ["POSTGRES_DATABASE"] = POSTGRES_DATABASE
+    os.environ["POSTGRES_PASSWORD"] = POSTGRES_PASSWORD
+    os.environ["POSTGRES_SSL"] = POSTGRES_SSL
+    os.environ["POSTGRESQL_DATABASE_URL"] = POSTGRESQL_DATABASE_URL
+    os.environ["RUNNING_IN_PRODUCTION"] = "False"
+    os.environ["OPENAI_API_KEY"] = "fakekey"
 
 
 @pytest.fixture(scope="session")
-def setup_database():
-    """Create tables in the database for all tests."""
-    try:
-        Base.metadata.create_all(bind=engine)
+def mock_azure_credential():
+    """Mock the Azure credential for testing."""
+    with patch("azure.identity.DefaultAzureCredential", return_value=None):
         yield
-        Base.metadata.drop_all(bind=engine)
-    except Exception as e:
-        pytest.skip(f"Unable to connect to the database: {e}")
 
 
 @pytest.fixture(scope="session")
-def app():
+def app(setup_env, mock_azure_credential):
     """Create a FastAPI app."""
-    return create_app()
+    if not Path("src/static/").exists():
+        pytest.skip("Please generate frontend files first!")
+    return create_app(is_testing=True)
 
 
 @pytest.fixture(scope="function")
-def db_session(setup_database):
-    """Create a new database session with a rollback at the end of the test."""
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-    yield session
-    session.close()
-    transaction.rollback()
-    connection.close()
-
-
-@pytest.fixture(scope="function")
-def test_db_client(app, db_session):
-    """Create a test client that uses the override_get_db fixture to return a session."""
-
-    def override_db_session():
-        try:
-            yield db_session
-        finally:
-            db_session.close()
-
-    app.router.lifespan = override_db_session
-    with TestClient(app) as test_client:
-        yield test_client
-
-
-@pytest.fixture(scope="session")
 def test_client(app):
     """Create a test client."""
+
     with TestClient(app) as test_client:
         yield test_client
+
+
+@pytest.fixture(scope="function")
+def db_session():
+    """Create a new database session with a rollback at the end of the test."""
+    async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=global_storage.engine)
+    session = async_sesion()
+    session.begin()
+    yield session
+    session.rollback()
+    session.close()
