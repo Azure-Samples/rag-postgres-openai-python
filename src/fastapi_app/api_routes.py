@@ -9,6 +9,8 @@ from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.rag_advanced import AdvancedRAGChat
 from fastapi_app.rag_simple import SimpleRAGChat
 
+from .api_models import RetrievalResponse
+
 router = fastapi.APIRouter()
 
 
@@ -52,7 +54,7 @@ async def search_handler(query: str, top: int = 5, enable_vector_search: bool = 
     return [item.to_dict() for item in results]
 
 
-@router.post("/chat")
+@router.post("/chat", response_model=RetrievalResponse)
 async def chat_handler(chat_request: ChatRequest):
     messages = [message.model_dump() for message in chat_request.messages]
     overrides = chat_request.context.get("overrides", {})
@@ -79,5 +81,5 @@ async def chat_handler(chat_request: ChatRequest):
             chat_deployment=global_storage.openai_chat_deployment,
         )
 
-    response = await ragchat.run(messages, overrides=overrides)
+    response: RetrievalResponse = await ragchat.run(messages, overrides=overrides)
     return response

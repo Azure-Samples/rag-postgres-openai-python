@@ -5,9 +5,13 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  test_package:
+  test-package:
     name: Test ${{ matrix.os }} Python ${{ matrix.python_version }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -66,3 +70,5 @@ jobs:
             cd ./src/frontend
             npm install
             npm run build
+        - name: Run Pytest
+          run: python3 -m pytest

@@ -17,3 +17,15 @@ class ThoughtStep(BaseModel):
     title: str
     description: Any
     props: dict = {}
+
+
+class RAGContext(BaseModel):
+    data_points: dict[int, dict[str, Any]]
+    thoughts: list[ThoughtStep]
+    followup_questions: list[str] | None = None
+
+
+class RetrievalResponse(BaseModel):
+    message: Message
+    context: RAGContext
+    session_state: Any | None = None
