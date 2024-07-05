@@ -18,7 +18,7 @@ logger = logging.getLogger("ragapp")
 async def lifespan(app: FastAPI):
     load_dotenv(override=True)
 
-    azure_credential = None
+    azure_credential: azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential | None = None
     try:
         if client_id := os.getenv("APP_IDENTITY_ID"):
             # Authenticate using a user-assigned managed identity on Azure

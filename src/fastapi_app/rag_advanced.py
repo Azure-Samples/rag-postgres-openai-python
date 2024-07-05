@@ -97,9 +97,10 @@ class AdvancedRAGChat:
             n=1,
             stream=False,
         )
-        first_choice = chat_completion_response.choices[0]
+        first_choice_message = chat_completion_response.choices[0].message
+
         return RetrievalResponse(
-            message=Message(content=first_choice.message.content, role=first_choice.message.role),
+            message=Message(content=str(first_choice_message.content), role=first_choice_message.role),
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
                 thoughts=[

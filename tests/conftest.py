@@ -93,8 +93,8 @@ async def db_session():
     engine = await create_postgres_engine_from_env()
     async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = async_sesion()
-    session.begin()
+    await session.begin()
     yield session
-    session.rollback()
-    session.close()
+    await session.rollback()
+    await session.close()
     await engine.dispose()

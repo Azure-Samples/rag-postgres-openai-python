@@ -1,4 +1,5 @@
 import fastapi
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -20,6 +21,8 @@ async def item_handler(id: int):
     async_session_maker = async_sessionmaker(global_storage.engine, expire_on_commit=False)
     async with async_session_maker() as session:
         item = (await session.scalars(select(Item).where(Item.id == id))).first()
+        if not item:
+            raise HTTPException(detail=f"Item with ID {id} not found.", status_code=404)
         return item.to_dict()
 
 
@@ -29,6 +32,8 @@ async def similar_handler(id: int, n: int = 5):
     async_session_maker = async_sessionmaker(global_storage.engine, expire_on_commit=False)
     async with async_session_maker() as session:
         item = (await session.scalars(select(Item).where(Item.id == id))).first()
+        if not item:
+            raise HTTPException(detail=f"Item with ID {id} not found.", status_code=404)
         closest = await session.execute(
             select(Item, Item.embedding.l2_distance(item.embedding))
             .filter(Item.id != id)
