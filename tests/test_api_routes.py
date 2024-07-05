@@ -80,6 +80,34 @@ async def test_similar_handler_404(test_client):
 
 
 @pytest.mark.asyncio
+async def test_search_handler(test_client):
+    """test the search_handler route"""
+    response = test_client.get(f"/search?query={test_data.name}&top=1")
+    response_data = response.json()[0]
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/json"
+    assert response.headers["Content-Length"] == "407"
+    assert response_data["id"] == test_data.id
+    assert response_data["name"] == test_data.name
+    assert response_data["description"] == test_data.description
+    assert response_data["price"] == test_data.price
+    assert response_data["type"] == test_data.type
+    assert response_data["brand"] == test_data.brand
+
+
+@pytest.mark.asyncio
+async def test_search_handler_422(test_client):
+    """test the search_handler route with missing query parameters"""
+    response = test_client.get("/search")
+
+    assert response.status_code == 422
+    assert response.headers["Content-Type"] == "application/json"
+    assert response.headers["Content-Length"] == "91"
+    assert b'{"detail":[{"type":"missing","loc":["query","query"]' in response.content
+
+
+@pytest.mark.asyncio
 async def test_chat_non_json_415(test_client):
     """test the chat route with a non-json request"""
     response = test_client.post("/chat")

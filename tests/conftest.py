@@ -2,15 +2,20 @@ import os
 from pathlib import Path
 from unittest import mock
 
+import openai
+import openai.resources
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
+from openai.types import CreateEmbeddingResponse, Embedding
+from openai.types.create_embedding_response import Usage
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from fastapi_app import create_app
 from fastapi_app.postgres_engine import create_postgres_engine_from_env
 from fastapi_app.setup_postgres_database import create_db_schema
 from fastapi_app.setup_postgres_seeddata import seed_data
+from tests.data import test_data
 from tests.mocks import MockAzureCredential
 
 POSTGRES_HOST = "localhost"
@@ -80,9 +85,32 @@ def mock_default_azure_credential(mock_session_env):
         yield mock_default_azure_credential
 
 
+@pytest.fixture(autouse=True)
+def mock_openai_embedding(monkeypatch):
+    async def mock_acreate(*args, **kwargs):
+        return CreateEmbeddingResponse(
+            object="list",
+            data=[
+                Embedding(
+                    embedding=test_data.embeddings,
+                    index=0,
+                    object="embedding",
+                )
+            ],
+            model="text-embedding-ada-002",
+            usage=Usage(prompt_tokens=8, total_tokens=8),
+        )
+
+    def patch():
+        monkeypatch.setattr(openai.resources.AsyncEmbeddings, "create", mock_acreate)
+
+    return patch
+
+
 @pytest_asyncio.fixture(scope="function")
-async def test_client(monkeypatch, app, mock_default_azure_credential):
+async def test_client(monkeypatch, app, mock_default_azure_credential, mock_openai_embedding):
     """Create a test client."""
+    mock_openai_embedding()
     with TestClient(app) as test_client:
         yield test_client
 
