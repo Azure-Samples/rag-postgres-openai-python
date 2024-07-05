@@ -3,11 +3,14 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from fastapi_app import create_app
-from fastapi_app.globals import global_storage
+from fastapi_app.postgres_engine import create_postgres_engine_from_env
+from fastapi_app.setup_postgres_database import create_db_schema
+from fastapi_app.setup_postgres_seeddata import seed_data
 from tests.mocks import MockAzureCredential
 
 POSTGRES_HOST = "localhost"
@@ -51,12 +54,22 @@ def mock_session_env(monkeypatch_session):
         yield
 
 
-@pytest.fixture(scope="session")
-def app(mock_session_env):
+async def create_and_seed_db():
+    """Create and seed the database."""
+    engine = await create_postgres_engine_from_env()
+    await create_db_schema(engine)
+    await seed_data(engine)
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture(scope="session")
+async def app(mock_session_env):
     """Create a FastAPI app."""
     if not Path("src/static/").exists():
         pytest.skip("Please generate frontend files first!")
-    return create_app(testing=True)
+    app = create_app(testing=True)
+    await create_and_seed_db()
+    return app
 
 
 @pytest.fixture(scope="function")
@@ -67,20 +80,21 @@ def mock_default_azure_credential(mock_session_env):
         yield mock_default_azure_credential
 
 
-@pytest.fixture(scope="function")
-def test_client(monkeypatch, app, mock_default_azure_credential):
+@pytest_asyncio.fixture(scope="function")
+async def test_client(monkeypatch, app, mock_default_azure_credential):
     """Create a test client."""
-
     with TestClient(app) as test_client:
         yield test_client
 
 
-@pytest.fixture(scope="function")
-def db_session():
+@pytest_asyncio.fixture(scope="function")
+async def db_session():
     """Create a new database session with a rollback at the end of the test."""
-    async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=global_storage.engine)
+    engine = await create_postgres_engine_from_env()
+    async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = async_sesion()
     session.begin()
     yield session
     session.rollback()
     session.close()
+    await engine.dispose()
