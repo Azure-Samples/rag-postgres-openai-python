@@ -8,6 +8,11 @@ import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from openai.types import CreateEmbeddingResponse, Embedding
+from openai.types.chat import ChatCompletion, ChatCompletionChunk
+from openai.types.chat.chat_completion import (
+    ChatCompletionMessage,
+    Choice,
+)
 from openai.types.create_embedding_response import Usage
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -107,10 +112,122 @@ def mock_openai_embedding(monkeypatch):
     return patch
 
 
+@pytest.fixture
+def mock_openai_chatcompletion(monkeypatch):
+    class AsyncChatCompletionIterator:
+        def __init__(self, answer: str):
+            chunk_id = "test-id"
+            model = "gpt-35-turbo"
+            self.responses = [
+                {"object": "chat.completion.chunk", "choices": [], "id": chunk_id, "model": model, "created": 1},
+                {
+                    "object": "chat.completion.chunk",
+                    "choices": [{"delta": {"role": "assistant"}, "index": 0, "finish_reason": None}],
+                    "id": chunk_id,
+                    "model": model,
+                    "created": 1,
+                },
+            ]
+            # Split at << to simulate chunked responses
+            if answer.find("<<") > -1:
+                parts = answer.split("<<")
+                self.responses.append(
+                    {
+                        "object": "chat.completion.chunk",
+                        "choices": [
+                            {
+                                "delta": {"role": "assistant", "content": parts[0] + "<<"},
+                                "index": 0,
+                                "finish_reason": None,
+                            }
+                        ],
+                        "id": chunk_id,
+                        "model": model,
+                        "created": 1,
+                    }
+                )
+                self.responses.append(
+                    {
+                        "object": "chat.completion.chunk",
+                        "choices": [
+                            {"delta": {"role": "assistant", "content": parts[1]}, "index": 0, "finish_reason": None}
+                        ],
+                        "id": chunk_id,
+                        "model": model,
+                        "created": 1,
+                    }
+                )
+                self.responses.append(
+                    {
+                        "object": "chat.completion.chunk",
+                        "choices": [{"delta": {"role": None, "content": None}, "index": 0, "finish_reason": "stop"}],
+                        "id": chunk_id,
+                        "model": model,
+                        "created": 1,
+                    }
+                )
+            else:
+                self.responses.append(
+                    {
+                        "object": "chat.completion.chunk",
+                        "choices": [{"delta": {"content": answer}, "index": 0, "finish_reason": None}],
+                        "id": chunk_id,
+                        "model": model,
+                        "created": 1,
+                    }
+                )
+
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            if self.responses:
+                return ChatCompletionChunk.model_validate(self.responses.pop(0))
+            else:
+                raise StopAsyncIteration
+
+    async def mock_acreate(*args, **kwargs):
+        messages = kwargs["messages"]
+        last_question = messages[-1]["content"]
+        if last_question == "Generate search query for: What is the capital of France?":
+            answer = "capital of France"
+        elif last_question == "Generate search query for: Are interest rates high?":
+            answer = "interest rates"
+        elif isinstance(last_question, list) and last_question[2].get("image_url"):
+            answer = "From the provided sources, the impact of interest rates and GDP growth on "
+            "financial markets can be observed through the line graph. [Financial Market Analysis Report 2023-7.png]"
+        else:
+            answer = "The capital of France is Paris. [Benefit_Options-2.pdf]."
+            if messages[0]["content"].find("Generate 3 very brief follow-up questions") > -1:
+                answer = "The capital of France is Paris. [Benefit_Options-2.pdf]. <<What is the capital of Spain?>>"
+        if "stream" in kwargs and kwargs["stream"] is True:
+            return AsyncChatCompletionIterator(answer)
+        else:
+            return ChatCompletion(
+                object="chat.completion",
+                choices=[
+                    Choice(
+                        message=ChatCompletionMessage(role="assistant", content=answer), finish_reason="stop", index=0
+                    )
+                ],
+                id="test-123",
+                created=0,
+                model="test-model",
+            )
+
+    def patch():
+        monkeypatch.setattr(openai.resources.chat.completions.AsyncCompletions, "create", mock_acreate)
+
+    return patch
+
+
 @pytest_asyncio.fixture(scope="function")
-async def test_client(monkeypatch, app, mock_default_azure_credential, mock_openai_embedding):
+async def test_client(
+    monkeypatch, app, mock_default_azure_credential, mock_openai_embedding, mock_openai_chatcompletion
+):
     """Create a test client."""
     mock_openai_embedding()
+    mock_openai_chatcompletion()
     with TestClient(app) as test_client:
         yield test_client
 

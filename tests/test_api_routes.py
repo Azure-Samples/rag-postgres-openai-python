@@ -108,7 +108,291 @@ async def test_search_handler_422(test_client):
 
 
 @pytest.mark.asyncio
-async def test_chat_non_json_415(test_client):
+async def test_simple_chat_flow(test_client):
+    """test the simple chat flow route with hybrid retrieval mode"""
+    response = test_client.post(
+        "/chat",
+        json={
+            "context": {
+                "overrides": {"top": 1, "use_advanced_flow": False, "retrieval_mode": "hybrid", "temperature": 0.3}
+            },
+            "messages": [{"content": "What is the capital of France?", "role": "user"}],
+        },
+    )
+    response_data = response.json()
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/json"
+    assert response_data["message"]["content"] == "The capital of France is Paris. [Benefit_Options-2.pdf]."
+    assert response_data["message"]["role"] == "assistant"
+    assert response_data["context"]["data_points"] == {
+        "1": {
+            "id": 1,
+            "name": "Wanderer Black Hiking Boots",
+            "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all "
+            "your outdoor adventures. These boots are made with a waterproof "
+            "leather upper and a durable rubber sole for superior traction. With "
+            "their cushioned insole and padded collar, these boots will keep you "
+            "comfortable all day long.",
+            "brand": "Daybird",
+            "price": 109.99,
+            "type": "Footwear",
+        }
+    }
+    assert response_data["context"]["thoughts"] == [
+        {
+            "description": "What is the capital of France?",
+            "props": {"text_search": True, "top": 1, "vector_search": True},
+            "title": "Search query for database",
+        },
+        {
+            "description": [
+                {
+                    "brand": "Daybird",
+                    "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all your "
+                    "outdoor adventures. These boots are made with a waterproof leather upper and a durable "
+                    "rubber sole for superior traction. With their cushioned insole and padded collar, "
+                    "these boots will keep you comfortable all day long.",
+                    "id": 1,
+                    "name": "Wanderer Black Hiking Boots",
+                    "price": 109.99,
+                    "type": "Footwear",
+                },
+            ],
+            "props": {},
+            "title": "Search results",
+        },
+        {
+            "description": [
+                "{'role': 'system', 'content': \"Assistant helps customers with questions about "
+                "products.\\nRespond as if you are a salesperson helping a customer in a store. "
+                "Do NOT respond with tables.\\nAnswer ONLY with the product details listed in the "
+                "products.\\nIf there isn't enough information below, say you don't know.\\nDo not "
+                "generate answers that don't use the sources below.\\nEach product has an ID in brackets "
+                "followed by colon and the product details.\\nAlways include the product ID for each product "
+                "you use in the response.\\nUse square brackets to reference the source, "
+                "for example [52].\\nDon't combine citations, list each product separately, for example [27][51].\"}",
+                "{'role': 'user', 'content': \"What is the capital of France?\\n\\nSources:\\n[1]:Name:Wanderer "
+                "Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for "
+                "all your outdoor adventures. These boots are made with a waterproof leather upper and a durable "
+                "rubber sole for superior traction. With their cushioned insole and padded collar, "
+                "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
+                'Type:Footwear\\n\\n"}',
+            ],
+            "props": {"model": "gpt-35-turbo"},
+            "title": "Prompt to generate answer",
+        },
+    ]
+    assert response_data["context"]["thoughts"] == [
+        {
+            "description": "What is the capital of France?",
+            "props": {"text_search": True, "top": 1, "vector_search": True},
+            "title": "Search query for database",
+        },
+        {
+            "description": [
+                {
+                    "brand": "Daybird",
+                    "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all "
+                    "your outdoor adventures. These boots are made with a waterproof leather upper and "
+                    "a durable rubber sole for superior traction. With their cushioned insole and padded "
+                    "collar, these boots will keep you comfortable all day long.",
+                    "id": 1,
+                    "name": "Wanderer Black Hiking Boots",
+                    "price": 109.99,
+                    "type": "Footwear",
+                }
+            ],
+            "props": {},
+            "title": "Search results",
+        },
+        {
+            "description": [
+                "{'role': 'system', 'content': \"Assistant helps customers with questions about "
+                "products.\\nRespond as if you are a salesperson helping a customer in a store. "
+                "Do NOT respond with tables.\\nAnswer ONLY with the product details listed in the "
+                "products.\\nIf there isn't enough information below, say you don't know.\\nDo not "
+                "generate answers that don't use the sources below.\\nEach product has an ID in brackets "
+                "followed by colon and the product details.\\nAlways include the product ID for each product "
+                "you use in the response.\\nUse square brackets to reference the source, "
+                "for example [52].\\nDon't combine citations, list each product separately, for example [27][51].\"}",
+                "{'role': 'user', 'content': \"What is the capital of France?\\n\\nSources:\\n[1]:Name:Wanderer "
+                "Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for "
+                "all your outdoor adventures. These boots are made with a waterproof leather upper and a durable "
+                "rubber sole for superior traction. With their cushioned insole and padded collar, "
+                "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
+                'Type:Footwear\\n\\n"}',
+            ],
+            "props": {"model": "gpt-35-turbo"},
+            "title": "Prompt to generate answer",
+        },
+    ]
+    assert response_data["session_state"] is None
+
+
+@pytest.mark.asyncio
+async def test_advanced_chat_flow(test_client):
+    """test the advanced chat flow route with hybrid retrieval mode"""
+    response = test_client.post(
+        "/chat",
+        json={
+            "context": {
+                "overrides": {"top": 1, "use_advanced_flow": True, "retrieval_mode": "hybrid", "temperature": 0.3}
+            },
+            "messages": [{"content": "What is the capital of France?", "role": "user"}],
+        },
+    )
+    response_data = response.json()
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/json"
+    assert response_data["message"]["content"] == "The capital of France is Paris. [Benefit_Options-2.pdf]."
+    assert response_data["message"]["role"] == "assistant"
+    assert response_data["context"]["data_points"] == {
+        "1": {
+            "id": 1,
+            "name": "Wanderer Black Hiking Boots",
+            "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all "
+            "your outdoor adventures. These boots are made with a waterproof "
+            "leather upper and a durable rubber sole for superior traction. With "
+            "their cushioned insole and padded collar, these boots will keep you "
+            "comfortable all day long.",
+            "brand": "Daybird",
+            "price": 109.99,
+            "type": "Footwear",
+        }
+    }
+    assert response_data["context"]["thoughts"] == [
+        {
+            "description": [
+                "{'role': 'system', 'content': 'Below is a history of the "
+                "conversation so far, and a new question asked by the user that "
+                "needs to be answered by searching database rows.\\nYou have "
+                "access to an Azure PostgreSQL database with an items table that "
+                "has columns for title, description, brand, price, and "
+                "type.\\nGenerate a search query based on the conversation and the "
+                "new question.\\nIf the question is not in English, translate the "
+                "question to English before generating the search query.\\nIf you "
+                "cannot generate a search query, return the original user "
+                "question.\\nDO NOT return anything besides the query.'}",
+                "{'role': 'user', 'content': 'What is the capital of France?'}",
+            ],
+            "props": {
+                "model": "gpt-35-turbo",
+            },
+            "title": "Prompt to generate search arguments",
+        },
+        {
+            "description": "The capital of France is Paris. [Benefit_Options-2.pdf].",
+            "props": {"filters": [], "text_search": True, "top": 1, "vector_search": True},
+            "title": "Search using generated search arguments",
+        },
+        {
+            "description": [
+                {
+                    "brand": "Daybird",
+                    "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all your "
+                    "outdoor adventures. These boots are made with a waterproof leather upper and a durable "
+                    "rubber sole for superior traction. With their cushioned insole and padded collar, "
+                    "these boots will keep you comfortable all day long.",
+                    "id": 1,
+                    "name": "Wanderer Black Hiking Boots",
+                    "price": 109.99,
+                    "type": "Footwear",
+                },
+            ],
+            "props": {},
+            "title": "Search results",
+        },
+        {
+            "description": [
+                "{'role': 'system', 'content': \"Assistant helps customers with questions about "
+                "products.\\nRespond as if you are a salesperson helping a customer in a store. "
+                "Do NOT respond with tables.\\nAnswer ONLY with the product details listed in the "
+                "products.\\nIf there isn't enough information below, say you don't know.\\nDo not "
+                "generate answers that don't use the sources below.\\nEach product has an ID in brackets "
+                "followed by colon and the product details.\\nAlways include the product ID for each product "
+                "you use in the response.\\nUse square brackets to reference the source, "
+                "for example [52].\\nDon't combine citations, list each product separately, for example [27][51].\"}",
+                "{'role': 'user', 'content': \"What is the capital of France?\\n\\nSources:\\n[1]:Name:Wanderer "
+                "Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for "
+                "all your outdoor adventures. These boots are made with a waterproof leather upper and a durable "
+                "rubber sole for superior traction. With their cushioned insole and padded collar, "
+                "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
+                'Type:Footwear\\n\\n"}',
+            ],
+            "props": {"model": "gpt-35-turbo"},
+            "title": "Prompt to generate answer",
+        },
+    ]
+    assert response_data["context"]["thoughts"] == [
+        {
+            "description": [
+                "{'role': 'system', 'content': 'Below is a history of the "
+                "conversation so far, and a new question asked by the user that "
+                "needs to be answered by searching database rows.\\nYou have "
+                "access to an Azure PostgreSQL database with an items table that "
+                "has columns for title, description, brand, price, and "
+                "type.\\nGenerate a search query based on the conversation and the "
+                "new question.\\nIf the question is not in English, translate the "
+                "question to English before generating the search query.\\nIf you "
+                "cannot generate a search query, return the original user "
+                "question.\\nDO NOT return anything besides the query.'}",
+                "{'role': 'user', 'content': 'What is the capital of France?'}",
+            ],
+            "props": {
+                "model": "gpt-35-turbo",
+            },
+            "title": "Prompt to generate search arguments",
+        },
+        {
+            "description": "The capital of France is Paris. [Benefit_Options-2.pdf].",
+            "props": {"filters": [], "text_search": True, "top": 1, "vector_search": True},
+            "title": "Search using generated search arguments",
+        },
+        {
+            "description": [
+                {
+                    "brand": "Daybird",
+                    "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all "
+                    "your outdoor adventures. These boots are made with a waterproof leather upper and "
+                    "a durable rubber sole for superior traction. With their cushioned insole and padded "
+                    "collar, these boots will keep you comfortable all day long.",
+                    "id": 1,
+                    "name": "Wanderer Black Hiking Boots",
+                    "price": 109.99,
+                    "type": "Footwear",
+                }
+            ],
+            "props": {},
+            "title": "Search results",
+        },
+        {
+            "description": [
+                "{'role': 'system', 'content': \"Assistant helps customers with questions about "
+                "products.\\nRespond as if you are a salesperson helping a customer in a store. "
+                "Do NOT respond with tables.\\nAnswer ONLY with the product details listed in the "
+                "products.\\nIf there isn't enough information below, say you don't know.\\nDo not "
+                "generate answers that don't use the sources below.\\nEach product has an ID in brackets "
+                "followed by colon and the product details.\\nAlways include the product ID for each product "
+                "you use in the response.\\nUse square brackets to reference the source, "
+                "for example [52].\\nDon't combine citations, list each product separately, for example [27][51].\"}",
+                "{'role': 'user', 'content': \"What is the capital of France?\\n\\nSources:\\n[1]:Name:Wanderer "
+                "Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for "
+                "all your outdoor adventures. These boots are made with a waterproof leather upper and a durable "
+                "rubber sole for superior traction. With their cushioned insole and padded collar, "
+                "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
+                'Type:Footwear\\n\\n"}',
+            ],
+            "props": {"model": "gpt-35-turbo"},
+            "title": "Prompt to generate answer",
+        },
+    ]
+    assert response_data["session_state"] is None
+
+
+@pytest.mark.asyncio
+async def test_chat_non_json_422(test_client):
     """test the chat route with a non-json request"""
     response = test_client.post("/chat")
 
