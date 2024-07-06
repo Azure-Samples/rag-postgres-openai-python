@@ -53,9 +53,16 @@ def mock_session_env(monkeypatch_session):
         monkeypatch_session.setenv("RUNNING_IN_PRODUCTION", "False")
         # Azure Subscription
         monkeypatch_session.setenv("AZURE_SUBSCRIPTION_ID", "test-storage-subid")
-        # OpenAI
-        monkeypatch_session.setenv("AZURE_OPENAI_CHATGPT_MODEL", "gpt-35-turbo")
-        monkeypatch_session.setenv("OPENAI_API_KEY", "fakekey")
+        # Azure OpenAI
+        monkeypatch_session.setenv("OPENAI_CHAT_HOST", "azure")
+        monkeypatch_session.setenv("OPENAI_EMBED_HOST", "azure")
+        monkeypatch_session.setenv("AZURE_OPENAI_VERSION", "2024-03-01-preview")
+        monkeypatch_session.setenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-35-turbo")
+        monkeypatch_session.setenv("AZURE_OPENAI_CHAT_MODEL", "gpt-35-turbo")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DEPLOYMENT", "text-embedding-ada-002")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL", "text-embedding-ada-002")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL_DIMENSIONS", "1536")
+        monkeypatch_session.setenv("AZURE_OPENAI_KEY", "fakekey")
         # Allowed Origin
         monkeypatch_session.setenv("ALLOWED_ORIGIN", "https://frontend.com")
 
@@ -82,16 +89,8 @@ async def app(mock_session_env):
     return app
 
 
-@pytest.fixture(scope="function")
-def mock_default_azure_credential(mock_session_env):
-    """Mock the Azure credential for testing."""
-    with mock.patch("azure.identity.DefaultAzureCredential") as mock_default_azure_credential:
-        mock_default_azure_credential.return_value = MockAzureCredential()
-        yield mock_default_azure_credential
-
-
-@pytest.fixture(autouse=True)
-def mock_openai_embedding(monkeypatch):
+@pytest.fixture(scope="session")
+def mock_openai_embedding(monkeypatch_session):
     async def mock_acreate(*args, **kwargs):
         return CreateEmbeddingResponse(
             object="list",
@@ -106,14 +105,13 @@ def mock_openai_embedding(monkeypatch):
             usage=Usage(prompt_tokens=8, total_tokens=8),
         )
 
-    def patch():
-        monkeypatch.setattr(openai.resources.AsyncEmbeddings, "create", mock_acreate)
+    monkeypatch_session.setattr(openai.resources.AsyncEmbeddings, "create", mock_acreate)
 
-    return patch
+    yield
 
 
-@pytest.fixture
-def mock_openai_chatcompletion(monkeypatch):
+@pytest.fixture(scope="session")
+def mock_openai_chatcompletion(monkeypatch_session):
     class AsyncChatCompletionIterator:
         def __init__(self, answer: str):
             chunk_id = "test-id"
@@ -215,19 +213,22 @@ def mock_openai_chatcompletion(monkeypatch):
                 model="test-model",
             )
 
-    def patch():
-        monkeypatch.setattr(openai.resources.chat.completions.AsyncCompletions, "create", mock_acreate)
+    monkeypatch_session.setattr(openai.resources.chat.completions.AsyncCompletions, "create", mock_acreate)
 
-    return patch
+    yield
+
+
+@pytest.fixture(scope="function")
+def mock_default_azure_credential(mock_session_env):
+    """Mock the Azure credential for testing."""
+    with mock.patch("azure.identity.DefaultAzureCredential") as mock_default_azure_credential:
+        mock_default_azure_credential.return_value = MockAzureCredential()
+        yield
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_client(
-    monkeypatch, app, mock_default_azure_credential, mock_openai_embedding, mock_openai_chatcompletion
-):
+async def test_client(app, mock_default_azure_credential, mock_openai_embedding, mock_openai_chatcompletion):
     """Create a test client."""
-    mock_openai_embedding()
-    mock_openai_chatcompletion()
     with TestClient(app) as test_client:
         yield test_client
 
