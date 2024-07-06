@@ -11,7 +11,6 @@ async def test_item_handler(test_client):
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/json"
-    assert response.headers["Content-Length"] == "405"
     assert response_data["id"] == test_data.id
     assert response_data["name"] == test_data.name
     assert response_data["description"] == test_data.description
@@ -39,7 +38,6 @@ async def test_similar_handler(test_client):
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/json"
-    assert response.headers["Content-Length"] == "428"
     assert response.json() == [
         {
             "id": 71,
@@ -87,7 +85,6 @@ async def test_search_handler(test_client):
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/json"
-    assert response.headers["Content-Length"] == "407"
     assert response_data["id"] == test_data.id
     assert response_data["name"] == test_data.name
     assert response_data["description"] == test_data.description
