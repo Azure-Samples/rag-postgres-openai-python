@@ -32,13 +32,15 @@ class AdvancedRAGChat:
         self.answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
 
     async def run(
-        self, messages: list[dict], overrides: dict[str, Any] = {}
+        self, messages: list[ChatCompletionMessageParam], overrides: dict[str, Any] = {}
     ) -> RetrievalResponse | AsyncGenerator[dict[str, Any], None]:
         text_search = overrides.get("retrieval_mode") in ["text", "hybrid", None]
         vector_search = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
         top = overrides.get("top", 3)
 
         original_user_query = messages[-1]["content"]
+        if not isinstance(original_user_query, str):
+            raise ValueError("The most recent message content must be a string.")
         past_messages = messages[:-1]
 
         # Generate an optimized keyword search query based on the chat history and the last question

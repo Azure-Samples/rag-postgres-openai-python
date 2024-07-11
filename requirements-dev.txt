@@ -6,3 +6,4 @@ pip-compile-cross-platform
 pytest
 pytest-cov
 pytest-asyncio
+mypy
