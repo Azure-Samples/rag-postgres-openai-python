@@ -72,19 +72,19 @@ async def chat_handler(chat_request: ChatRequest):
         embed_dimensions=global_storage.openai_embed_dimensions,
     )
     if overrides.get("use_advanced_flow"):
-        ragchat = AdvancedRAGChat(
+        run_ragchat = AdvancedRAGChat(
             searcher=searcher,
             openai_chat_client=global_storage.openai_chat_client,
             chat_model=global_storage.openai_chat_model,
             chat_deployment=global_storage.openai_chat_deployment,
-        )
+        ).run
     else:
-        ragchat = SimpleRAGChat(
+        run_ragchat = SimpleRAGChat(
             searcher=searcher,
             openai_chat_client=global_storage.openai_chat_client,
             chat_model=global_storage.openai_chat_model,
             chat_deployment=global_storage.openai_chat_deployment,
-        )
+        ).run
 
-    response: RetrievalResponse = await ragchat.run(messages, overrides=overrides)
+    response = await run_ragchat(messages, overrides=overrides)
     return response
