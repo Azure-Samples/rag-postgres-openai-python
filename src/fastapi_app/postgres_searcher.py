@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
 from pgvector.utils import to_db
-from sqlalchemy import Float, Integer, select, text
+from sqlalchemy import Float, Integer, column, select, text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from fastapi_app.embeddings import compute_text_embedding
@@ -78,11 +78,11 @@ class PostgresSearcher:
         """
 
         if query_text is not None and len(query_vector) > 0:
-            sql = text(hybrid_query).columns(id=Integer, score=Float)
+            sql = text(hybrid_query).columns(column("id", Integer), column("score", Float))
         elif len(query_vector) > 0:
-            sql = text(vector_query).columns(id=Integer, rank=Integer)
+            sql = text(vector_query).columns(column("id", Integer), column("rank", Integer))
         elif query_text is not None:
-            sql = text(fulltext_query).columns(id=Integer, rank=Integer)
+            sql = text(fulltext_query).columns(column("id", Integer), column("rank", Integer))
         else:
             raise ValueError("Both query text and query vector are empty")
 
@@ -113,7 +113,7 @@ class PostgresSearcher:
         Search items by query text. Optionally converts the query text to a vector if enable_vector_search is True.
         """
         vector: list[float] = []
-        if enable_vector_search:
+        if enable_vector_search and query_text is not None:
             vector = await compute_text_embedding(
                 query_text,
                 self.openai_embed_client,
