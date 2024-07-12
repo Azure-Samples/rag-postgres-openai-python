@@ -1,4 +1,5 @@
 from collections import namedtuple
+from types import TracebackType
 
 from azure.core.credentials_async import AsyncTokenCredential
 
@@ -8,6 +9,17 @@ MockToken = namedtuple("MockToken", ["token", "expires_on", "value"])
 class MockAzureCredential(AsyncTokenCredential):
     async def get_token(self, uri):
         return MockToken("", 9999999999, "")
+
+    async def close(self) -> None:
+        pass
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_value: BaseException | None = None,
+        traceback: TracebackType | None = None,
+    ) -> None:
+        pass
 
 
 class MockAzureCredentialExpired(AsyncTokenCredential):
