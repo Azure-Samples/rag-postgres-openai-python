@@ -25,7 +25,7 @@ async def create_openai_chat_client(
                 api_key=api_key,
             )
         else:
-            logger.info("Authenticating to Azure OpenAI using Azure Identity...")
+            logger.info("Authenticating to Azure OpenAI Chat using Azure Identity...")
             token_provider = azure.identity.get_bearer_token_provider(
                 azure_credential, "https://cognitiveservices.azure.com/.default"
             )
@@ -66,7 +66,7 @@ async def create_openai_embed_client(
                 api_key=api_key,
             )
         else:
-            logger.info("Authenticating to Azure OpenAI using Azure Identity...")
+            logger.info("Authenticating to Azure OpenAI Embedding using Azure Identity...")
             token_provider = azure.identity.get_bearer_token_provider(
                 azure_credential, "https://cognitiveservices.azure.com/.default"
             )

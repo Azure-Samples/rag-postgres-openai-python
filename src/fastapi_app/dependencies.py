@@ -3,7 +3,6 @@ import os
 from typing import Annotated
 
 import azure.identity
-from dotenv import load_dotenv
 from fastapi import Depends
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 from pydantic import BaseModel
@@ -40,7 +39,6 @@ async def common_parameters():
     """
     Get the common parameters for the FastAPI app
     """
-    load_dotenv(override=True)
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_EMBED_HOST == "azure":
@@ -69,7 +67,7 @@ async def common_parameters():
     )
 
 
-async def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential:
+def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential:
     azure_credential: azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential
     try:
         if client_id := os.getenv("APP_IDENTITY_ID"):
@@ -88,10 +86,11 @@ async def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azu
         raise e
 
 
+azure_credentials = get_azure_credentials()
+
+
 async def get_engine():
     """Get the agent database engine"""
-    load_dotenv(override=True)
-    azure_credentials = await get_azure_credentials()
     engine = await create_postgres_engine_from_env(azure_credentials)
     return engine
 
@@ -105,14 +104,12 @@ async def get_async_session(engine: Annotated[AsyncEngine, Depends(get_engine)])
 
 async def get_openai_chat_client():
     """Get the OpenAI chat client"""
-    azure_credentials = await get_azure_credentials()
     chat_client = await create_openai_chat_client(azure_credentials)
     return OpenAIClient(client=chat_client)
 
 
 async def get_openai_embed_client():
     """Get the OpenAI embed client"""
-    azure_credentials = await get_azure_credentials()
     embed_client = await create_openai_embed_client(azure_credentials)
     return OpenAIClient(client=embed_client)
 

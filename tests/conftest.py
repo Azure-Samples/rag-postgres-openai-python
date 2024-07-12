@@ -56,6 +56,7 @@ def mock_session_env(monkeypatch_session):
         # Azure OpenAI
         monkeypatch_session.setenv("OPENAI_CHAT_HOST", "azure")
         monkeypatch_session.setenv("OPENAI_EMBED_HOST", "azure")
+        monkeypatch_session.setenv("AZURE_OPENAI_ENDPOINT", "https://api.openai.com")
         monkeypatch_session.setenv("AZURE_OPENAI_VERSION", "2024-03-01-preview")
         monkeypatch_session.setenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-35-turbo")
         monkeypatch_session.setenv("AZURE_OPENAI_CHAT_MODEL", "gpt-35-turbo")
