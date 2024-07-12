@@ -2,7 +2,7 @@ import pathlib
 from collections.abc import AsyncGenerator
 from typing import Any
 
-from openai import AsyncOpenAI
+from openai import AsyncAzureOpenAI, AsyncOpenAI
 from openai.types.chat import ChatCompletion, ChatCompletionMessageParam
 from openai_messages_token_helper import build_messages, get_token_limit
 
@@ -15,7 +15,7 @@ class SimpleRAGChat:
         self,
         *,
         searcher: PostgresSearcher,
-        openai_chat_client: AsyncOpenAI,
+        openai_chat_client: AsyncOpenAI | AsyncAzureOpenAI,
         chat_model: str,
         chat_deployment: str | None,  # Not needed for non-Azure OpenAI
     ):

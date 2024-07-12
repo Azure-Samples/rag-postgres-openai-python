@@ -176,7 +176,7 @@ async def test_simple_chat_flow(test_client):
                 "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
                 'Type:Footwear\\n\\n"}',
             ],
-            "props": {"model": "gpt-35-turbo"},
+            "props": {"deployment": "gpt-35-turbo", "model": "gpt-35-turbo"},
             "title": "Prompt to generate answer",
         },
     ]
@@ -220,7 +220,7 @@ async def test_simple_chat_flow(test_client):
                 "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
                 'Type:Footwear\\n\\n"}',
             ],
-            "props": {"model": "gpt-35-turbo"},
+            "props": {"deployment": "gpt-35-turbo", "model": "gpt-35-turbo"},
             "title": "Prompt to generate answer",
         },
     ]
@@ -274,9 +274,7 @@ async def test_advanced_chat_flow(test_client):
                 "question.\\nDO NOT return anything besides the query.'}",
                 "{'role': 'user', 'content': 'What is the capital of France?'}",
             ],
-            "props": {
-                "model": "gpt-35-turbo",
-            },
+            "props": {"deployment": "gpt-35-turbo", "model": "gpt-35-turbo"},
             "title": "Prompt to generate search arguments",
         },
         {
@@ -318,7 +316,7 @@ async def test_advanced_chat_flow(test_client):
                 "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
                 'Type:Footwear\\n\\n"}',
             ],
-            "props": {"model": "gpt-35-turbo"},
+            "props": {"deployment": "gpt-35-turbo", "model": "gpt-35-turbo"},
             "title": "Prompt to generate answer",
         },
     ]
@@ -337,9 +335,7 @@ async def test_advanced_chat_flow(test_client):
                 "question.\\nDO NOT return anything besides the query.'}",
                 "{'role': 'user', 'content': 'What is the capital of France?'}",
             ],
-            "props": {
-                "model": "gpt-35-turbo",
-            },
+            "props": {"deployment": "gpt-35-turbo", "model": "gpt-35-turbo"},
             "title": "Prompt to generate search arguments",
         },
         {
@@ -381,7 +377,7 @@ async def test_advanced_chat_flow(test_client):
                 "these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird "
                 'Type:Footwear\\n\\n"}',
             ],
-            "props": {"model": "gpt-35-turbo"},
+            "props": {"deployment": "gpt-35-turbo", "model": "gpt-35-turbo"},
             "title": "Prompt to generate answer",
         },
     ]

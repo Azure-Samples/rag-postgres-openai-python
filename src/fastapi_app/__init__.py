@@ -2,14 +2,12 @@ import contextlib
 import logging
 import os
 
-import azure.identity
 from dotenv import load_dotenv
 from environs import Env
 from fastapi import FastAPI
 
-from .globals import global_storage
-from .openai_clients import create_openai_chat_client, create_openai_embed_client
-from .postgres_engine import create_postgres_engine_from_env
+from fastapi_app.dependencies import get_azure_credentials
+from fastapi_app.postgres_engine import create_postgres_engine_from_env
 
 logger = logging.getLogger("ragapp")
 
@@ -18,34 +16,8 @@ logger = logging.getLogger("ragapp")
 async def lifespan(app: FastAPI):
     load_dotenv(override=True)
 
-    azure_credential: azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential | None = None
-    try:
-        if client_id := os.getenv("APP_IDENTITY_ID"):
-            # Authenticate using a user-assigned managed identity on Azure
-            # See web.bicep for value of APP_IDENTITY_ID
-            logger.info(
-                "Using managed identity for client ID %s",
-                client_id,
-            )
-            azure_credential = azure.identity.ManagedIdentityCredential(client_id=client_id)
-        else:
-            azure_credential = azure.identity.DefaultAzureCredential()
-    except Exception as e:
-        logger.warning("Failed to authenticate to Azure: %s", e)
-
+    azure_credential = await get_azure_credentials()
     engine = await create_postgres_engine_from_env(azure_credential)
-    global_storage.engine = engine
-
-    openai_chat_client, openai_chat_model = await create_openai_chat_client(azure_credential)
-    global_storage.openai_chat_client = openai_chat_client
-    global_storage.openai_chat_model = openai_chat_model
-
-    openai_embed_client, openai_embed_model, openai_embed_dimensions = await create_openai_embed_client(
-        azure_credential
-    )
-    global_storage.openai_embed_client = openai_embed_client
-    global_storage.openai_embed_model = openai_embed_model
-    global_storage.openai_embed_dimensions = openai_embed_dimensions
 
     yield
 
@@ -55,17 +27,16 @@ async def lifespan(app: FastAPI):
 def create_app(testing: bool = False):
     env = Env()
 
-    if not os.getenv("RUNNING_IN_PRODUCTION"):
-        if not testing:
-            env.read_env(".env")
-        logging.basicConfig(level=logging.INFO)
-    else:
+    if os.getenv("RUNNING_IN_PRODUCTION"):
         logging.basicConfig(level=logging.WARNING)
+    else:
+        if not testing:
+            env.read_env(".env", override=True)
+        logging.basicConfig(level=logging.INFO)
 
     app = FastAPI(docs_url="/docs", lifespan=lifespan)
 
-    from . import api_routes  # noqa
-    from . import frontend_routes  # noqa
+    from fastapi_app.routes import api_routes, frontend_routes
 
     app.include_router(api_routes.router)
     app.mount("/", frontend_routes.router)

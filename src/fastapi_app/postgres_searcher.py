@@ -1,7 +1,7 @@
-from openai import AsyncOpenAI
+from openai import AsyncAzureOpenAI, AsyncOpenAI
 from pgvector.utils import to_db
 from sqlalchemy import Float, Integer, column, select, text
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi_app.embeddings import compute_text_embedding
 from fastapi_app.postgres_models import Item
@@ -10,13 +10,13 @@ from fastapi_app.postgres_models import Item
 class PostgresSearcher:
     def __init__(
         self,
-        engine,
-        openai_embed_client: AsyncOpenAI,
+        db_session: AsyncSession,
+        openai_embed_client: AsyncOpenAI | AsyncAzureOpenAI,
         embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
         embed_dimensions: int,
     ):
-        self.async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+        self.db_session = db_session
         self.openai_embed_client = openai_embed_client
         self.embed_model = embed_model
         self.embed_deployment = embed_deployment
@@ -86,20 +86,19 @@ class PostgresSearcher:
         else:
             raise ValueError("Both query text and query vector are empty")
 
-        async with self.async_session_maker() as session:
-            results = (
-                await session.execute(
-                    sql,
-                    {"embedding": to_db(query_vector), "query": query_text, "k": 60},
-                )
-            ).fetchall()
+        results = (
+            await self.db_session.execute(
+                sql,
+                {"embedding": to_db(query_vector), "query": query_text, "k": 60},
+            )
+        ).fetchall()
 
-            # Convert results to Item models
-            items = []
-            for id, _ in results[:top]:
-                item = await session.execute(select(Item).where(Item.id == id))
-                items.append(item.scalar())
-            return items
+        # Convert results to Item models
+        items = []
+        for id, _ in results[:top]:
+            item = await self.db_session.execute(select(Item).where(Item.id == id))
+            items.append(item.scalar())
+        return items
 
     async def search_and_embed(
         self,
