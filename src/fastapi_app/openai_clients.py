@@ -13,7 +13,7 @@ async def create_openai_chat_client(azure_credential):
     if OPENAI_CHAT_HOST == "azure":
         api_version = os.environ["AZURE_OPENAI_VERSION"]
         azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
-        azure_deployment = os.environ["AZURE_OPENAI_EMBED_DEPLOYMENT"]
+        azure_deployment = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
         if api_key := os.getenv("AZURE_OPENAI_KEY"):
             logger.info("Authenticating to Azure OpenAI using API key...")
             openai_chat_client = openai.AsyncAzureOpenAI(
