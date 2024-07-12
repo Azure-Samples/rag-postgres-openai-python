@@ -70,5 +70,7 @@ jobs:
             cd ./src/frontend
             npm install
             npm run build
+        - name: Run MyPy
+          run: python3 -m mypy .
         - name: Run Pytest
           run: python3 -m pytest

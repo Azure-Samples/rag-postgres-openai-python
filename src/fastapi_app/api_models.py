@@ -1,5 +1,6 @@
 from typing import Any
 
+from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel
 
 
@@ -9,7 +10,7 @@ class Message(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    messages: list[Message]
+    messages: list[ChatCompletionMessageParam]
     context: dict = {}
 
 

@@ -70,7 +70,6 @@ async def chat_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    messages = [message.model_dump() for message in chat_request.messages]
     overrides = chat_request.context.get("overrides", {})
 
     searcher = PostgresSearcher(
@@ -95,5 +94,5 @@ async def chat_handler(
             chat_deployment=context.openai_chat_deployment,
         ).run
 
-    response = await run_ragchat(messages, overrides=overrides)
+    response = await run_ragchat(chat_request.messages, overrides=overrides)
     return response
