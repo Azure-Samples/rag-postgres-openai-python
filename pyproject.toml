@@ -16,5 +16,11 @@ testpaths = ["tests"]
 pythonpath = ['src']
 filterwarnings = ["ignore::DeprecationWarning"]
 
+[[tool.mypy.overrides]]
+module = [
+    "pgvector.*",
+]
+ignore_missing_imports = true
+
 [tool.coverage.report]
 show_missing = true
