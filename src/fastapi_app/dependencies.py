@@ -1,15 +1,13 @@
 import logging
 import os
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 import azure.identity
-from fastapi import Depends
+from fastapi import Depends, Request
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
-
-from fastapi_app.openai_clients import create_openai_chat_client, create_openai_embed_client
-from fastapi_app.postgres_engine import create_postgres_engine_from_env
 
 logger = logging.getLogger("ragapp")
 
@@ -67,7 +65,7 @@ async def common_parameters():
     )
 
 
-def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential:
+async def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential:
     azure_credential: azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential
     try:
         if client_id := os.getenv("APP_IDENTITY_ID"):
@@ -86,35 +84,55 @@ def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azure.ide
         raise e
 
 
-azure_credentials = get_azure_credentials()
-
-
-async def get_engine():
-    """Get the agent database engine"""
-    engine = await create_postgres_engine_from_env(azure_credentials)
-    return engine
-
-
-async def get_async_session(engine: Annotated[AsyncEngine, Depends(get_engine)]):
+async def create_async_sessionmaker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     """Get the agent database"""
-    async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-    async with async_session_maker() as async_session:
-        yield async_session
+    return async_sessionmaker(
+        engine,
+        expire_on_commit=False,
+        autoflush=False,
+    )
 
 
-async def get_openai_chat_client():
+async def get_async_sessionmaker(
+    request: Request,
+) -> AsyncGenerator[async_sessionmaker[AsyncSession], None]:
+    yield request.state.sessionmaker
+
+
+async def get_context(
+    request: Request,
+) -> FastAPIAppContext:
+    return request.state.context
+
+
+async def get_async_db_session(
+    sessionmaker: Annotated[async_sessionmaker[AsyncSession], Depends(get_async_sessionmaker)],
+) -> AsyncGenerator[AsyncSession, None]:
+    async with sessionmaker() as session:
+        try:
+            yield session
+        except:
+            await session.rollback()
+            raise
+        else:
+            await session.commit()
+
+
+async def get_openai_chat_client(
+    request: Request,
+) -> OpenAIClient:
     """Get the OpenAI chat client"""
-    chat_client = await create_openai_chat_client(azure_credentials)
-    return OpenAIClient(client=chat_client)
+    return OpenAIClient(client=request.state.chat_client)
 
 
-async def get_openai_embed_client():
+async def get_openai_embed_client(
+    request: Request,
+) -> OpenAIClient:
     """Get the OpenAI embed client"""
-    embed_client = await create_openai_embed_client(azure_credentials)
-    return OpenAIClient(client=embed_client)
+    return OpenAIClient(client=request.state.embed_client)
 
 
-CommonDeps = Annotated[FastAPIAppContext, Depends(common_parameters)]
-DBSession = Annotated[AsyncSession, Depends(get_async_session)]
+CommonDeps = Annotated[FastAPIAppContext, Depends(get_context)]
+DBSession = Annotated[AsyncSession, Depends(get_async_db_session)]
 ChatClient = Annotated[OpenAIClient, Depends(get_openai_chat_client)]
 EmbeddingsClient = Annotated[OpenAIClient, Depends(get_openai_embed_client)]
