@@ -1,14 +1,7 @@
-from dataclasses import dataclass
+from fastapi_app.api_models import ItemPublic
 
 
-@dataclass
-class TestData:
-    id: int
-    type: str
-    brand: str
-    name: str
-    description: str
-    price: float
+class TestData(ItemPublic):
     embeddings: list[float]
 
 
