@@ -224,7 +224,7 @@ def mock_default_azure_credential(mock_session_env):
     """Mock the Azure credential for testing."""
     with mock.patch("azure.identity.DefaultAzureCredential") as mock_default_azure_credential:
         mock_default_azure_credential.return_value = MockAzureCredential()
-        yield
+        yield mock_default_azure_credential
 
 
 @pytest_asyncio.fixture(scope="function")

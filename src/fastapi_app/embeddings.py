@@ -11,7 +11,7 @@ async def compute_text_embedding(
     embed_model: str,
     embed_deployment: str | None = None,
     embedding_dimensions: int = 1536,
-):
+) -> list[float]:
     SUPPORTED_DIMENSIONS_MODEL = {
         "text-embedding-ada-002": False,
         "text-embedding-3-small": True,
