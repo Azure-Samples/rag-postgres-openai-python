@@ -13,7 +13,7 @@ router = fastapi.APIRouter()
 
 
 @router.get("/items/{id}", response_model=ItemPublic)
-async def item_handler(id: int, database_session: DBSession) -> ItemPublic:
+async def item_handler(database_session: DBSession, id: int) -> ItemPublic:
     """A simple API to get an item by ID."""
     item = (await database_session.scalars(select(Item).where(Item.id == id))).first()
     if not item:

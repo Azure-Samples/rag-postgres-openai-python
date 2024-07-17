@@ -109,13 +109,7 @@ async def get_async_db_session(
     sessionmaker: Annotated[async_sessionmaker[AsyncSession], Depends(get_async_sessionmaker)],
 ) -> AsyncGenerator[AsyncSession, None]:
     async with sessionmaker() as session:
-        try:
-            yield session
-        except:
-            await session.rollback()
-            raise
-        else:
-            await session.commit()
+        yield session
 
 
 async def get_openai_chat_client(
