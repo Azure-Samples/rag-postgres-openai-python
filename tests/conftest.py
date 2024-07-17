@@ -17,6 +17,7 @@ from openai.types.create_embedding_response import Usage
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from fastapi_app import create_app
+from fastapi_app.openai_clients import create_openai_embed_client
 from fastapi_app.postgres_engine import create_postgres_engine_from_env
 from fastapi_app.setup_postgres_database import create_db_schema
 from fastapi_app.setup_postgres_seeddata import seed_data
@@ -235,7 +236,7 @@ async def test_client(app, mock_default_azure_credential, mock_openai_embedding,
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session():
+async def db_session(mock_session_env, mock_default_azure_credential):
     """Create a new database session with a rollback at the end of the test."""
     engine = await create_postgres_engine_from_env()
     async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -245,3 +246,18 @@ async def db_session():
     await session.rollback()
     await session.close()
     await engine.dispose()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def postgres_searcher(mock_session_env, mock_default_azure_credential, db_session, mock_openai_embedding):
+    from fastapi_app.postgres_searcher import PostgresSearcher
+
+    openai_embed_client = await create_openai_embed_client(mock_default_azure_credential)
+
+    yield PostgresSearcher(
+        db_session=db_session,
+        openai_embed_client=openai_embed_client,
+        embed_deployment="text-embedding-ada-002",
+        embed_model="text-embedding-ada-002",
+        embed_dimensions=1536,
+    )
