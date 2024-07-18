@@ -1,70 +1,57 @@
-import contextlib
 import logging
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from typing import TypedDict
 
-import azure.identity
 from dotenv import load_dotenv
-from environs import Env
 from fastapi import FastAPI
+from openai import AsyncAzureOpenAI, AsyncOpenAI
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from .globals import global_storage
-from .openai_clients import create_openai_chat_client, create_openai_embed_client
-from .postgres_engine import create_postgres_engine_from_env
+from fastapi_app.dependencies import (
+    FastAPIAppContext,
+    common_parameters,
+    create_async_sessionmaker,
+    get_azure_credentials,
+)
+from fastapi_app.openai_clients import create_openai_chat_client, create_openai_embed_client
+from fastapi_app.postgres_engine import create_postgres_engine_from_env
 
 logger = logging.getLogger("ragapp")
 
 
-@contextlib.asynccontextmanager
-async def lifespan(app: FastAPI):
-    load_dotenv(override=True)
+class State(TypedDict):
+    sessionmaker: async_sessionmaker[AsyncSession]
+    context: FastAPIAppContext
+    chat_client: AsyncOpenAI | AsyncAzureOpenAI
+    embed_client: AsyncOpenAI | AsyncAzureOpenAI
 
-    azure_credential = None
-    try:
-        if client_id := os.getenv("APP_IDENTITY_ID"):
-            # Authenticate using a user-assigned managed identity on Azure
-            # See web.bicep for value of APP_IDENTITY_ID
-            logger.info(
-                "Using managed identity for client ID %s",
-                client_id,
-            )
-            azure_credential = azure.identity.ManagedIdentityCredential(client_id=client_id)
-        else:
-            azure_credential = azure.identity.DefaultAzureCredential()
-    except Exception as e:
-        logger.warning("Failed to authenticate to Azure: %s", e)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[State]:
+    context = await common_parameters()
+    azure_credential = await get_azure_credentials()
     engine = await create_postgres_engine_from_env(azure_credential)
-    global_storage.engine = engine
+    sessionmaker = await create_async_sessionmaker(engine)
+    chat_client = await create_openai_chat_client(azure_credential)
+    embed_client = await create_openai_embed_client(azure_credential)
 
-    openai_chat_client, openai_chat_model = await create_openai_chat_client(azure_credential)
-    global_storage.openai_chat_client = openai_chat_client
-    global_storage.openai_chat_model = openai_chat_model
-
-    openai_embed_client, openai_embed_model, openai_embed_dimensions = await create_openai_embed_client(
-        azure_credential
-    )
-    global_storage.openai_embed_client = openai_embed_client
-    global_storage.openai_embed_model = openai_embed_model
-    global_storage.openai_embed_dimensions = openai_embed_dimensions
-
-    yield
-
+    yield {"sessionmaker": sessionmaker, "context": context, "chat_client": chat_client, "embed_client": embed_client}
     await engine.dispose()
 
 
-def create_app():
-    env = Env()
-
-    if not os.getenv("RUNNING_IN_PRODUCTION"):
-        env.read_env(".env")
-        logging.basicConfig(level=logging.INFO)
-    else:
+def create_app(testing: bool = False):
+    if os.getenv("RUNNING_IN_PRODUCTION"):
         logging.basicConfig(level=logging.WARNING)
+    else:
+        if not testing:
+            load_dotenv(override=True)
+        logging.basicConfig(level=logging.INFO)
 
     app = FastAPI(docs_url="/docs", lifespan=lifespan)
 
-    from . import api_routes  # noqa
-    from . import frontend_routes  # noqa
+    from fastapi_app.routes import api_routes, frontend_routes
 
     app.include_router(api_routes.router)
     app.mount("/", frontend_routes.router)

@@ -1,13 +1,12 @@
 import pathlib
 from collections.abc import AsyncGenerator
-from typing import (
-    Any,
-)
+from typing import Any
 
-from openai import AsyncOpenAI
+from openai import AsyncAzureOpenAI, AsyncOpenAI
+from openai.types.chat import ChatCompletion, ChatCompletionMessageParam
 from openai_messages_token_helper import build_messages, get_token_limit
 
-from .api_models import ThoughtStep
+from .api_models import Message, RAGContext, RetrievalResponse, ThoughtStep
 from .postgres_searcher import PostgresSearcher
 
 
@@ -16,7 +15,7 @@ class SimpleRAGChat:
         self,
         *,
         searcher: PostgresSearcher,
-        openai_chat_client: AsyncOpenAI,
+        openai_chat_client: AsyncOpenAI | AsyncAzureOpenAI,
         chat_model: str,
         chat_deployment: str | None,  # Not needed for non-Azure OpenAI
     ):
@@ -29,13 +28,15 @@ class SimpleRAGChat:
         self.answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
 
     async def run(
-        self, messages: list[dict], overrides: dict[str, Any] = {}
-    ) -> dict[str, Any] | AsyncGenerator[dict[str, Any], None]:
+        self, messages: list[ChatCompletionMessageParam], overrides: dict[str, Any] = {}
+    ) -> RetrievalResponse | AsyncGenerator[dict[str, Any], None]:
         text_search = overrides.get("retrieval_mode") in ["text", "hybrid", None]
         vector_search = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
         top = overrides.get("top", 3)
 
         original_user_query = messages[-1]["content"]
+        if not isinstance(original_user_query, str):
+            raise ValueError("The most recent message content must be a string.")
         past_messages = messages[:-1]
 
         # Retrieve relevant items from the database
@@ -48,7 +49,7 @@ class SimpleRAGChat:
 
         # Generate a contextual and content specific answer using the search results and chat history
         response_token_limit = 1024
-        messages = build_messages(
+        contextual_messages: list[ChatCompletionMessageParam] = build_messages(
             model=self.chat_model,
             system_prompt=overrides.get("prompt_template") or self.answer_prompt_template,
             new_user_content=original_user_query + "\n\nSources:\n" + content,
@@ -57,21 +58,22 @@ class SimpleRAGChat:
             fallback_to_default=True,
         )
 
-        chat_completion_response = await self.openai_chat_client.chat.completions.create(
+        chat_completion_response: ChatCompletion = await self.openai_chat_client.chat.completions.create(
             # Azure OpenAI takes the deployment name as the model name
             model=self.chat_deployment if self.chat_deployment else self.chat_model,
-            messages=messages,
+            messages=contextual_messages,
             temperature=overrides.get("temperature", 0.3),
             max_tokens=response_token_limit,
             n=1,
             stream=False,
         )
-        first_choice = chat_completion_response.model_dump()["choices"][0]
-        return {
-            "message": first_choice["message"],
-            "context": {
-                "data_points": {item.id: item.to_dict() for item in results},
-                "thoughts": [
+        first_choice_message = chat_completion_response.choices[0].message
+
+        return RetrievalResponse(
+            message=Message(content=str(first_choice_message.content), role=first_choice_message.role),
+            context=RAGContext(
+                data_points={item.id: item.to_dict() for item in results},
+                thoughts=[
                     ThoughtStep(
                         title="Search query for database",
                         description=original_user_query if text_search else None,
@@ -87,7 +89,7 @@ class SimpleRAGChat:
                     ),
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[str(message) for message in messages],
+                        description=[str(message) for message in contextual_messages],
                         props=(
                             {"model": self.chat_model, "deployment": self.chat_deployment}
                             if self.chat_deployment
@@ -95,5 +97,5 @@ class SimpleRAGChat:
                         ),
                     ),
                 ],
-            },
-        }
+            ),
+        )

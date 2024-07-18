@@ -1,10 +1,26 @@
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"
+lint.select = ["E", "F", "I", "UP"]
+lint.ignore = ["D203"]
+lint.isort.known-first-party = ["fastapi_app"]
 
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP"]
-ignore = ["D203"]
+[tool.mypy]
+check_untyped_defs = true
+python_version = 3.12
+exclude = [".venv/*"]
 
-[tool.ruff.lint.isort]
-known-first-party = ["fastapi_app"]
+[tool.pytest.ini_options]
+addopts = "-ra --cov"
+testpaths = ["tests"]
+pythonpath = ['src']
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[[tool.mypy.overrides]]
+module = [
+    "pgvector.*",
+]
+ignore_missing_imports = true
+
+[tool.coverage.report]
+show_missing = true
