@@ -84,7 +84,7 @@ async def create_and_seed_db():
 @pytest_asyncio.fixture(scope="session")
 async def app(mock_session_env):
     """Create a FastAPI app."""
-    if not Path("src/static/").exists():
+    if not Path("src/backend/static/").exists():
         pytest.skip("Please generate frontend files first!")
     app = create_app(testing=True)
     await create_and_seed_db()

@@ -56,7 +56,6 @@ jobs:
         - name: Install app as editable app
           run: |
             python -m pip install -e src/backend
-            python -m pip install -e src
         - name: Setup local database with seed data
           run: |
             cp .env.sample .env
