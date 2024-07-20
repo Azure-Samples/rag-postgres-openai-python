@@ -232,5 +232,7 @@ class SimpleRAGChat(RAGChatBase):
             ),
         )
         async for response_chunk in chat_completion_async_stream:
-            yield Message(content=str(response_chunk.choices[0].delta.content), role="assistant")
+            # first response has empty choices
+            if response_chunk.choices:
+                yield Message(content=str(response_chunk.choices[0].delta.content), role="assistant")
         return
