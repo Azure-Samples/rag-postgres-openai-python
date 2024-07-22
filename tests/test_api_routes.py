@@ -228,6 +228,123 @@ async def test_simple_chat_flow(test_client):
 
 
 @pytest.mark.asyncio
+async def test_simple_chat_streaming_flow(test_client):
+    """test the simple chat streaming flow route with hybrid retrieval mode"""
+    response = test_client.post(
+        "/chat/stream",
+        json={
+            "context": {
+                "overrides": {"top": 1, "use_advanced_flow": False, "retrieval_mode": "hybrid", "temperature": 0.3}
+            },
+            "messages": [{"content": "What is the capital of France?", "role": "user"}],
+        },
+    )
+    response_data = response.content.split(b"\n")
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/x-ndjson"
+    assert response_data[0] == (
+        b'{"message": {"content": "", "role": "assistant"}, "context": {"data_points":'
+        + b' {"1": {"id": 1, "type": "Footwear", "brand": "Daybird", "name": "Wanderer B'
+        + b'lack Hiking Boots", "description": "Daybird\'s Wanderer Hiking Boots in s'
+        + b"leek black are perfect for all your outdoor adventures. These boots are made"
+        + b" with a waterproof leather upper and a durable rubber sole for superior trac"
+        + b"tion. With their cushioned insole and padded collar, these boots will keep y"
+        + b'ou comfortable all day long.", "price": 109.99}}, "thoughts": [{"title": "Se'
+        + b'arch query for database", "description": "What is the capital of France?", "'
+        + b'props": {"top": 1, "vector_search": true, "text_search": true}}, {"title": "'
+        + b'Search results", "description": [{"id": 1, "type": "Footwear", "brand": "Day'
+        + b'bird", "name": "Wanderer Black Hiking Boots", "description": "Daybird\'s '
+        + b"Wanderer Hiking Boots in sleek black are perfect for all your outdoor advent"
+        + b"ures. These boots are made with a waterproof leather upper and a durable rub"
+        + b"ber sole for superior traction. With their cushioned insole and padded colla"
+        + b'r, these boots will keep you comfortable all day long.", "price": 109.99}], '
+        + b'"props": {}}, {"title": "Prompt to generate answer", "description": ["{\''
+        + b"role': 'system', 'content': \\\"Assistant helps customers with questio"
+        + b"ns about products.\\\\nRespond as if you are a salesperson helping a custo"
+        + b"mer in a store. Do NOT respond with tables.\\\\nAnswer ONLY with the produ"
+        + b"ct details listed in the products.\\\\nIf there isn't enough information b"
+        + b"elow, say you don't know.\\\\nDo not generate answers that don't use the s"
+        + b"ources below.\\\\nEach product has an ID in brackets followed by colon and"
+        + b" the product details.\\\\nAlways include the product ID for each product y"
+        + b"ou use in the response.\\\\nUse square brackets to reference the source, f"
+        + b"or example [52].\\\\nDon't combine citations, list each product separately"
+        + b", for example [27][51].\\\"}\", \"{'role': 'user', 'content': \\\"What is "
+        + b"the capital of France?\\\\n\\\\nSources:\\\\n[1]:Name:Wanderer Black Hikin"
+        + b"g Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfe"
+        + b"ct for all your outdoor adventures. These boots are made with a waterproof l"
+        + b"eather upper and a durable rubber sole for superior traction. With their cus"
+        + b"hioned insole and padded collar, these boots will keep you comfortable all d"
+        + b'ay long. Price:109.99 Brand:Daybird Type:Footwear\\\\n\\\\n\\"}"], "props'
+        + b'": {"model": "gpt-35-turbo", "deployment": "gpt-35-turbo"}}], "followup_ques'
+        + b'tions": null}, "session_state": null}'
+    )
+
+
+@pytest.mark.asyncio
+async def test_advanved_chat_streaming_flow(test_client):
+    """test the advanced chat streaming flow route with hybrid retrieval mode"""
+    response = test_client.post(
+        "/chat/stream",
+        json={
+            "context": {
+                "overrides": {"top": 1, "use_advanced_flow": True, "retrieval_mode": "hybrid", "temperature": 0.3}
+            },
+            "messages": [{"content": "What is the capital of France?", "role": "user"}],
+        },
+    )
+    response_data = response.content.split(b"\n")
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/x-ndjson"
+    assert response_data[0] == (
+        b'{"message": {"content": "", "role": "assistant"}, "context": {"data_points":'
+        +  b' {"1": {"id": 1, "type": "Footwear", "brand": "Daybird", "name": "Wanderer B'
+        +  b'lack Hiking Boots", "description": "Daybird\'s Wanderer Hiking Boots in s'
+        +  b'leek black are perfect for all your outdoor adventures. These boots are made'
+        +  b' with a waterproof leather upper and a durable rubber sole for superior trac'
+        +  b'tion. With their cushioned insole and padded collar, these boots will keep y'
+        +  b'ou comfortable all day long.", "price": 109.99}}, "thoughts": [{"title": "Pr'
+        +  b'ompt to generate search arguments", "description": ["{\'role\': \'system\', '
+        +  b"'content': 'Below is a history of the conversation so far, and a new questio"
+        +  b'n asked by the user that needs to be answered by searching database rows'
+        +  b'.\\\\nYou have access to an Azure PostgreSQL database with an items table '
+        +  b'that has columns for title, description, brand, price, and type.\\\\nGener'
+        +  b'ate a search query based on the conversation and the new question.\\\\nIf '
+        +  b'the question is not in English, translate the question to English before gen'
+        +  b'erating the search query.\\\\nIf you cannot generate a search query, retur'
+        +  b'n the original user question.\\\\nDO NOT return anything besides the query'
+        +  b'.\'}", "{\'role\': \'user\', \'content\': \'What is the capital of Franc'
+        +  b'e?\'}"], "props": {"model": "gpt-35-turbo", "deployment": "gpt-35-turbo"}'
+        +  b'}, {"title": "Search using generated search arguments", "description": "The '
+        +  b'capital of France is Paris. [Benefit_Options-2.pdf].", "props": {"top": 1, "'
+        +  b'vector_search": true, "text_search": true, "filters": []}}, {"title": "Searc'
+        +  b'h results", "description": [{"id": 1, "type": "Footwear", "brand": "Daybird"'
+        +  b', "name": "Wanderer Black Hiking Boots", "description": "Daybird\'s Wande'
+        +  b'rer Hiking Boots in sleek black are perfect for all your outdoor adventures.'
+        +  b' These boots are made with a waterproof leather upper and a durable rubber s'
+        +  b'ole for superior traction. With their cushioned insole and padded collar, th'
+        +  b'ese boots will keep you comfortable all day long.", "price": 109.99}], "prop'
+        +  b's": {}}, {"title": "Prompt to generate answer", "description": ["{\'role\''
+        +  b': \'system\', \'content\': \\"Assistant helps customers with questions ab'
+        +  b'out products.\\\\nRespond as if you are a salesperson helping a customer i'
+        +  b'n a store. Do NOT respond with tables.\\\\nAnswer ONLY with the product de'
+        +  b"tails listed in the products.\\\\nIf there isn't enough information below,"
+        +  b" say you don't know.\\\\nDo not generate answers that don't use the source"
+        +  b's below.\\\\nEach product has an ID in brackets followed by colon and the '
+        +  b'product details.\\\\nAlways include the product ID for each product you us'
+        +  b'e in the response.\\\\nUse square brackets to reference the source, for ex'
+        +  b"ample [52].\\\\nDon't combine citations, list each product separately, for"
+        +  b' example [27][51].\\"}", "{\'role\': \'user\', \'content\': \\"What is the c'
+        +  b'apital of France?\\\\n\\\\nSources:\\\\n[1]:Name:Wanderer Black Hiking Boo'
+        +  b"ts Description:Daybird's Wanderer Hiking Boots in sleek black are perfect fo"
+        +  b'r all your outdoor adventures. These boots are made with a waterproof leathe'
+        +  b'r upper and a durable rubber sole for superior traction. With their cushione'
+        +  b'd insole and padded collar, these boots will keep you comfortable all day lo'
+        +  b'ng. Price:109.99 Brand:Daybird Type:Footwear\\\\n\\\\n\\"}"], "props": {"'
+        +  b'model": "gpt-35-turbo", "deployment": "gpt-35-turbo"}}], "followup_questions'
+        +  b'": null}, "session_state": null}'
+    )
+
+@pytest.mark.asyncio
 async def test_advanced_chat_flow(test_client):
     """test the advanced chat flow route with hybrid retrieval mode"""
     response = test_client.post(

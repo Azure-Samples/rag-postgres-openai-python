@@ -201,6 +201,11 @@ class SimpleRAGChat(RAGChatBase):
             stream=True,
         )
 
+        # Forcefully Close the database session before yielding the response
+        # Yielding keeps the connection open while streaming the response until the end
+        # The connection closes when it returns back to the context manger in the dependencies
+        await self.searcher.db_session.close()
+
         yield RetrievalResponse(
             message=Message(content="", role="assistant"),
             context=RAGContext(
