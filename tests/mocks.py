@@ -1,22 +1,34 @@
-from collections import namedtuple
+from typing import Any
 
-from azure.core.credentials import TokenCredential
-
-MockToken = namedtuple("MockToken", ["token", "expires_on"])
+from azure.core.credentials import AccessToken, TokenCredential
 
 
 class MockAzureCredential(TokenCredential):
-    def get_token(self, uri):
-        return MockToken("", 9999999999)
+    def get_token(
+        self,
+        *scopes: str,
+        claims: str | None = None,
+        tenant_id: str | None = None,
+        enable_cae: bool = False,
+        **kwargs: Any,
+    ) -> AccessToken:
+        return AccessToken("", 9999999999)
 
 
 class MockAzureCredentialExpired(TokenCredential):
     def __init__(self):
         self.access_number = 0
 
-    async def get_token(self, uri):
+    def get_token(
+        self,
+        *scopes: str,
+        claims: str | None = None,
+        tenant_id: str | None = None,
+        enable_cae: bool = False,
+        **kwargs: Any,
+    ) -> AccessToken:
         self.access_number += 1
         if self.access_number == 1:
-            return MockToken("", 0)
+            return AccessToken("", 0)
         else:
-            return MockToken("", 9999999999)
+            return AccessToken("", 9999999999)
