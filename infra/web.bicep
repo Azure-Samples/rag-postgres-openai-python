@@ -8,6 +8,8 @@ param exists bool
 param identityName string
 param serviceName string = 'web'
 param environmentVariables array = []
+@secure()
+param secrets object
 
 resource webIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: identityName
@@ -37,6 +39,7 @@ module app 'core/host/container-app-upsert.bicep' = {
         }
       ]
     )
+    secrets: secrets
     targetPort: 8000
   }
 }

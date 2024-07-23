@@ -58,6 +58,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 1. Make sure the following tools are installed:
 
     * [Azure Developer CLI (azd)](https://aka.ms/install-azd)
+    * [Node.js 18+](https://nodejs.org/download/)
     * [Python 3.10+](https://www.python.org/downloads/)
     * [PostgreSQL 14+](https://www.postgresql.org/download/)
     * [pgvector](https://github.com/pgvector/pgvector)
@@ -99,6 +100,8 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
 
     This will create a folder under `.azure/` in your project to store the configuration for this deployment. You may have multiple azd environments if desired.
 
+3. (Optional) If you would like to customize the deployment to [use existing Azure resources](docs/deploy_existing.md), you can set the values now.
+
 3. Provision the resources and deploy the code:
 
     ```shell
@@ -128,12 +131,10 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 1. Run these commands to install the web app as a local package (named `fastapi_app`), set up the local database, and seed it with test data:
 
     ```bash
-    python3 -m pip install -e src
-    python ./src/fastapi_app/setup_postgres_database.py
-    python ./src/fastapi_app/setup_postgres_seeddata.p
+    python3 -m pip install -e src/backend
+    python ./src/backend/fastapi_app/setup_postgres_database.py
+    python ./src/backend/fastapi_app/setup_postgres_seeddata.py
     ```
-
-    If you opened the project in Codespaces or a Dev Container, these commands will already have been run for you.
 
 2. Build the frontend:
 
@@ -141,11 +142,12 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     cd src/frontend
     npm install
     npm run build
+    cd ../../
     ```
 
     There must be an initial build of static assets before running the backend, since the backend serves static files from the `src/static` directory.
 
-3. Run the FastAPI backend (with hot reloading):
+3. Run the FastAPI backend (with hot reloading). This should be run from the root of the project:
 
     ```shell
     python3 -m uvicorn fastapi_app:create_app --factory --reload
