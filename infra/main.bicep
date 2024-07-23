@@ -166,17 +166,17 @@ module containerApps 'core/host/container-apps.bicep' = {
 var webAppName = replace('${take(prefix, 19)}-ca', '--', '-')
 var webAppIdentityName = '${prefix}-id-web'
 
-var azureOpenAiKeySecret = !empty(azureOpenAIKey)
+var azureOpenAIKeySecret = !empty(azureOpenAIKey)
   ? {
       'azure-openai-key': azureOpenAIKey
     }
   : {}
-var openAiComKeySecret = !empty(openAIComKey)
+var openAIComKeySecret = !empty(openAIComKey)
   ? {
       'openaicom-key': openAIComKey
     }
   : {}
-var secrets = union(azureOpenAiKeySecret, openAiComKeySecret)
+var secrets = union(azureOpenAIKeySecret, openAIComKeySecret)
 
 var azureOpenAIKeyEnv = !empty(azureOpenAIKey)
   ? [

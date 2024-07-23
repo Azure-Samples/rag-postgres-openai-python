@@ -100,6 +100,8 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
 
     This will create a folder under `.azure/` in your project to store the configuration for this deployment. You may have multiple azd environments if desired.
 
+3. (Optional) If you would like to customize the deployment to [use existing Azure resources](docs/deploy_existing.md), you can set the values now.
+
 3. Provision the resources and deploy the code:
 
     ```shell
