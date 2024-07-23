@@ -4,17 +4,14 @@ from collections.abc import AsyncGenerator
 
 from openai.types.chat import ChatCompletionMessageParam
 
-from fastapi_app.api_models import ChatRequestOverrides, RetrievalResponse, RetrievalResponseDelta
+from fastapi_app.api_models import (
+    ChatParams,
+    ChatRequestOverrides,
+    RetrievalResponse,
+    RetrievalResponseDelta,
+    ThoughtStep,
+)
 from fastapi_app.postgres_models import Item
-
-
-class ChatParams(ChatRequestOverrides):
-    prompt_template: str
-    response_token_limit: int = 1024
-    enable_text_search: bool
-    enable_vector_search: bool
-    original_user_query: str
-    past_messages: list[ChatCompletionMessageParam]
 
 
 class RAGChatBase(ABC):
@@ -48,27 +45,28 @@ class RAGChatBase(ABC):
         )
 
     @abstractmethod
-    async def retrieve_and_build_context(
-        self,
-        chat_params: ChatParams,
-        *args,
-        **kwargs,
-    ) -> tuple[list[ChatCompletionMessageParam], list[Item]]:
+    async def prepare_context(
+        self, chat_params: ChatParams
+    ) -> tuple[list[ChatCompletionMessageParam], list[Item], list[ThoughtStep]]:
         raise NotImplementedError
 
     @abstractmethod
-    async def run(
+    async def answer(
         self,
-        messages: list[ChatCompletionMessageParam],
-        overrides: ChatRequestOverrides,
+        chat_params: ChatParams,
+        contextual_messages: list[ChatCompletionMessageParam],
+        results: list[Item],
+        earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
         raise NotImplementedError
 
     @abstractmethod
-    async def run_stream(
+    async def answer_stream(
         self,
-        messages: list[ChatCompletionMessageParam],
-        overrides: ChatRequestOverrides,
+        chat_params: ChatParams,
+        contextual_messages: list[ChatCompletionMessageParam],
+        results: list[Item],
+        earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
         raise NotImplementedError
         if False:

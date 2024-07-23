@@ -93,8 +93,6 @@ async def chat_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    overrides = chat_request.context.overrides
-
     searcher = PostgresSearcher(
         db_session=database_session,
         openai_embed_client=openai_embed.client,
@@ -102,22 +100,28 @@ async def chat_handler(
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
     )
-    if overrides.use_advanced_flow:
-        run_ragchat = AdvancedRAGChat(
+    rag_flow: SimpleRAGChat | AdvancedRAGChat
+    if chat_request.context.overrides.use_advanced_flow:
+        rag_flow = AdvancedRAGChat(
             searcher=searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
             chat_deployment=context.openai_chat_deployment,
-        ).run
+        )
     else:
-        run_ragchat = SimpleRAGChat(
+        rag_flow = SimpleRAGChat(
             searcher=searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
             chat_deployment=context.openai_chat_deployment,
-        ).run
+        )
 
-    response = await run_ragchat(chat_request.messages, overrides=overrides)
+    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
+
+    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+    response = await rag_flow.answer(
+        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
+    )
     return response
 
 
@@ -129,8 +133,6 @@ async def chat_stream_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    overrides = chat_request.context.overrides
-
     searcher = PostgresSearcher(
         db_session=database_session,
         openai_embed_client=openai_embed.client,
@@ -138,20 +140,30 @@ async def chat_stream_handler(
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
     )
-    if overrides.use_advanced_flow:
-        run_ragchat = AdvancedRAGChat(
-            searcher=searcher,
-            openai_chat_client=openai_chat.client,
-            chat_model=context.openai_chat_model,
-            chat_deployment=context.openai_chat_deployment,
-        ).run_stream
-    else:
-        run_ragchat = SimpleRAGChat(
-            searcher=searcher,
-            openai_chat_client=openai_chat.client,
-            chat_model=context.openai_chat_model,
-            chat_deployment=context.openai_chat_deployment,
-        ).run_stream
 
-    result = run_ragchat(chat_request.messages, overrides=overrides)
+    rag_flow: SimpleRAGChat | AdvancedRAGChat
+    if chat_request.context.overrides.use_advanced_flow:
+        rag_flow = AdvancedRAGChat(
+            searcher=searcher,
+            openai_chat_client=openai_chat.client,
+            chat_model=context.openai_chat_model,
+            chat_deployment=context.openai_chat_deployment,
+        )
+    else:
+        rag_flow = SimpleRAGChat(
+            searcher=searcher,
+            openai_chat_client=openai_chat.client,
+            chat_model=context.openai_chat_model,
+            chat_deployment=context.openai_chat_deployment,
+        )
+
+    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
+
+    # Intentionally do this before we stream down a response, to avoid using database connections during stream
+    # See https://github.com/tiangolo/fastapi/discussions/11321
+    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+
+    result = rag_flow.answer_stream(
+        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
+    )
     return StreamingResponse(content=format_as_ndjson(result), media_type="application/x-ndjson")

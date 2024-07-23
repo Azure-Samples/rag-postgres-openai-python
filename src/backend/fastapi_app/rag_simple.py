@@ -6,7 +6,6 @@ from openai_messages_token_helper import build_messages, get_token_limit
 
 from fastapi_app.api_models import (
     AIChatRoles,
-    ChatRequestOverrides,
     Message,
     RAGContext,
     RetrievalResponse,
@@ -33,9 +32,9 @@ class SimpleRAGChat(RAGChatBase):
         self.chat_deployment = chat_deployment
         self.chat_token_limit = get_token_limit(chat_model, default_to_minimum=True)
 
-    async def retrieve_and_build_context(
+    async def prepare_context(
         self, chat_params: ChatParams
-    ) -> tuple[list[ChatCompletionMessageParam], list[Item]]:
+    ) -> tuple[list[ChatCompletionMessageParam], list[Item], list[ThoughtStep]]:
         """Retrieve relevant items from the database and build a context for the chat model."""
 
         # Retrieve relevant items from the database
@@ -58,17 +57,31 @@ class SimpleRAGChat(RAGChatBase):
             max_tokens=self.chat_token_limit - chat_params.response_token_limit,
             fallback_to_default=True,
         )
-        return contextual_messages, results
 
-    async def run(
+        thoughts = [
+            ThoughtStep(
+                title="Search query for database",
+                description=chat_params.original_user_query,
+                props={
+                    "top": chat_params.top,
+                    "vector_search": chat_params.enable_vector_search,
+                    "text_search": chat_params.enable_text_search,
+                },
+            ),
+            ThoughtStep(
+                title="Search results",
+                description=[result.to_dict() for result in results],
+            ),
+        ]
+        return contextual_messages, results, thoughts
+
+    async def answer(
         self,
-        messages: list[ChatCompletionMessageParam],
-        overrides: ChatRequestOverrides,
+        chat_params: ChatParams,
+        contextual_messages: list[ChatCompletionMessageParam],
+        results: list[Item],
+        earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
-        chat_params = self.get_params(messages, overrides)
-
-        contextual_messages, results = await self.retrieve_and_build_context(chat_params=chat_params)
-
         chat_completion_response: ChatCompletion = await self.openai_chat_client.chat.completions.create(
             # Azure OpenAI takes the deployment name as the model name
             model=self.chat_deployment if self.chat_deployment else self.chat_model,
@@ -85,20 +98,8 @@ class SimpleRAGChat(RAGChatBase):
             ),
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
-                thoughts=[
-                    ThoughtStep(
-                        title="Search query for database",
-                        description=chat_params.original_user_query if chat_params.enable_text_search else None,
-                        props={
-                            "top": chat_params.top,
-                            "vector_search": chat_params.enable_vector_search,
-                            "text_search": chat_params.enable_text_search,
-                        },
-                    ),
-                    ThoughtStep(
-                        title="Search results",
-                        description=[result.to_dict() for result in results],
-                    ),
+                thoughts=earlier_thoughts
+                + [
                     ThoughtStep(
                         title="Prompt to generate answer",
                         description=[str(message) for message in contextual_messages],
@@ -112,15 +113,13 @@ class SimpleRAGChat(RAGChatBase):
             ),
         )
 
-    async def run_stream(
+    async def answer_stream(
         self,
-        messages: list[ChatCompletionMessageParam],
-        overrides: ChatRequestOverrides,
+        chat_params: ChatParams,
+        contextual_messages: list[ChatCompletionMessageParam],
+        results: list[Item],
+        earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
-        chat_params = self.get_params(messages, overrides)
-
-        contextual_messages, results = await self.retrieve_and_build_context(chat_params=chat_params)
-
         chat_completion_async_stream: AsyncStream[
             ChatCompletionChunk
         ] = await self.openai_chat_client.chat.completions.create(
@@ -133,28 +132,11 @@ class SimpleRAGChat(RAGChatBase):
             stream=True,
         )
 
-        # Forcefully close the database session before yielding the response
-        # Yielding keeps the connection open while streaming the response until the end
-        # The connection closes when it returns back to the context manger in the dependencies
-        await self.searcher.db_session.close()
-
         yield RetrievalResponseDelta(
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
-                thoughts=[
-                    ThoughtStep(
-                        title="Search query for database",
-                        description=chat_params.original_user_query if chat_params.enable_text_search else None,
-                        props={
-                            "top": chat_params.top,
-                            "vector_search": chat_params.enable_vector_search,
-                            "text_search": chat_params.enable_text_search,
-                        },
-                    ),
-                    ThoughtStep(
-                        title="Search results",
-                        description=[result.to_dict() for result in results],
-                    ),
+                thoughts=earlier_thoughts
+                + [
                     ThoughtStep(
                         title="Prompt to generate answer",
                         description=[str(message) for message in contextual_messages],

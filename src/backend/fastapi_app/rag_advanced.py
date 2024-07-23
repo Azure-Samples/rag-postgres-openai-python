@@ -7,7 +7,6 @@ from openai_messages_token_helper import build_messages, get_token_limit
 
 from fastapi_app.api_models import (
     AIChatRoles,
-    ChatRequestOverrides,
     Message,
     RAGContext,
     RetrievalResponse,
@@ -63,10 +62,15 @@ class AdvancedRAGChat(RAGChatBase):
 
         return query_messages, query_text, filters
 
-    async def retrieve_and_build_context(
-        self, chat_params: ChatParams, query_text: str | Any | None, filters: list
-    ) -> tuple[list[ChatCompletionMessageParam], list[Item]]:
-        """Retrieve relevant items from the database and build a context for the chat model."""
+    async def prepare_context(
+        self, chat_params: ChatParams
+    ) -> tuple[list[ChatCompletionMessageParam], list[Item], list[ThoughtStep]]:
+        query_messages, query_text, filters = await self.generate_search_query(
+            original_user_query=chat_params.original_user_query,
+            past_messages=chat_params.past_messages,
+            query_response_token_limit=500,
+        )
+
         # Retrieve relevant items from the database with the GPT optimized query
         results = await self.searcher.search_and_embed(
             query_text,
@@ -88,28 +92,41 @@ class AdvancedRAGChat(RAGChatBase):
             max_tokens=self.chat_token_limit - chat_params.response_token_limit,
             fallback_to_default=True,
         )
-        return contextual_messages, results
 
-    async def run(
+        thoughts = [
+            ThoughtStep(
+                title="Prompt to generate search arguments",
+                description=[str(message) for message in query_messages],
+                props=(
+                    {"model": self.chat_model, "deployment": self.chat_deployment}
+                    if self.chat_deployment
+                    else {"model": self.chat_model}
+                ),
+            ),
+            ThoughtStep(
+                title="Search using generated search arguments",
+                description=query_text,
+                props={
+                    "top": chat_params.top,
+                    "vector_search": chat_params.enable_vector_search,
+                    "text_search": chat_params.enable_text_search,
+                    "filters": filters,
+                },
+            ),
+            ThoughtStep(
+                title="Search results",
+                description=[result.to_dict() for result in results],
+            ),
+        ]
+        return contextual_messages, results, thoughts
+
+    async def answer(
         self,
-        messages: list[ChatCompletionMessageParam],
-        overrides: ChatRequestOverrides,
+        chat_params: ChatParams,
+        contextual_messages: list[ChatCompletionMessageParam],
+        results: list[Item],
+        earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
-        chat_params = self.get_params(messages, overrides)
-
-        # Generate an optimized keyword search query based on the chat history and the last question
-        query_messages, query_text, filters = await self.generate_search_query(
-            original_user_query=chat_params.original_user_query,
-            past_messages=chat_params.past_messages,
-            query_response_token_limit=500,
-        )
-
-        # Retrieve relevant items from the database with the GPT optimized query
-        # Generate a contextual and content specific answer using the search results and chat history
-        contextual_messages, results = await self.retrieve_and_build_context(
-            chat_params=chat_params, query_text=query_text, filters=filters
-        )
-
         chat_completion_response: ChatCompletion = await self.openai_chat_client.chat.completions.create(
             # Azure OpenAI takes the deployment name as the model name
             model=self.chat_deployment if self.chat_deployment else self.chat_model,
@@ -126,30 +143,8 @@ class AdvancedRAGChat(RAGChatBase):
             ),
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
-                thoughts=[
-                    ThoughtStep(
-                        title="Prompt to generate search arguments",
-                        description=[str(message) for message in query_messages],
-                        props=(
-                            {"model": self.chat_model, "deployment": self.chat_deployment}
-                            if self.chat_deployment
-                            else {"model": self.chat_model}
-                        ),
-                    ),
-                    ThoughtStep(
-                        title="Search using generated search arguments",
-                        description=query_text,
-                        props={
-                            "top": chat_params.top,
-                            "vector_search": chat_params.enable_vector_search,
-                            "text_search": chat_params.enable_text_search,
-                            "filters": filters,
-                        },
-                    ),
-                    ThoughtStep(
-                        title="Search results",
-                        description=[result.to_dict() for result in results],
-                    ),
+                thoughts=earlier_thoughts
+                + [
                     ThoughtStep(
                         title="Prompt to generate answer",
                         description=[str(message) for message in contextual_messages],
@@ -163,23 +158,13 @@ class AdvancedRAGChat(RAGChatBase):
             ),
         )
 
-    async def run_stream(
+    async def answer_stream(
         self,
-        messages: list[ChatCompletionMessageParam],
-        overrides: ChatRequestOverrides,
+        chat_params: ChatParams,
+        contextual_messages: list[ChatCompletionMessageParam],
+        results: list[Item],
+        earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
-        chat_params = self.get_params(messages, overrides)
-
-        query_messages, query_text, filters = await self.generate_search_query(
-            original_user_query=chat_params.original_user_query,
-            past_messages=chat_params.past_messages,
-            query_response_token_limit=500,
-        )
-
-        contextual_messages, results = await self.retrieve_and_build_context(
-            chat_params=chat_params, query_text=query_text, filters=filters
-        )
-
         chat_completion_async_stream: AsyncStream[
             ChatCompletionChunk
         ] = await self.openai_chat_client.chat.completions.create(
@@ -192,38 +177,11 @@ class AdvancedRAGChat(RAGChatBase):
             stream=True,
         )
 
-        # Forcefully close the database session before yielding the response
-        # Yielding keeps the connection open while streaming the response until the end
-        # The connection closes when it returns back to the context manger in the dependencies
-        await self.searcher.db_session.close()
-
         yield RetrievalResponseDelta(
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
-                thoughts=[
-                    ThoughtStep(
-                        title="Prompt to generate search arguments",
-                        description=[str(message) for message in query_messages],
-                        props=(
-                            {"model": self.chat_model, "deployment": self.chat_deployment}
-                            if self.chat_deployment
-                            else {"model": self.chat_model}
-                        ),
-                    ),
-                    ThoughtStep(
-                        title="Search using generated search arguments",
-                        description=query_text,
-                        props={
-                            "top": chat_params.top,
-                            "vector_search": chat_params.enable_vector_search,
-                            "text_search": chat_params.enable_text_search,
-                            "filters": filters,
-                        },
-                    ),
-                    ThoughtStep(
-                        title="Search results",
-                        description=[result.to_dict() for result in results],
-                    ),
+                thoughts=earlier_thoughts
+                + [
                     ThoughtStep(
                         title="Prompt to generate answer",
                         description=[str(message) for message in contextual_messages],

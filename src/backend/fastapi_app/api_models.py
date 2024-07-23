@@ -74,3 +74,12 @@ class ItemPublic(BaseModel):
 
 class ItemWithDistance(ItemPublic):
     distance: float
+
+
+class ChatParams(ChatRequestOverrides):
+    prompt_template: str
+    response_token_limit: int = 1024
+    enable_text_search: bool
+    enable_vector_search: bool
+    original_user_query: str
+    past_messages: list[ChatCompletionMessageParam]

@@ -51,7 +51,7 @@ def create_app(testing: bool = False):
     else:
         if not testing:
             load_dotenv(override=True)
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.DEBUG)
     # Turn off particularly noisy INFO level logs from Azure Core SDK:
     logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
 
