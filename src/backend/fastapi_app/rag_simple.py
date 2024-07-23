@@ -70,7 +70,7 @@ class RAGChatBase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def retreive_and_build_context(
+    async def retrieve_and_build_context(
         self,
         chat_params: ChatParams,
         *args,
