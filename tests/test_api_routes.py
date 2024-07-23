@@ -140,7 +140,7 @@ async def test_simple_chat_streaming_flow(test_client, snapshot):
     response_data = response.content
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/x-ndjson"
-    snapshot.assert_match(response_data, "simple_chat_streaming_flow_response.txt")
+    snapshot.assert_match(response_data, "simple_chat_streaming_flow_response.jsonlines")
 
 
 @pytest.mark.asyncio
@@ -163,7 +163,7 @@ async def test_advanced_chat_flow(test_client, snapshot):
 
 
 @pytest.mark.asyncio
-async def test_advanved_chat_streaming_flow(test_client, snapshot):
+async def test_advanced_chat_streaming_flow(test_client, snapshot):
     """test the advanced chat streaming flow route with hybrid retrieval mode"""
     response = test_client.post(
         "/chat/stream",
@@ -177,7 +177,7 @@ async def test_advanved_chat_streaming_flow(test_client, snapshot):
     response_data = response.content
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/x-ndjson"
-    snapshot.assert_match(response_data, "advanced_chat_streaming_flow_response.txt")
+    snapshot.assert_match(response_data, "advanced_chat_streaming_flow_response.jsonlines")
 
 
 @pytest.mark.asyncio
