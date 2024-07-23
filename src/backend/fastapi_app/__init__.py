@@ -39,7 +39,8 @@ async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[State]:
     sessionmaker = await create_async_sessionmaker(engine)
     chat_client = await create_openai_chat_client(azure_credential)
     embed_client = await create_openai_embed_client(azure_credential)
-    SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+        SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
     yield {"sessionmaker": sessionmaker, "context": context, "chat_client": chat_client, "embed_client": embed_client}
     await engine.dispose()
 
@@ -51,6 +52,7 @@ def create_app(testing: bool = False):
         if not testing:
             load_dotenv(override=True)
         logging.basicConfig(level=logging.INFO)
+    # Turn off particularly noisy INFO level logs from Azure Core SDK:
     logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
 
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):

@@ -19,7 +19,7 @@
         "request": "launch",
         "module": "uvicorn",
         "args": ["fastapi_app:create_app", "--factory", "--reload"],
-        "justMyCode": false
+        "justMyCode": true
     }
   ],
   "compounds": [

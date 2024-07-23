@@ -31,8 +31,8 @@ more about load on OpenAI than on Azure Container Apps and PostgreSQL Flexible S
 For the number of users and spawn rate, we recommend starting with 20 users and 1 users/second.
 From there, you can keep increasing the number of users to simulate your expected load.
 
-Here's an example loadtest for 50 users and a spawn rate of 1 per second:
+Here's an example loadtest for 20 users and a spawn rate of 1 per second:
 
-![Screenshot of Locust charts showing 5 requests per second](images/screenshot_locust.png)
+![Screenshot of Locust charts showing 5 requests per second](images/locust_loadtest.png)
 
 After each test, check the local or App Service logs to see if there are any errors.
