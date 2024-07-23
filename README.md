@@ -58,6 +58,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 1. Make sure the following tools are installed:
 
     * [Azure Developer CLI (azd)](https://aka.ms/install-azd)
+    * [Node.js 18+](https://nodejs.org/download/)
     * [Python 3.10+](https://www.python.org/downloads/)
     * [PostgreSQL 14+](https://www.postgresql.org/download/)
     * [pgvector](https://github.com/pgvector/pgvector)
@@ -98,6 +99,8 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
     ```
 
     This will create a folder under `.azure/` in your project to store the configuration for this deployment. You may have multiple azd environments if desired.
+
+3. (Optional) If you would like to customize the deployment to [use existing Azure resources](docs/deploy_existing.md), you can set the values now.
 
 3. Provision the resources and deploy the code:
 
