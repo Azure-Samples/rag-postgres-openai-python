@@ -1,4 +1,4 @@
-import { AIChatCompletion, AIChatCompletionDelta } from "@microsoft/ai-chat-protocol";
+import { AIChatCompletion, AIChatCompletionDelta, AIChatCompletionOperationOptions } from "@microsoft/ai-chat-protocol";
 
 export const enum RetrievalMode {
     Hybrid = "hybrid",
@@ -13,6 +13,14 @@ export type ChatAppRequestOverrides = {
     temperature?: number;
     prompt_template?: string;
 };
+
+export type ChatAppRequestContext = {
+    overrides: ChatAppRequestOverrides;
+};
+
+export interface ChatAppRequestOptions extends AIChatCompletionOperationOptions {
+    context: ChatAppRequestContext
+}
 
 export type Thoughts = {
     title: string;

@@ -93,7 +93,7 @@ async def chat_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    overrides = chat_request.context.get("overrides", {})
+    overrides = chat_request.context.overrides
 
     searcher = PostgresSearcher(
         db_session=database_session,
@@ -102,7 +102,7 @@ async def chat_handler(
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
     )
-    if overrides.get("use_advanced_flow"):
+    if overrides.use_advanced_flow:
         run_ragchat = AdvancedRAGChat(
             searcher=searcher,
             openai_chat_client=openai_chat.client,
@@ -129,7 +129,7 @@ async def chat_stream_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    overrides = chat_request.context.get("overrides", {})
+    overrides = chat_request.context.overrides
 
     searcher = PostgresSearcher(
         db_session=database_session,
@@ -138,7 +138,7 @@ async def chat_stream_handler(
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
     )
-    if overrides.get("use_advanced_flow"):
+    if overrides.use_advanced_flow:
         run_ragchat = AdvancedRAGChat(
             searcher=searcher,
             openai_chat_client=openai_chat.client,

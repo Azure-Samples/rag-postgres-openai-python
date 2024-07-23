@@ -1,5 +1,4 @@
 from collections.abc import AsyncGenerator
-from typing import Any
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam
@@ -7,6 +6,7 @@ from openai_messages_token_helper import build_messages, get_token_limit
 
 from fastapi_app.api_models import (
     AIChatRoles,
+    ChatRequestOverrides,
     Message,
     RAGContext,
     RetrievalResponse,
@@ -63,7 +63,7 @@ class SimpleRAGChat(RAGChatBase):
     async def run(
         self,
         messages: list[ChatCompletionMessageParam],
-        overrides: dict[str, Any] = {},
+        overrides: ChatRequestOverrides,
     ) -> RetrievalResponse:
         chat_params = self.get_params(messages, overrides)
 
@@ -115,7 +115,7 @@ class SimpleRAGChat(RAGChatBase):
     async def run_stream(
         self,
         messages: list[ChatCompletionMessageParam],
-        overrides: dict[str, Any] = {},
+        overrides: ChatRequestOverrides,
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
         chat_params = self.get_params(messages, overrides)
 

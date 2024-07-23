@@ -1,27 +1,20 @@
 import pathlib
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
-from typing import Any
 
 from openai.types.chat import ChatCompletionMessageParam
-from pydantic import BaseModel
 
-from fastapi_app.api_models import (
-    RetrievalResponse,
-    RetrievalResponseDelta,
-)
+from fastapi_app.api_models import ChatRequestOverrides, RetrievalResponse, RetrievalResponseDelta
 from fastapi_app.postgres_models import Item
 
 
-class ChatParams(BaseModel):
-    top: int = 3
-    temperature: float = 0.3
+class ChatParams(ChatRequestOverrides):
+    prompt_template: str
     response_token_limit: int = 1024
     enable_text_search: bool
     enable_vector_search: bool
     original_user_query: str
     past_messages: list[ChatCompletionMessageParam]
-    prompt_template: str
 
 
 class RAGChatBase(ABC):
@@ -29,14 +22,12 @@ class RAGChatBase(ABC):
     query_prompt_template = open(current_dir / "prompts/query.txt").read()
     answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
 
-    def get_params(self, messages: list[ChatCompletionMessageParam], overrides: dict[str, Any]) -> ChatParams:
-        top: int = overrides.get("top", 3)
-        temperature: float = overrides.get("temperature", 0.3)
+    def get_params(self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides) -> ChatParams:
         response_token_limit = 1024
-        prompt_template = overrides.get("prompt_template") or self.answer_prompt_template
+        prompt_template = overrides.prompt_template or self.answer_prompt_template
 
-        enable_text_search = overrides.get("retrieval_mode") in ["text", "hybrid", None]
-        enable_vector_search = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
+        enable_text_search = overrides.retrieval_mode in ["text", "hybrid", None]
+        enable_vector_search = overrides.retrieval_mode in ["vectors", "hybrid", None]
 
         original_user_query = messages[-1]["content"]
         if not isinstance(original_user_query, str):
@@ -44,8 +35,10 @@ class RAGChatBase(ABC):
         past_messages = messages[:-1]
 
         return ChatParams(
-            top=top,
-            temperature=temperature,
+            top=overrides.top,
+            temperature=overrides.temperature,
+            retrieval_mode=overrides.retrieval_mode,
+            use_advanced_flow=overrides.use_advanced_flow,
             response_token_limit=response_token_limit,
             prompt_template=prompt_template,
             enable_text_search=enable_text_search,
@@ -67,7 +60,7 @@ class RAGChatBase(ABC):
     async def run(
         self,
         messages: list[ChatCompletionMessageParam],
-        overrides: dict[str, Any] = {},
+        overrides: ChatRequestOverrides,
     ) -> RetrievalResponse:
         raise NotImplementedError
 
@@ -75,7 +68,7 @@ class RAGChatBase(ABC):
     async def run_stream(
         self,
         messages: list[ChatCompletionMessageParam],
-        overrides: dict[str, Any] = {},
+        overrides: ChatRequestOverrides,
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
         raise NotImplementedError
         if False:

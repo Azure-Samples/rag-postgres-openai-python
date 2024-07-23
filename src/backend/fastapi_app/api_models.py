@@ -16,9 +16,27 @@ class Message(BaseModel):
     role: AIChatRoles = AIChatRoles.USER
 
 
+class RetrievalMode(str, Enum):
+    TEXT = "text"
+    VECTORS = "vectors"
+    HYBRID = "hybrid"
+
+
+class ChatRequestOverrides(BaseModel):
+    top: int = 3
+    temperature: float = 0.3
+    retrieval_mode: RetrievalMode = RetrievalMode.HYBRID
+    use_advanced_flow: bool = True
+    prompt_template: str | None = None
+
+
+class ChatRequestContext(BaseModel):
+    overrides: ChatRequestOverrides
+
+
 class ChatRequest(BaseModel):
     messages: list[ChatCompletionMessageParam]
-    context: dict = {}
+    context: ChatRequestContext
 
 
 class ThoughtStep(BaseModel):

@@ -4,7 +4,7 @@ import { SparkleFilled } from "@fluentui/react-icons";
 
 import styles from "./Chat.module.css";
 
-import { RetrievalMode, RAGChatCompletion, RAGChatCompletionDelta } from "../../api";
+import { RetrievalMode, RAGChatCompletion, RAGChatCompletionDelta, ChatAppRequestOptions } from "../../api";
 import { AIChatProtocolClient, AIChatMessage } from "@microsoft/ai-chat-protocol";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
@@ -99,7 +99,7 @@ const Chat = () => {
                 { content: answer[1].message.content, role: "assistant" }
             ]);
             const allMessages: AIChatMessage[] = [...messages, { content: question, role: "user" }];
-            const options = {
+            const options: ChatAppRequestOptions = {
                 context: {
                     overrides: {
                         use_advanced_flow: useAdvancedFlow,
