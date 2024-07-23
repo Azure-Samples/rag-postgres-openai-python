@@ -9,7 +9,7 @@ services:
         module: web
         host: containerapp
         hooks:
-            prepackage:
+            prebuild:
                 windows:
                     shell: pwsh
                     run:  cd ../frontend;npm install;npm run build

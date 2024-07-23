@@ -58,6 +58,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 1. Make sure the following tools are installed:
 
     * [Azure Developer CLI (azd)](https://aka.ms/install-azd)
+    * [Node.js 18+](https://nodejs.org/download/)
     * [Python 3.10+](https://www.python.org/downloads/)
     * [PostgreSQL 14+](https://www.postgresql.org/download/)
     * [pgvector](https://github.com/pgvector/pgvector)
