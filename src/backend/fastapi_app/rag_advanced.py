@@ -183,7 +183,7 @@ class AdvancedRAGChat(RAGChatBase):
             stream=True,
         )
 
-        # Forcefully Close the database session before yielding the response
+        # Forcefully close the database session before yielding the response
         # Yielding keeps the connection open while streaming the response until the end
         # The connection closes when it returns back to the context manger in the dependencies
         await self.searcher.db_session.close()
@@ -230,5 +230,7 @@ class AdvancedRAGChat(RAGChatBase):
         )
 
         async for response_chunk in chat_completion_async_stream:
-            yield Message(content=str(response_chunk.choices[0].delta.content), role="assistant")
+            # first response has empty choices
+            if response_chunk.choices:
+                yield Message(content=str(response_chunk.choices[0].delta.content), role="assistant")
         return
