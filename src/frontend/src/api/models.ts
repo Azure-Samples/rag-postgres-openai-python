@@ -1,4 +1,4 @@
-import { AIChatCompletion } from "@microsoft/ai-chat-protocol";
+import { AIChatCompletion, AIChatCompletionDelta } from "@microsoft/ai-chat-protocol";
 
 export const enum RetrievalMode {
     Hybrid = "hybrid",
@@ -27,5 +27,9 @@ export type RAGContext = {
 };
 
 export interface RAGChatCompletion extends AIChatCompletion {
+    context: RAGContext;
+}
+
+export interface RAGChatCompletionDelta extends AIChatCompletionDelta {
     context: RAGContext;
 }
