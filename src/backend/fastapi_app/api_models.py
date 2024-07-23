@@ -1,12 +1,19 @@
+from enum import Enum
 from typing import Any
 
 from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel
 
 
+class AIChatRoles(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+
+
 class Message(BaseModel):
     content: str
-    role: str = "user"
+    role: AIChatRoles = AIChatRoles.USER
 
 
 class ChatRequest(BaseModel):
@@ -29,6 +36,12 @@ class RAGContext(BaseModel):
 class RetrievalResponse(BaseModel):
     message: Message
     context: RAGContext
+    session_state: Any | None = None
+
+
+class RetrievalResponseDelta(BaseModel):
+    delta: Message | None = None
+    context: RAGContext | None = None
     session_state: Any | None = None
 
 

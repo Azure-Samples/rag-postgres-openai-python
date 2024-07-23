@@ -7,7 +7,13 @@ from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
-from fastapi_app.api_models import ChatRequest, ItemPublic, ItemWithDistance, Message, RetrievalResponse
+from fastapi_app.api_models import (
+    ChatRequest,
+    ItemPublic,
+    ItemWithDistance,
+    RetrievalResponse,
+    RetrievalResponseDelta,
+)
 from fastapi_app.dependencies import ChatClient, CommonDeps, DBSession, EmbeddingsClient
 from fastapi_app.postgres_models import Item
 from fastapi_app.postgres_searcher import PostgresSearcher
@@ -17,13 +23,13 @@ from fastapi_app.rag_simple import SimpleRAGChat
 router = fastapi.APIRouter()
 
 
-async def format_as_ndjson(r: AsyncGenerator[RetrievalResponse | Message, None]) -> AsyncGenerator[str, None]:
+async def format_as_ndjson(r: AsyncGenerator[RetrievalResponseDelta, None]) -> AsyncGenerator[str, None]:
     """
     Format the response as NDJSON
     """
     try:
         async for event in r:
-            yield json.dumps(event.model_dump(), ensure_ascii=False) + "\n"
+            yield event.model_dump_json() + "\n"
     except Exception as error:
         logging.exception("Exception while generating response stream: %s", error)
         yield json.dumps({"error": str(error)}, ensure_ascii=False) + "\n"

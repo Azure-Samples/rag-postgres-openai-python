@@ -5,7 +5,14 @@ from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam
 from openai_messages_token_helper import build_messages, get_token_limit
 
-from fastapi_app.api_models import Message, RAGContext, RetrievalResponse, ThoughtStep
+from fastapi_app.api_models import (
+    AIChatRoles,
+    Message,
+    RAGContext,
+    RetrievalResponse,
+    RetrievalResponseDelta,
+    ThoughtStep,
+)
 from fastapi_app.postgres_models import Item
 from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.query_rewriter import build_search_function, extract_search_arguments
@@ -110,10 +117,10 @@ class AdvancedRAGChat(RAGChatBase):
             stream=False,
         )
 
-        first_choice_message = chat_completion_response.choices[0].message
-
         return RetrievalResponse(
-            message=Message(content=str(first_choice_message.content), role=first_choice_message.role),
+            message=Message(
+                content=str(chat_completion_response.choices[0].message.content), role=AIChatRoles.ASSISTANT
+            ),
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
                 thoughts=[
@@ -157,7 +164,7 @@ class AdvancedRAGChat(RAGChatBase):
         self,
         messages: list[ChatCompletionMessageParam],
         overrides: dict[str, Any] = {},
-    ) -> AsyncGenerator[RetrievalResponse | Message, None]:
+    ) -> AsyncGenerator[RetrievalResponseDelta, None]:
         chat_params = self.get_params(messages, overrides)
 
         # Generate an optimized keyword search query based on the chat history and the last question
@@ -188,8 +195,7 @@ class AdvancedRAGChat(RAGChatBase):
         # The connection closes when it returns back to the context manger in the dependencies
         await self.searcher.db_session.close()
 
-        yield RetrievalResponse(
-            message=Message(content="", role="assistant"),
+        yield RetrievalResponseDelta(
             context=RAGContext(
                 data_points={item.id: item.to_dict() for item in results},
                 thoughts=[
@@ -230,7 +236,9 @@ class AdvancedRAGChat(RAGChatBase):
         )
 
         async for response_chunk in chat_completion_async_stream:
-            # first response has empty choices
-            if response_chunk.choices:
-                yield Message(content=str(response_chunk.choices[0].delta.content), role="assistant")
+            # first response has empty choices and last response has empty content
+            if response_chunk.choices and response_chunk.choices[0].delta.content:
+                yield RetrievalResponseDelta(
+                    delta=Message(content=str(response_chunk.choices[0].delta.content), role=AIChatRoles.ASSISTANT)
+                )
         return
