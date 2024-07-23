@@ -13,6 +13,7 @@ This project is designed for deployment to Azure using [the Azure Developer CLI]
 * [Local development](#local-development)
 * [Costs](#costs)
 * [Security guidelines](#security-guidelines)
+* [Guidance](#guidance)
 * [Resources](#resources)
 
 ## Features
@@ -58,6 +59,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 1. Make sure the following tools are installed:
 
     * [Azure Developer CLI (azd)](https://aka.ms/install-azd)
+    * [Node.js 18+](https://nodejs.org/download/)
     * [Python 3.10+](https://www.python.org/downloads/)
     * [PostgreSQL 14+](https://www.postgresql.org/download/)
     * [pgvector](https://github.com/pgvector/pgvector)
@@ -99,6 +101,8 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
 
     This will create a folder under `.azure/` in your project to store the configuration for this deployment. You may have multiple azd environments if desired.
 
+3. (Optional) If you would like to customize the deployment to [use existing Azure resources](docs/deploy_existing.md), you can set the values now.
+
 3. Provision the resources and deploy the code:
 
     ```shell
@@ -128,9 +132,9 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 1. Run these commands to install the web app as a local package (named `fastapi_app`), set up the local database, and seed it with test data:
 
     ```bash
-    python3 -m pip install -e src
-    python ./src/fastapi_app/setup_postgres_database.py
-    python ./src/fastapi_app/setup_postgres_seeddata.py
+    python3 -m pip install -e src/backend
+    python ./src/backend/fastapi_app/setup_postgres_database.py
+    python ./src/backend/fastapi_app/setup_postgres_seeddata.py
     ```
 
 2. Build the frontend:
@@ -139,7 +143,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     cd src/frontend
     npm install
     npm run build
-    cd ../..
+    cd ../../
     ```
 
     There must be an initial build of static assets before running the backend, since the backend serves static files from the `src/static` directory.
@@ -173,11 +177,21 @@ You may try the [Azure pricing calculator](https://azure.microsoft.com/pricing/c
 * Azure PostgreSQL Flexible Server: Burstable Tier with 1 CPU core, 32GB storage. Pricing is hourly. [Pricing](https://azure.microsoft.com/pricing/details/postgresql/flexible-server/)
 * Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
 
-## Security Guidelines
+## Security guidelines
 
 This template uses [Managed Identity](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) for authenticating to the Azure services used (Azure OpenAI, Azure PostgreSQL Flexible Server).
 
 Additionally, we have added a [GitHub Action](https://github.com/microsoft/security-devops-action) that scans the infrastructure-as-code files and generates a report containing any detected issues. To ensure continued best practices in your own repository, we recommend that anyone creating solutions based on our templates ensure that the [Github secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning) setting is enabled.
+
+## Guidance
+
+Further documentation is available in the `docs/` folder:
+
+* [Deploying with existing resources](docs/deploy_existing.md)
+* [Monitoring with Azure Monitor](docs/monitoring.md)
+* [Load testing](docs/loadtesting.md)
+
+Please post in the issue tracker with any questions or issues.
 
 ## Resources
 

@@ -26,7 +26,10 @@
       "azureOpenAIEndpoint": {
         "value": "${AZURE_OPENAI_ENDPOINT}"
       },
-      "chatModelName":{
+      "openAIChatHost": {
+        "value": "${OPENAI_CHAT_HOST=azure}"
+      },
+      "chatModelName": {
         "value": "${AZURE_OPENAI_CHAT_MODEL}"
       },
       "chatDeploymentName": {
@@ -37,6 +40,9 @@
       },
       "chatDeploymentCapacity":{
         "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY}"
+      },
+      "openAIEmbedHost": {
+        "value": "${OPENAI_EMBED_HOST=azure}"
       },
       "embedModelName":{
         "value": "${AZURE_OPENAI_EMBED_MODEL}"
@@ -52,6 +58,9 @@
       },
       "embedDimensions": {
         "value": "${AZURE_OPENAI_EMBED_DIMENSIONS}"
+      },
+      "openAIComKey": {
+        "value": "${OPENAICOM_KEY}"
       }
     }
 }

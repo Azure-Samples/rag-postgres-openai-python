@@ -36,8 +36,8 @@ async def seed_data(engine):
         with open(os.path.join(current_dir, "seed_data.json")) as f:
             catalog_items = json.load(f)
             for catalog_item in catalog_items:
-                item = await session.execute(select(Item).filter(Item.id == catalog_item["Id"]))
-                if item.scalars().first():
+                db_item = await session.execute(select(Item).filter(Item.id == catalog_item["Id"]))
+                if db_item.scalars().first():
                     continue
                 item = Item(
                     id=catalog_item["Id"],

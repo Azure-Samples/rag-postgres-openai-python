@@ -75,10 +75,6 @@ param serviceBinds array = []
 @description('The target port for the container')
 param targetPort int = 80
 
-// Service options
-@description('PostgreSQL service ID')
-param postgresServiceId string = ''
-
 resource existingApp 'Microsoft.App/containerApps@2023-05-02-preview' existing = if (exists) {
   name: name
 }
@@ -103,7 +99,6 @@ module app 'container-app.bicep' = {
     daprEnabled: daprEnabled
     daprAppId: daprAppId
     daprAppProtocol: daprAppProtocol
-    postgresServiceId: postgresServiceId
     secrets: secrets
     keyvaultIdentities: keyvaultIdentities
     external: external

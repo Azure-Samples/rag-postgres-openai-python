@@ -2,10 +2,16 @@ from typing import (
     TypedDict,
 )
 
+from openai import AsyncAzureOpenAI, AsyncOpenAI
+
 
 async def compute_text_embedding(
-    q: str, openai_client, embed_model: str, embed_deployment: str = None, embedding_dimensions: int = 1536
-):
+    q: str,
+    openai_client: AsyncOpenAI | AsyncAzureOpenAI,
+    embed_model: str,
+    embed_deployment: str | None = None,
+    embedding_dimensions: int = 1536,
+) -> list[float]:
     SUPPORTED_DIMENSIONS_MODEL = {
         "text-embedding-ada-002": False,
         "text-embedding-3-small": True,

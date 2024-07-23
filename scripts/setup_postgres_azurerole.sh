@@ -9,4 +9,4 @@ fi
 
 . ./scripts/load_python_env.sh
 
-.venv/bin/python ./src/fastapi_app/setup_postgres_azurerole.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --app-identity-name $APP_IDENTITY_NAME
+.venv/bin/python ./src/backend/fastapi_app/setup_postgres_azurerole.py --host $POSTGRES_HOST --username $POSTGRES_USERNAME --app-identity-name $APP_IDENTITY_NAME

@@ -37,6 +37,21 @@ param openAIResourceGroupName string = ''
 @description('Whether to deploy Azure OpenAI resources')
 param deployAzureOpenAI bool = true
 
+@allowed([
+  'azure'
+  'openaicom'
+])
+param openAIChatHost string = 'azure'
+
+@allowed([
+  'azure'
+  'openaicom'
+])
+param openAIEmbedHost string = 'azure'
+
+@secure()
+param openAIComKey string = ''
+
 @description('Name of the GPT model to deploy')
 param chatModelName string = ''
 @description('Name of the model deployment')
@@ -50,18 +65,16 @@ param chatDeploymentVersion string = ''
 param azureOpenAIAPIVersion string = '2024-03-01-preview'
 @secure()
 param azureOpenAIKey string = ''
+
 @description('Azure OpenAI endpoint to use, if not using the one deployed here.')
 param azureOpenAIEndpoint string = ''
-
-@description('Whether to use Azure OpenAI (either deployed here or elsewhere) or OpenAI.com')
-var useAzureOpenAI = deployAzureOpenAI || !empty(azureOpenAIEndpoint)
 
 @description('Capacity of the GPT deployment')
 // You can increase this, but capacity is limited per model/region, so you will get errors if you go over
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
 param chatDeploymentCapacity int = 0
 var chatConfig = {
-  modelName: !empty(chatModelName) ? chatModelName : (useAzureOpenAI ? 'gpt-35-turbo' : 'gpt-3.5-turbo')
+  modelName: !empty(chatModelName) ? chatModelName : (openAIChatHost == 'azure' ? 'gpt-35-turbo' : 'gpt-3.5-turbo')
   deploymentName: !empty(chatDeploymentName) ? chatDeploymentName : 'gpt-35-turbo'
   deploymentVersion: !empty(chatDeploymentVersion) ? chatDeploymentVersion : '0125'
   deploymentCapacity: chatDeploymentCapacity != 0 ? chatDeploymentCapacity : 30
@@ -130,9 +143,19 @@ module monitoring 'core/monitor/monitoring.bicep' = {
   params: {
     location: location
     tags: tags
-    applicationInsightsDashboardName: '${prefix}-appinsights-dashboard'
     applicationInsightsName: '${prefix}-appinsights'
     logAnalyticsName: '${take(prefix, 50)}-loganalytics' // Max 63 chars
+  }
+}
+
+
+module applicationInsightsDashboard 'backend-dashboard.bicep' = {
+  name: 'application-insights-dashboard'
+  scope: resourceGroup
+  params: {
+    name: '${prefix}-appinsights-dashboard'
+    location: location
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
   }
 }
 
@@ -152,7 +175,37 @@ module containerApps 'core/host/container-apps.bicep' = {
 // Web frontend
 var webAppName = replace('${take(prefix, 19)}-ca', '--', '-')
 var webAppIdentityName = '${prefix}-id-web'
-var webAppEnv = [
+
+var azureOpenAIKeySecret = !empty(azureOpenAIKey)
+  ? {
+      'azure-openai-key': azureOpenAIKey
+    }
+  : {}
+var openAIComKeySecret = !empty(openAIComKey)
+  ? {
+      'openaicom-key': openAIComKey
+    }
+  : {}
+var secrets = union(azureOpenAIKeySecret, openAIComKeySecret)
+
+var azureOpenAIKeyEnv = !empty(azureOpenAIKey)
+  ? [
+      {
+        name: 'AZURE_OPENAI_KEY'
+        secretRef: 'azure-openai-key'
+      }
+    ]
+  : []
+var openAIComKeyEnv = !empty(openAIComKey)
+  ? [
+      {
+        name: 'OPENAICOM_KEY'
+        secretRef: 'openaicom-key'
+      }
+    ]
+  : []
+
+var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   {
     name: 'POSTGRES_HOST'
     value: postgresServer.outputs.POSTGRES_DOMAIN_NAME
@@ -179,63 +232,53 @@ var webAppEnv = [
   }
   {
     name: 'OPENAI_CHAT_HOST'
-    value: useAzureOpenAI ? 'azure' : 'openaicom'
+    value: openAIChatHost
   }
   {
     name: 'AZURE_OPENAI_CHAT_DEPLOYMENT'
-    value: useAzureOpenAI ? chatConfig.deploymentName : ''
+    value: openAIChatHost == 'azure' ? chatConfig.deploymentName : ''
   }
   {
     name: 'AZURE_OPENAI_CHAT_MODEL'
-    value: useAzureOpenAI ? chatConfig.modelName : ''
+    value: openAIChatHost == 'azure' ? chatConfig.modelName : ''
   }
   {
     name: 'OPENAICOM_CHAT_MODEL'
-    value: useAzureOpenAI ? '' : 'gpt-3.5-turbo'
+    value: openAIChatHost == 'openaicom' ? 'gpt-3.5-turbo' : ''
   }
   {
     name: 'OPENAI_EMBED_HOST'
-    value: useAzureOpenAI ? 'azure' : 'openaicom'
+    value: openAIEmbedHost
   }
   {
     name: 'OPENAICOM_EMBED_MODEL_DIMENSIONS'
-    value: useAzureOpenAI ? '' : '1536'
+    value: openAIEmbedHost == 'openaicom' ? '1536' : ''
   }
   {
     name: 'OPENAICOM_EMBED_MODEL'
-    value: useAzureOpenAI ? '' : 'text-embedding-ada-002'
+    value: openAIEmbedHost == 'openaicom' ? 'text-embedding-ada-002' : ''
   }
   {
     name: 'AZURE_OPENAI_EMBED_MODEL'
-    value: useAzureOpenAI ? embedConfig.modelName : ''
+    value: openAIEmbedHost == 'azure' ? embedConfig.modelName : ''
   }
   {
     name: 'AZURE_OPENAI_EMBED_DEPLOYMENT'
-    value: useAzureOpenAI ? embedConfig.deploymentName : ''
+    value: openAIEmbedHost == 'azure' ? embedConfig.deploymentName : ''
   }
   {
     name: 'AZURE_OPENAI_EMBED_MODEL_DIMENSIONS'
-    value: useAzureOpenAI ? string(embedConfig.dimensions) : ''
+    value: openAIEmbedHost == 'azure' ? string(embedConfig.dimensions) : ''
   }
   {
     name: 'AZURE_OPENAI_ENDPOINT'
-    value: useAzureOpenAI ? (deployAzureOpenAI ? openAI.outputs.endpoint : azureOpenAIEndpoint) : ''
+    value: !empty(azureOpenAIEndpoint) ? azureOpenAIEndpoint : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
   }
   {
     name: 'AZURE_OPENAI_VERSION'
-    value: useAzureOpenAI ? azureOpenAIAPIVersion : ''
+    value: openAIEmbedHost == 'azure' ? azureOpenAIAPIVersion : ''
   }
-]
-var webAppEnvWithSecret = !empty(azureOpenAIKey) ? union(webAppEnv, [
-  {
-    name: 'AZURE_OPENAI_KEY'
-    secretRef: 'azure-openai-key'
-  }
-]) : webAppEnv
-
-var secrets = !empty(azureOpenAIKey) ? {
-  'azure-openai-key': azureOpenAIKey
-} : {}
+])
 
 module web 'web.bicep' = {
   name: 'web'
@@ -248,15 +291,14 @@ module web 'web.bicep' = {
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
     exists: webAppExists
-    environmentVariables: webAppEnvWithSecret
+    environmentVariables: webAppEnv
     secrets: secrets
   }
 }
 
-resource openAIResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing =
-  if (!empty(openAIResourceGroupName)) {
-    name: !empty(openAIResourceGroupName) ? openAIResourceGroupName : resourceGroup.name
-  }
+resource openAIResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!empty(openAIResourceGroupName)) {
+  name: !empty(openAIResourceGroupName) ? openAIResourceGroupName : resourceGroup.name
+}
 
 module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
   name: 'openai'
@@ -299,16 +341,15 @@ module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
 }
 
 // USER ROLES
-module openAIRoleUser 'core/security/role.bicep' =
-  if (empty(runningOnGh)) {
-    scope: openAIResourceGroup
-    name: 'openai-role-user'
-    params: {
-      principalId: principalId
-      roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
-      principalType: 'User'
-    }
+module openAIRoleUser 'core/security/role.bicep' = if (empty(runningOnGh)) {
+  scope: openAIResourceGroup
+  name: 'openai-role-user'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+    principalType: 'User'
   }
+}
 
 // Backend roles
 module openAIRoleBackend 'core/security/role.bicep' = {
@@ -334,13 +375,11 @@ output SERVICE_WEB_NAME string = web.outputs.SERVICE_WEB_NAME
 output SERVICE_WEB_URI string = web.outputs.SERVICE_WEB_URI
 output SERVICE_WEB_IMAGE_NAME string = web.outputs.SERVICE_WEB_IMAGE_NAME
 
-output AZURE_OPENAI_ENDPOINT string = useAzureOpenAI ? (deployAzureOpenAI ? openAI.outputs.endpoint : azureOpenAIEndpoint) : ''
-output AZURE_OPENAI_VERSION string =  useAzureOpenAI ? azureOpenAIAPIVersion : ''
-output AZURE_OPENAI_CHAT_DEPLOYMENT string = useAzureOpenAI ? chatConfig.deploymentName : ''
-output AZURE_OPENAI_EMBED_DEPLOYMENT string = useAzureOpenAI ? embedConfig.deploymentName : ''
-output AZURE_OPENAI_CHAT_MODEL string = useAzureOpenAI ? chatConfig.modelName : ''
-output AZURE_OPENAI_EMBED_MODEL string = useAzureOpenAI ? embedConfig.modelName : ''
-output AZURE_OPENAI_EMBED_MODEL_DIMENSIONS int = useAzureOpenAI ? embedConfig.dimensions : 0
+output AZURE_OPENAI_ENDPOINT string = !empty(azureOpenAIEndpoint)
+  ? azureOpenAIEndpoint
+  : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
+output AZURE_OPENAI_CHAT_DEPLOYMENT string = deployAzureOpenAI ? chatConfig.deploymentName : ''
+output AZURE_OPENAI_EMBED_DEPLOYMENT string = deployAzureOpenAI ? embedConfig.deploymentName : ''
 
 output POSTGRES_HOST string = postgresServer.outputs.POSTGRES_DOMAIN_NAME
 output POSTGRES_USERNAME string = postgresEntraAdministratorName
