@@ -143,9 +143,19 @@ module monitoring 'core/monitor/monitoring.bicep' = {
   params: {
     location: location
     tags: tags
-    applicationInsightsDashboardName: '${prefix}-appinsights-dashboard'
     applicationInsightsName: '${prefix}-appinsights'
     logAnalyticsName: '${take(prefix, 50)}-loganalytics' // Max 63 chars
+  }
+}
+
+
+module applicationInsightsDashboard 'backend-dashboard.bicep' = {
+  name: 'application-insights-dashboard'
+  scope: resourceGroup
+  params: {
+    name: '${prefix}-appinsights-dashboard'
+    location: location
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
   }
 }
 
