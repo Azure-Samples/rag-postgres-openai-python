@@ -16,7 +16,7 @@ from fastapi_app.api_models import (
 from fastapi_app.postgres_models import Item
 from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.query_rewriter import build_search_function, extract_search_arguments
-from fastapi_app.rag_simple import ChatParams, RAGChatBase
+from fastapi_app.rag_base import ChatParams, RAGChatBase
 
 
 class AdvancedRAGChat(RAGChatBase):
@@ -35,14 +35,14 @@ class AdvancedRAGChat(RAGChatBase):
         self.chat_token_limit = get_token_limit(chat_model, default_to_minimum=True)
 
     async def generate_search_query(
-        self, chat_params: ChatParams, query_response_token_limit: int
+        self, original_user_query: str, past_messages: list[ChatCompletionMessageParam], query_response_token_limit: int
     ) -> tuple[list[ChatCompletionMessageParam], Any | str | None, list]:
         """Generate an optimized keyword search query based on the chat history and the last question"""
         query_messages: list[ChatCompletionMessageParam] = build_messages(
             model=self.chat_model,
             system_prompt=self.query_prompt_template,
-            new_user_content=chat_params.original_user_query,
-            past_messages=chat_params.past_messages,
+            new_user_content=original_user_query,
+            past_messages=past_messages,
             max_tokens=self.chat_token_limit - query_response_token_limit,  # TODO: count functions
             fallback_to_default=True,
         )
@@ -58,11 +58,11 @@ class AdvancedRAGChat(RAGChatBase):
             tool_choice="auto",
         )
 
-        query_text, filters = extract_search_arguments(chat_params.original_user_query, chat_completion)
+        query_text, filters = extract_search_arguments(original_user_query, chat_completion)
 
         return query_messages, query_text, filters
 
-    async def retreive_and_build_context(
+    async def retrieve_and_build_context(
         self, chat_params: ChatParams, query_text: str | Any | None, filters: list
     ) -> tuple[list[ChatCompletionMessageParam], list[Item]]:
         """Retrieve relevant items from the database and build a context for the chat model."""
@@ -98,12 +98,14 @@ class AdvancedRAGChat(RAGChatBase):
 
         # Generate an optimized keyword search query based on the chat history and the last question
         query_messages, query_text, filters = await self.generate_search_query(
-            chat_params=chat_params, query_response_token_limit=500
+            original_user_query=chat_params.original_user_query,
+            past_messages=chat_params.past_messages,
+            query_response_token_limit=500,
         )
 
         # Retrieve relevant items from the database with the GPT optimized query
         # Generate a contextual and content specific answer using the search results and chat history
-        contextual_messages, results = await self.retreive_and_build_context(
+        contextual_messages, results = await self.retrieve_and_build_context(
             chat_params=chat_params, query_text=query_text, filters=filters
         )
 
@@ -167,14 +169,13 @@ class AdvancedRAGChat(RAGChatBase):
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
         chat_params = self.get_params(messages, overrides)
 
-        # Generate an optimized keyword search query based on the chat history and the last question
         query_messages, query_text, filters = await self.generate_search_query(
-            chat_params=chat_params, query_response_token_limit=500
+            original_user_query=chat_params.original_user_query,
+            past_messages=chat_params.past_messages,
+            query_response_token_limit=500,
         )
 
-        # Retrieve relevant items from the database with the GPT optimized query
-        # Generate a contextual and content specific answer using the search results and chat history
-        contextual_messages, results = await self.retreive_and_build_context(
+        contextual_messages, results = await self.retrieve_and_build_context(
             chat_params=chat_params, query_text=query_text, filters=filters
         )
 
