@@ -8,3 +8,5 @@ pytest
 pytest-cov
 pytest-asyncio
 pytest-snapshot
+mypy
+locust
