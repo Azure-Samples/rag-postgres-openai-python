@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { Panel, DefaultButton, TextField, SpinButton, Slider, Checkbox } from "@fluentui/react";
 import { SparkleFilled } from "@fluentui/react-icons";
-import { AIChatMessage, AIChatProtocolClient } from "@microsoft/ai-chat-protocol";
 
 import styles from "./Chat.module.css";
 
-import {RetrievalMode, RAGChatCompletion} from "../../api";
+import { RetrievalMode, RAGChatCompletion, RAGChatCompletionDelta, ChatAppRequestOptions } from "../../api";
+import { AIChatProtocolClient, AIChatMessage } from "@microsoft/ai-chat-protocol";
 import { Answer, AnswerError, AnswerLoading } from "../../components/Answer";
 import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
@@ -22,11 +22,13 @@ const Chat = () => {
     const [retrieveCount, setRetrieveCount] = useState<number>(3);
     const [retrievalMode, setRetrievalMode] = useState<RetrievalMode>(RetrievalMode.Hybrid);
     const [useAdvancedFlow, setUseAdvancedFlow] = useState<boolean>(true);
+    const [shouldStream, setShouldStream] = useState<boolean>(true);
 
     const lastQuestionRef = useRef<string>("");
     const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isStreaming, setIsStreaming] = useState<boolean>(false);
     const [error, setError] = useState<unknown>();
 
     const [activeCitation, setActiveCitation] = useState<string>();
@@ -34,7 +36,55 @@ const Chat = () => {
 
     const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
     const [answers, setAnswers] = useState<[user: string, response: RAGChatCompletion][]>([]);
+    const [streamedAnswers, setStreamedAnswers] = useState<[user: string, response: RAGChatCompletion][]>([]);
 
+    const handleAsyncRequest = async (question: string, answers: [string, RAGChatCompletion][], result: AsyncIterable<RAGChatCompletionDelta>) => {
+        let answer = "";
+        let chatCompletion: RAGChatCompletion = {
+            context: {
+                data_points: {},
+                followup_questions: null,
+                thoughts: []
+            },
+            message: { content: "", role: "assistant" }
+        };
+        const updateState = (newContent: string) => {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    answer += newContent;
+                    // We need to create a new object to trigger a re-render
+                    const latestCompletion: RAGChatCompletion = {
+                        ...chatCompletion,
+                        message: { content: answer, role: chatCompletion.message.role }
+                    };
+                    setStreamedAnswers([...answers, [question, latestCompletion]]);
+                    resolve(null);
+                }, 33);
+            });
+        };
+        try {
+            setIsStreaming(true);
+            for await (const response of result) {
+                if (response.context) {
+                    chatCompletion.context = {
+                        ...chatCompletion.context,
+                        ...response.context
+                    };
+                }
+                if (response.delta && response.delta.role) {
+                    chatCompletion.message.role = response.delta.role;
+                }
+                if (response.delta && response.delta.content) {
+                    setIsLoading(false);
+                    await updateState(response.delta.content);
+                }
+            }
+        } finally {
+            setIsStreaming(false);
+        }
+        chatCompletion.message.content = answer;
+        return chatCompletion;
+    };
     const makeApiRequest = async (question: string) => {
         lastQuestionRef.current = question;
 
@@ -49,7 +99,7 @@ const Chat = () => {
                 { content: answer[1].message.content, role: "assistant" }
             ]);
             const allMessages: AIChatMessage[] = [...messages, { content: question, role: "user" }];
-            const options = {
+            const options: ChatAppRequestOptions = {
                 context: {
                     overrides: {
                         use_advanced_flow: useAdvancedFlow,
@@ -61,8 +111,14 @@ const Chat = () => {
                 }
             };
             const chatClient: AIChatProtocolClient = new AIChatProtocolClient("/chat");
-            const result = await chatClient.getCompletion(allMessages, options) as RAGChatCompletion;
-            setAnswers([...answers, [question, result]]);
+            if (shouldStream) {
+                const result = (await chatClient.getStreamedCompletion(allMessages, options)) as AsyncIterable<RAGChatCompletionDelta>;
+                const parsedResponse = await handleAsyncRequest(question, answers, result);
+                setAnswers([...answers, [question, parsedResponse]]);
+            } else {
+                const result = (await chatClient.getCompletion(allMessages, options)) as RAGChatCompletion;
+                setAnswers([...answers, [question, result]]);
+            }
         } catch (e) {
             setError(e);
         } finally {
@@ -76,10 +132,13 @@ const Chat = () => {
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
         setAnswers([]);
+        setStreamedAnswers([]);
         setIsLoading(false);
+        setIsStreaming(false);
     };
 
     useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
+    useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" }), [streamedAnswers]);
 
     const onPromptTemplateChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
         setPromptTemplate(newValue || "");
@@ -99,7 +158,11 @@ const Chat = () => {
 
     const onUseAdvancedFlowChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
         setUseAdvancedFlow(!!checked);
-    }
+    };
+
+    const onShouldStreamChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+        setShouldStream(!!checked);
+    };
 
     const onExampleClicked = (example: string) => {
         makeApiRequest(example);
@@ -143,7 +206,26 @@ const Chat = () => {
                         </div>
                     ) : (
                         <div className={styles.chatMessageStream}>
-                            {answers.map((answer, index) => (
+                            {isStreaming &&
+                                streamedAnswers.map((streamedAnswer, index) => (
+                                    <div key={index}>
+                                        <UserChatMessage message={streamedAnswer[0]} />
+                                        <div className={styles.chatMessageGpt}>
+                                            <Answer
+                                                isStreaming={true}
+                                                key={index}
+                                                answer={streamedAnswer[1]}
+                                                isSelected={false}
+                                                onCitationClicked={c => onShowCitation(c, index)}
+                                                onThoughtProcessClicked={() => onToggleTab(AnalysisPanelTabs.ThoughtProcessTab, index)}
+                                                onSupportingContentClicked={() => onToggleTab(AnalysisPanelTabs.SupportingContentTab, index)}
+                                                onFollowupQuestionClicked={q => makeApiRequest(q)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            {!isStreaming &&
+                                answers.map((answer, index) => (
                                     <div key={index}>
                                         <UserChatMessage message={answer[0]} />
                                         <div className={styles.chatMessageGpt}>
@@ -210,7 +292,6 @@ const Chat = () => {
                     onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
                     isFooterAtBottom={true}
                 >
-
                     <Checkbox
                         className={styles.chatSettingsSeparator}
                         checked={useAdvancedFlow}
@@ -229,10 +310,7 @@ const Chat = () => {
                         onChange={onRetrieveCountChange}
                     />
 
-                    <VectorSettings
-                        updateRetrievalMode={(retrievalMode: RetrievalMode) => setRetrievalMode(retrievalMode)}
-                    />
-
+                    <VectorSettings updateRetrievalMode={(retrievalMode: RetrievalMode) => setRetrievalMode(retrievalMode)} />
 
                     <h3>Settings for final chat completion:</h3>
 
@@ -257,6 +335,12 @@ const Chat = () => {
                         snapToStep
                     />
 
+                    <Checkbox
+                        className={styles.chatSettingsSeparator}
+                        checked={shouldStream}
+                        label="Stream chat completion responses"
+                        onChange={onShouldStreamChange}
+                    />
                 </Panel>
             </div>
         </div>

@@ -1,8 +1,19 @@
+import json
+import logging
+from collections.abc import AsyncGenerator
+
 import fastapi
 from fastapi import HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
-from fastapi_app.api_models import ChatRequest, ItemPublic, ItemWithDistance, RetrievalResponse
+from fastapi_app.api_models import (
+    ChatRequest,
+    ItemPublic,
+    ItemWithDistance,
+    RetrievalResponse,
+    RetrievalResponseDelta,
+)
 from fastapi_app.dependencies import ChatClient, CommonDeps, DBSession, EmbeddingsClient
 from fastapi_app.postgres_models import Item
 from fastapi_app.postgres_searcher import PostgresSearcher
@@ -10,6 +21,18 @@ from fastapi_app.rag_advanced import AdvancedRAGChat
 from fastapi_app.rag_simple import SimpleRAGChat
 
 router = fastapi.APIRouter()
+
+
+async def format_as_ndjson(r: AsyncGenerator[RetrievalResponseDelta, None]) -> AsyncGenerator[str, None]:
+    """
+    Format the response as NDJSON
+    """
+    try:
+        async for event in r:
+            yield event.model_dump_json() + "\n"
+    except Exception as error:
+        logging.exception("Exception while generating response stream: %s", error)
+        yield json.dumps({"error": str(error)}, ensure_ascii=False) + "\n"
 
 
 @router.get("/items/{id}", response_model=ItemPublic)
@@ -70,8 +93,6 @@ async def chat_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    overrides = chat_request.context.get("overrides", {})
-
     searcher = PostgresSearcher(
         db_session=database_session,
         openai_embed_client=openai_embed.client,
@@ -79,20 +100,70 @@ async def chat_handler(
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
     )
-    if overrides.get("use_advanced_flow"):
-        run_ragchat = AdvancedRAGChat(
+    rag_flow: SimpleRAGChat | AdvancedRAGChat
+    if chat_request.context.overrides.use_advanced_flow:
+        rag_flow = AdvancedRAGChat(
             searcher=searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
             chat_deployment=context.openai_chat_deployment,
-        ).run
+        )
     else:
-        run_ragchat = SimpleRAGChat(
+        rag_flow = SimpleRAGChat(
             searcher=searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
             chat_deployment=context.openai_chat_deployment,
-        ).run
+        )
 
-    response = await run_ragchat(chat_request.messages, overrides=overrides)
+    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
+
+    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+    response = await rag_flow.answer(
+        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
+    )
     return response
+
+
+@router.post("/chat/stream")
+async def chat_stream_handler(
+    context: CommonDeps,
+    database_session: DBSession,
+    openai_embed: EmbeddingsClient,
+    openai_chat: ChatClient,
+    chat_request: ChatRequest,
+):
+    searcher = PostgresSearcher(
+        db_session=database_session,
+        openai_embed_client=openai_embed.client,
+        embed_deployment=context.openai_embed_deployment,
+        embed_model=context.openai_embed_model,
+        embed_dimensions=context.openai_embed_dimensions,
+    )
+
+    rag_flow: SimpleRAGChat | AdvancedRAGChat
+    if chat_request.context.overrides.use_advanced_flow:
+        rag_flow = AdvancedRAGChat(
+            searcher=searcher,
+            openai_chat_client=openai_chat.client,
+            chat_model=context.openai_chat_model,
+            chat_deployment=context.openai_chat_deployment,
+        )
+    else:
+        rag_flow = SimpleRAGChat(
+            searcher=searcher,
+            openai_chat_client=openai_chat.client,
+            chat_model=context.openai_chat_model,
+            chat_deployment=context.openai_chat_deployment,
+        )
+
+    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
+
+    # Intentionally do this before we stream down a response, to avoid using database connections during stream
+    # See https://github.com/tiangolo/fastapi/discussions/11321
+    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+
+    result = rag_flow.answer_stream(
+        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
+    )
+    return StreamingResponse(content=format_as_ndjson(result), media_type="application/x-ndjson")
