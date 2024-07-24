@@ -37,6 +37,7 @@ class ChatRequestContext(BaseModel):
 class ChatRequest(BaseModel):
     messages: list[ChatCompletionMessageParam]
     context: ChatRequestContext
+    sessionState: Any | None = None
 
 
 class ThoughtStep(BaseModel):
@@ -54,13 +55,13 @@ class RAGContext(BaseModel):
 class RetrievalResponse(BaseModel):
     message: Message
     context: RAGContext
-    session_state: Any | None = None
+    sessionState: Any | None = None
 
 
 class RetrievalResponseDelta(BaseModel):
     delta: Message | None = None
     context: RAGContext | None = None
-    session_state: Any | None = None
+    sessionState: Any | None = None
 
 
 class ItemPublic(BaseModel):
