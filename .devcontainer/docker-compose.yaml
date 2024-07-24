@@ -27,6 +27,9 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: postgres
 
+    ports:
+      - "5432:5432"
+    # For local developemnt, we need to forward the database port here too.
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
