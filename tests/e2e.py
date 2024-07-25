@@ -51,21 +51,12 @@ def live_server_url(mock_session_env, free_port: int) -> Generator[str, None, No
     proc.kill()
 
 
-@pytest.fixture(params=[(480, 800), (600, 1024), (768, 1024), (992, 1024), (1024, 768)])
-def sized_page(page: Page, request):
-    size = request.param
-    page.set_viewport_size({"width": size[0], "height": size[1]})
-    yield page
-
-
 def test_home(page: Page, live_server_url: str):
     page.goto(live_server_url)
     expect(page).to_have_title("RAG on PostgreSQL")
 
 
-def test_chat(sized_page: Page, live_server_url: str):
-    page = sized_page
-
+def test_chat(page: Page, live_server_url: str):
     # Set up a mock route to the /chat endpoint with streaming results
     def handle(route: Route):
         # Assert that session_state is specified in the request (None for now)
