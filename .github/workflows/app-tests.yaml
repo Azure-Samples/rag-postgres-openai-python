@@ -76,7 +76,7 @@ jobs:
           run: python3 -m pytest -s -vv --cov --cov-fail-under=85
         - name: Run E2E tests with Playwright
           id: e2e
-          if: runner.os != 'Windows'
+          #if: runner.os != 'Windows'
           run: |
             playwright install chromium --with-deps
             python3 -m pytest tests/e2e.py --tracing=retain-on-failure
