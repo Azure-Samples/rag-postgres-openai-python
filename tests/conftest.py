@@ -43,7 +43,7 @@ def monkeypatch_session():
 @pytest.fixture(scope="session")
 def mock_session_env(monkeypatch_session):
     """Mock the environment variables for testing."""
-    with mock.patch.dict(os.environ, clear=True):
+    with mock.patch.dict(os.environ):
         # Database
         monkeypatch_session.setenv("POSTGRES_HOST", POSTGRES_HOST)
         monkeypatch_session.setenv("POSTGRES_USERNAME", POSTGRES_USERNAME)
