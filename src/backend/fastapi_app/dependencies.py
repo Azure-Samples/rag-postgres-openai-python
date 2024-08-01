@@ -29,8 +29,8 @@ class FastAPIAppContext(BaseModel):
     openai_chat_model: str
     openai_embed_model: str
     openai_embed_dimensions: int
-    openai_chat_deployment: str
-    openai_embed_deployment: str
+    openai_chat_deployment: str | None
+    openai_embed_deployment: str | None
 
 
 async def common_parameters():
@@ -51,10 +51,10 @@ async def common_parameters():
         openai_chat_deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-35-turbo")
         openai_chat_model = os.getenv("AZURE_OPENAI_CHAT_MODEL", "gpt-35-turbo")
     elif OPENAI_CHAT_HOST == "ollama":
-        openai_chat_deployment = "phi3:3.8b"
+        openai_chat_deployment = None
         openai_chat_model = os.getenv("OLLAMA_CHAT_MODEL", "phi3:3.8b")
     else:
-        openai_chat_deployment = "gpt-3.5-turbo"
+        openai_chat_deployment = None
         openai_chat_model = os.getenv("OPENAICOM_CHAT_MODEL", "gpt-3.5-turbo")
     return FastAPIAppContext(
         openai_chat_model=openai_chat_model,
