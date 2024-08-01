@@ -43,7 +43,10 @@ def monkeypatch_session():
 @pytest.fixture(scope="session")
 def mock_session_env(monkeypatch_session):
     """Mock the environment variables for testing."""
-    with mock.patch.dict(os.environ, clear=True):
+    # Note that this does *not* clear existing env variables by default-
+    # we used to specify clear=True but this caused issues with Playwright tests
+    # https://github.com/microsoft/playwright-python/issues/2506
+    with mock.patch.dict(os.environ):
         # Database
         monkeypatch_session.setenv("POSTGRES_HOST", POSTGRES_HOST)
         monkeypatch_session.setenv("POSTGRES_USERNAME", POSTGRES_USERNAME)
