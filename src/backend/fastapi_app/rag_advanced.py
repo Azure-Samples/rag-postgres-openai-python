@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from typing import Any
+from typing import Any, Final
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam
@@ -40,7 +40,7 @@ class AdvancedRAGChat(RAGChatBase):
         """Generate an optimized keyword search query based on the chat history and the last question"""
 
         tools = build_search_function()
-        tool_choice = "auto"
+        tool_choice: Final = "auto"
 
         query_messages: list[ChatCompletionMessageParam] = build_messages(
             model=self.chat_model,
