@@ -1,0 +1,34 @@
+[
+    {"role": "user", "content": "good options for climbing gear that can be used outside?"},
+    {"role": "assistant", "tool_calls": [
+        {
+            "id": "call_abc123",
+            "type": "function",
+            "function": {
+                "arguments": "{\"search_query\":\"climbing gear outside\"}",
+                "name": "search_database"
+            }
+        }
+    ]},
+    {
+        "role": "tool",
+        "tool_call_id": "call_abc123",
+        "content": "Search results for climbing gear that can be used outside: ..."
+    },
+    {"role": "user", "content": "are there any shoes less than $50?"},
+    {"role": "assistant", "tool_calls": [
+        {
+            "id": "call_abc456",
+            "type": "function",
+            "function": {
+                "arguments": "{\"search_query\":\"shoes\",\"price_filter\":{\"comparison_operator\":\"<\",\"value\":50}}",
+                "name": "search_database"
+            }
+        }
+    ]},
+    {
+        "role": "tool",
+        "tool_call_id": "call_abc456",
+        "content": "Search results for shoes cheaper than 50: ..."
+    }
+]

@@ -17,9 +17,10 @@
         "name": "Backend",
         "type": "debugpy",
         "request": "launch",
+        "cwd": "${workspaceFolder}",
         "module": "uvicorn",
         "args": ["fastapi_app:create_app", "--factory", "--reload"],
-        "justMyCode": true
+        "justMyCode": false
     }
   ],
   "compounds": [

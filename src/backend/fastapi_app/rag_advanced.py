@@ -38,12 +38,19 @@ class AdvancedRAGChat(RAGChatBase):
         self, original_user_query: str, past_messages: list[ChatCompletionMessageParam], query_response_token_limit: int
     ) -> tuple[list[ChatCompletionMessageParam], Any | str | None, list]:
         """Generate an optimized keyword search query based on the chat history and the last question"""
+
+        tools = build_search_function()
+        tool_choice = "auto"
+
         query_messages: list[ChatCompletionMessageParam] = build_messages(
             model=self.chat_model,
             system_prompt=self.query_prompt_template,
+            few_shots=self.query_fewshots,
             new_user_content=original_user_query,
             past_messages=past_messages,
-            max_tokens=self.chat_token_limit - query_response_token_limit,  # TODO: count functions
+            max_tokens=self.chat_token_limit - query_response_token_limit,
+            tools=tools,
+            tool_choice=tool_choice,
             fallback_to_default=True,
         )
 
@@ -54,8 +61,8 @@ class AdvancedRAGChat(RAGChatBase):
             temperature=0.0,  # Minimize creativity for search query generation
             max_tokens=query_response_token_limit,  # Setting too low risks malformed JSON, too high risks performance
             n=1,
-            tools=build_search_function(),
-            tool_choice="auto",
+            tools=tools,
+            tool_choice=tool_choice,
         )
 
         query_text, filters = extract_search_arguments(original_user_query, chat_completion)
