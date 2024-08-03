@@ -99,6 +99,7 @@ async def chat_handler(
         embed_deployment=context.openai_embed_deployment,
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
+        embedding_column=context.embedding_column,
     )
     rag_flow: SimpleRAGChat | AdvancedRAGChat
     if chat_request.context.overrides.use_advanced_flow:
@@ -139,6 +140,7 @@ async def chat_stream_handler(
         embed_deployment=context.openai_embed_deployment,
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
+        embedding_column=context.embedding_column,
     )
 
     rag_flow: SimpleRAGChat | AdvancedRAGChat

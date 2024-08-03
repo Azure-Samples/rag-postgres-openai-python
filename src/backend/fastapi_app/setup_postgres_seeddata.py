@@ -36,17 +36,18 @@ async def seed_data(engine):
         with open(os.path.join(current_dir, "seed_data.json")) as f:
             catalog_items = json.load(f)
             for catalog_item in catalog_items:
-                db_item = await session.execute(select(Item).filter(Item.id == catalog_item["Id"]))
+                db_item = await session.execute(select(Item).filter(Item.id == catalog_item["id"]))
                 if db_item.scalars().first():
                     continue
                 item = Item(
-                    id=catalog_item["Id"],
-                    type=catalog_item["Type"],
-                    brand=catalog_item["Brand"],
-                    name=catalog_item["Name"],
-                    description=catalog_item["Description"],
-                    price=catalog_item["Price"],
-                    embedding=catalog_item["Embedding"],
+                    id=catalog_item["id"],
+                    type=catalog_item["type"],
+                    brand=catalog_item["brand"],
+                    name=catalog_item["name"],
+                    description=catalog_item["description"],
+                    price=catalog_item["price"],
+                    embedding_ada002=catalog_item["embedding_ada002"],
+                    embedding_nomic=catalog_item.get("embedding_nomic"),
                 )
                 session.add(item)
             try:

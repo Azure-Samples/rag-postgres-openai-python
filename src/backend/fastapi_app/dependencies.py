@@ -28,9 +28,10 @@ class FastAPIAppContext(BaseModel):
 
     openai_chat_model: str
     openai_embed_model: str
-    openai_embed_dimensions: int
+    openai_embed_dimensions: int | None
     openai_chat_deployment: str | None
     openai_embed_deployment: str | None
+    embedding_column: str
 
 
 async def common_parameters():
@@ -43,16 +44,24 @@ async def common_parameters():
         openai_embed_deployment = os.getenv("AZURE_OPENAI_EMBED_DEPLOYMENT", "text-embedding-ada-002")
         openai_embed_model = os.getenv("AZURE_OPENAI_EMBED_MODEL", "text-embedding-ada-002")
         openai_embed_dimensions = int(os.getenv("AZURE_OPENAI_EMBED_DIMENSIONS", 1536))
+        embedding_column = os.getenv("AZURE_OPENAI_EMBEDDING_COLUMN", "embedding_ada002")
+    elif OPENAI_EMBED_HOST == "ollama":
+        openai_embed_deployment = None
+        openai_embed_model = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+        openai_embed_dimensions = None
+        embedding_column = os.getenv("OLLAMA_EMBEDDING_COLUMN", "embedding_nomic")
     else:
-        openai_embed_deployment = "text-embedding-ada-002"
+        openai_embed_deployment = None
         openai_embed_model = os.getenv("OPENAICOM_EMBED_MODEL", "text-embedding-ada-002")
         openai_embed_dimensions = int(os.getenv("OPENAICOM_EMBED_DIMENSIONS", 1536))
+        embedding_column = os.getenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_ada002")
     if OPENAI_CHAT_HOST == "azure":
         openai_chat_deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-35-turbo")
         openai_chat_model = os.getenv("AZURE_OPENAI_CHAT_MODEL", "gpt-35-turbo")
     elif OPENAI_CHAT_HOST == "ollama":
         openai_chat_deployment = None
         openai_chat_model = os.getenv("OLLAMA_CHAT_MODEL", "phi3:3.8b")
+        openai_embed_model = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
     else:
         openai_chat_deployment = None
         openai_chat_model = os.getenv("OPENAICOM_CHAT_MODEL", "gpt-3.5-turbo")
@@ -62,6 +71,7 @@ async def common_parameters():
         openai_embed_dimensions=openai_embed_dimensions,
         openai_chat_deployment=openai_chat_deployment,
         openai_embed_deployment=openai_embed_deployment,
+        embedding_column=embedding_column,
     )
 
 

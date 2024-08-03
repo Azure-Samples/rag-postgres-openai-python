@@ -21,7 +21,9 @@ async def compute_text_embedding(
     class ExtraArgs(TypedDict, total=False):
         dimensions: int
 
-    dimensions_args: ExtraArgs = {"dimensions": embedding_dimensions} if SUPPORTED_DIMENSIONS_MODEL[embed_model] else {}
+    dimensions_args: ExtraArgs = (
+        {"dimensions": embedding_dimensions} if SUPPORTED_DIMENSIONS_MODEL.get(embed_model) else {}
+    )
 
     embedding = await openai_client.embeddings.create(
         # Azure OpenAI takes the deployment name as the model name
