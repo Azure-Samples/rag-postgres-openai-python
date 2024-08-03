@@ -263,4 +263,5 @@ async def postgres_searcher(mock_session_env, mock_default_azure_credential, db_
         embed_deployment="text-embedding-ada-002",
         embed_model="text-embedding-ada-002",
         embed_dimensions=1536,
+        embedding_column="embedding_ada002",
     )

@@ -63,9 +63,9 @@ async def update_embeddings(in_seed_data=False):
 
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
         async with session.begin():
-            items = (await session.scalars(select(Item))).all()
+            items_to_update = (await session.scalars(select(Item))).all()
 
-            for item in items:
+            for item in items_to_update:
                 setattr(
                     item,
                     embedding_column,

@@ -21,7 +21,7 @@ class Item(Base):
     description: Mapped[str] = mapped_column()
     price: Mapped[float] = mapped_column()
     embedding_ada002: Mapped[Vector] = mapped_column(Vector(1536))  # ada-002
-    embedding_nomic: Mapped[Vector] | None = mapped_column(Vector(768), nullable=True)  # nomic-embed-text
+    embedding_nomic: Mapped[Vector] = mapped_column(Vector(768))  # nomic-embed-text
 
     def to_dict(self, include_embedding: bool = False):
         model_dict = asdict(self)

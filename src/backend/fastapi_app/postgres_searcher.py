@@ -14,7 +14,7 @@ class PostgresSearcher:
         openai_embed_client: AsyncOpenAI | AsyncAzureOpenAI,
         embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
-        embed_dimensions: int,
+        embed_dimensions: int | None,
         embedding_column: str,
     ):
         self.db_session = db_session
