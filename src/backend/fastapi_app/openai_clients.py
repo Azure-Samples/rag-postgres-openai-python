@@ -76,7 +76,13 @@ async def create_openai_embed_client(
                 azure_deployment=azure_deployment,
                 azure_ad_token_provider=token_provider,
             )
-
+    elif OPENAI_EMBED_HOST == "ollama":
+        logger.info("Authenticating to OpenAI using Ollama...")
+        openai_embed_client = openai.AsyncOpenAI(
+            base_url=os.getenv("OLLAMA_ENDPOINT"),
+            api_key="nokeyneeded",
+        )
     else:
+        logger.info("Authenticating to OpenAI using OpenAI.com API key...")
         openai_embed_client = openai.AsyncOpenAI(api_key=os.getenv("OPENAICOM_KEY"))
     return openai_embed_client

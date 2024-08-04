@@ -10,7 +10,7 @@ async def compute_text_embedding(
     openai_client: AsyncOpenAI | AsyncAzureOpenAI,
     embed_model: str,
     embed_deployment: str | None = None,
-    embedding_dimensions: int = 1536,
+    embedding_dimensions: int | None = None,
 ) -> list[float]:
     SUPPORTED_DIMENSIONS_MODEL = {
         "text-embedding-ada-002": False,
@@ -21,7 +21,12 @@ async def compute_text_embedding(
     class ExtraArgs(TypedDict, total=False):
         dimensions: int
 
-    dimensions_args: ExtraArgs = {"dimensions": embedding_dimensions} if SUPPORTED_DIMENSIONS_MODEL[embed_model] else {}
+    dimensions_args: ExtraArgs = {}
+    if SUPPORTED_DIMENSIONS_MODEL.get(embed_model):
+        if embedding_dimensions is None:
+            raise ValueError(f"Model {embed_model} requires embedding dimensions")
+        else:
+            dimensions_args = {"dimensions": embedding_dimensions}
 
     embedding = await openai_client.embeddings.create(
         # Azure OpenAI takes the deployment name as the model name
