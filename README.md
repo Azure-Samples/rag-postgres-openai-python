@@ -73,10 +73,11 @@ A related option is VS Code Dev Containers, which will open the project in your 
     ```
 
 3. Open the project folder
-4. Install required Python packages:
+4. Install required Python packages and backend application:
 
     ```shell
     pip install -r requirements-dev.txt
+    pip install -e src/backend
     ```
 
 5. Continue with the [deployment steps](#deployment)
