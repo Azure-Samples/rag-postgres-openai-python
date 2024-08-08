@@ -1,6 +1,6 @@
-POSTGRES_HOST=$(azd env get-values | grep POSTGRES_HOST | sed 's/="/=/' | sed 's/"$//' | sed 's/^POSTGRES_HOST=//')
-POSTGRES_USERNAME=$(azd env get-values | grep POSTGRES_USERNAME | sed 's/="/=/' | sed 's/"$//' | sed 's/^POSTGRES_USERNAME=//')
-POSTGRES_DATABASE=$(azd env get-values | grep POSTGRES_DATABASE | sed 's/="/=/' | sed 's/"$//' | sed 's/^POSTGRES_DATABASE=//')
+POSTGRES_HOST=$(azd env get-value POSTGRES_HOST)
+POSTGRES_USERNAME=$(azd env get-value POSTGRES_USERNAME)
+POSTGRES_DATABASE=$(azd env get-value POSTGRES_DATABASE)
 
 . ./scripts/load_python_env.sh
 
