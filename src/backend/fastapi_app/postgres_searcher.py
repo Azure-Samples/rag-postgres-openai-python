@@ -14,13 +14,15 @@ class PostgresSearcher:
         openai_embed_client: AsyncOpenAI | AsyncAzureOpenAI,
         embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
-        embed_dimensions: int,
+        embed_dimensions: int | None,
+        embedding_column: str,
     ):
         self.db_session = db_session
         self.openai_embed_client = openai_embed_client
         self.embed_model = embed_model
         self.embed_deployment = embed_deployment
         self.embed_dimensions = embed_dimensions
+        self.embedding_column = embedding_column
 
     def build_filter_clause(self, filters) -> tuple[str, str]:
         if filters is None:
@@ -36,19 +38,15 @@ class PostgresSearcher:
         return "", ""
 
     async def search(
-        self,
-        query_text: str | None,
-        query_vector: list[float] | list,
-        top: int = 5,
-        filters: list[dict] | None = None,
+        self, query_text: str | None, query_vector: list[float] | list, top: int = 5, filters: list[dict] | None = None
     ):
         filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
 
         vector_query = f"""
-            SELECT id, RANK () OVER (ORDER BY embedding <=> :embedding) AS rank
+            SELECT id, RANK () OVER (ORDER BY {self.embedding_column} <=> :embedding) AS rank
                 FROM items
                 {filter_clause_where}
-                ORDER BY embedding <=> :embedding
+                ORDER BY {self.embedding_column} <=> :embedding
                 LIMIT 20
             """
 

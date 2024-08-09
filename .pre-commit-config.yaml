@@ -4,6 +4,7 @@ repos:
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
+        exclude: ^tests/snapshots
     -   id: trailing-whitespace
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.0

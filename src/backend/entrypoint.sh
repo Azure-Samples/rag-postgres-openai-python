@@ -1,4 +1,3 @@
 #!/bin/bash
 set -e
-python3 -m pip install .
-python3 -m gunicorn "fastapi_app:create_app()"
+python3 -m uvicorn "fastapi_app:create_app" --factory --host 0.0.0.0 --port 8000

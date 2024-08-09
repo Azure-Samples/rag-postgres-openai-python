@@ -11,9 +11,9 @@ python_version = 3.12
 exclude = [".venv/*"]
 
 [tool.pytest.ini_options]
-addopts = "-ra --cov"
+addopts = "-ra"
 testpaths = ["tests"]
-pythonpath = ['src']
+pythonpath = ['src/backend']
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [[tool.mypy.overrides]]

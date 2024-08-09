@@ -45,15 +45,18 @@ async def item_handler(database_session: DBSession, id: int) -> ItemPublic:
 
 
 @router.get("/similar", response_model=list[ItemWithDistance])
-async def similar_handler(database_session: DBSession, id: int, n: int = 5) -> list[ItemWithDistance]:
+async def similar_handler(
+    context: CommonDeps, database_session: DBSession, id: int, n: int = 5
+) -> list[ItemWithDistance]:
     """A similarity API to find items similar to items with given ID."""
     item = (await database_session.scalars(select(Item).where(Item.id == id))).first()
     if not item:
         raise HTTPException(detail=f"Item with ID {id} not found.", status_code=404)
+
     closest = await database_session.execute(
-        select(Item, Item.embedding.l2_distance(item.embedding))
+        select(Item, Item.embedding_ada002.l2_distance(item.embedding_ada002))
         .filter(Item.id != id)
-        .order_by(Item.embedding.l2_distance(item.embedding))
+        .order_by(Item.embedding_ada002.l2_distance(item.embedding_ada002))
         .limit(n)
     )
     return [
@@ -78,6 +81,7 @@ async def search_handler(
         embed_deployment=context.openai_embed_deployment,
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
+        embedding_column=context.embedding_column,
     )
     results = await searcher.search_and_embed(
         query, top=top, enable_vector_search=enable_vector_search, enable_text_search=enable_text_search
@@ -99,6 +103,7 @@ async def chat_handler(
         embed_deployment=context.openai_embed_deployment,
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
+        embedding_column=context.embedding_column,
     )
     rag_flow: SimpleRAGChat | AdvancedRAGChat
     if chat_request.context.overrides.use_advanced_flow:
@@ -139,6 +144,7 @@ async def chat_stream_handler(
         embed_deployment=context.openai_embed_deployment,
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
+        embedding_column=context.embedding_column,
     )
 
     rag_flow: SimpleRAGChat | AdvancedRAGChat

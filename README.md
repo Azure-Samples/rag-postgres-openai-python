@@ -73,10 +73,11 @@ A related option is VS Code Dev Containers, which will open the project in your 
     ```
 
 3. Open the project folder
-4. Install required Python packages:
+4. Install required Python packages and backend application:
 
     ```shell
     pip install -r requirements-dev.txt
+    pip install -e src/backend
     ```
 
 5. Continue with the [deployment steps](#deployment)
@@ -125,7 +126,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     ```
 
 3. To use OpenAI.com OpenAI, set `OPENAI_CHAT_HOST` and `OPENAI_EMBED_HOST` to "openai". Then fill in the value for `OPENAICOM_KEY`.
-4. To use Ollama, set `OPENAI_CHAT_HOST` to "ollama". Then update the values for `OLLAMA_ENDPOINT` and `OLLAMA_CHAT_MODEL` to match your local setup and model. Note that you won't be able to use function calling with an Ollama model, and you'll need to either turn off vector search or use either "azure" or "openai" for `OPENAI_EMBED_HOST`.
+4. To use Ollama, set `OPENAI_CHAT_HOST` to "ollama". Then update the values for `OLLAMA_ENDPOINT` and `OLLAMA_CHAT_MODEL` to match your local setup and model. Note that most Ollama models are not compatible with the "Advanced flow", due to the need for function calling support, so you'll need to disable that in _Developer Settings_ in the UI. In addition, the database rows are embedded using the default OpenAI embedding model, so you can't search them using an Ollama embedding model. You can either choose to set `OPENAI_EMBED_HOST` to "azure" or "openai", or turn off vector search in _Developer Settings_.
 
 ### Running the frontend and backend
 

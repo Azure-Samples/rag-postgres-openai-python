@@ -18,7 +18,8 @@
         },
         "ghcr.io/azure/azure-dev/azd:latest": {},
         // Required for azd to package the app to ACA
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/prulloac/devcontainer-features/ollama:1": {}
     },
 	// Configure tool-specific properties.
 	"customizations": {
