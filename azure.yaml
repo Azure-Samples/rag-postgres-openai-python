@@ -2,6 +2,8 @@
 name: rag-postgres-openai-python
 metadata:
     template: rag-postgres-openai-python@0.0.1
+requiredVersions:
+    azd: ">= 1.9.5"
 services:
     web:
         project: ./src/backend
