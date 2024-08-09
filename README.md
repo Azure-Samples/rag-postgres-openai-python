@@ -8,7 +8,10 @@ This project creates a web-based chat application with an API backend that can u
 This project is designed for deployment to Azure using [the Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/), hosting the app on Azure Container Apps, the database in Azure PostgreSQL Flexible Server, and the models in Azure OpenAI.
 
 * [Features](#features)
-* [Opening the project](#opening-the-project)
+* [Getting started](#getting-started)
+    * [GitHub Codespaces](#github-codespaces)
+    * [VS Code Dev Containers](#vs-code-dev-containers)
+    * [Local environment](#local-environment)
 * [Deployment](#deployment)
 * [Local development](#local-development)
 * [Costs](#costs)
@@ -26,7 +29,7 @@ This project provides the following features:
 
 ![Screenshot of chat app with question about climbing gear](docs/screenshot_chat.png)
 
-## Opening the project
+## Getting started
 
 You have a few options for getting started with this template.
 The quickest way to get started is GitHub Codespaces, since it will setup all the tools for you, but you can also [set it up locally](#local-environment).
