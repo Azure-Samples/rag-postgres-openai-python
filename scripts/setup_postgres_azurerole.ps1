@@ -1,4 +1,8 @@
 $POSTGRES_HOST = (azd env get-value POSTGRES_HOST)
+if (-not $?) {
+    Write-Host "Failed to find a value or POSTGRES_HOST in your azd environment. Make sure you run azd up first."
+    exit 1
+}
 $POSTGRES_USERNAME = (azd env get-value POSTGRES_USERNAME)
 $APP_IDENTITY_NAME = (azd env get-value SERVICE_WEB_IDENTITY_NAME)
 
