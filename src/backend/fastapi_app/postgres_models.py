@@ -20,14 +20,17 @@ class Item(Base):
     name: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
     price: Mapped[float] = mapped_column()
-    embedding: Mapped[Vector] = mapped_column(Vector(1536))  # ada-002
+    embedding_ada002: Mapped[Vector] = mapped_column(Vector(1536))  # ada-002
+    embedding_nomic: Mapped[Vector] = mapped_column(Vector(768))  # nomic-embed-text
 
     def to_dict(self, include_embedding: bool = False):
         model_dict = asdict(self)
         if include_embedding:
-            model_dict["embedding"] = model_dict["embedding"].tolist()
+            model_dict["embedding_ada002"] = model_dict.get("embedding_ada002", [])
+            model_dict["embedding_nomic"] = model_dict.get("embedding_nomic", [])
         else:
-            del model_dict["embedding"]
+            del model_dict["embedding_ada002"]
+            del model_dict["embedding_nomic"]
         return model_dict
 
     def to_str_for_rag(self):
@@ -38,10 +41,18 @@ class Item(Base):
 
 
 # Define HNSW index to support vector similarity search through the vector_cosine_ops access method (cosine distance).
-index = Index(
-    "hnsw_index_for_innerproduct_item_embedding",
-    Item.embedding,
+index_ada002 = Index(
+    "hnsw_index_for_innerproduct_item_embedding_ada002",
+    Item.embedding_ada002,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},
-    postgresql_ops={"embedding": "vector_ip_ops"},
+    postgresql_ops={"embedding_ada002": "vector_ip_ops"},
+)
+
+index_nomic = Index(
+    "hnsw_index_for_innerproduct_item_embedding_nomic",
+    Item.embedding_nomic,
+    postgresql_using="hnsw",
+    postgresql_with={"m": 16, "ef_construction": 64},
+    postgresql_ops={"embedding_nomic": "vector_ip_ops"},
 )

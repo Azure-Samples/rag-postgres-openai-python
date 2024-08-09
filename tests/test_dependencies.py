@@ -14,6 +14,26 @@ async def test_get_common_parameters(mock_session_env):
 
 
 @pytest.mark.asyncio
+async def test_get_common_parameters_ollama(mock_session_env_ollama):
+    result = await common_parameters()
+    assert result.openai_chat_model == "llama3.1"
+    assert result.openai_embed_model == "nomic-embed-text"
+    assert result.openai_embed_dimensions is None
+    assert result.openai_chat_deployment is None
+    assert result.openai_embed_deployment is None
+
+
+@pytest.mark.asyncio
+async def test_get_common_parameters_openai(mock_session_env_openai):
+    result = await common_parameters()
+    assert result.openai_chat_model == "gpt-3.5-turbo"
+    assert result.openai_embed_model == "text-embedding-ada-002"
+    assert result.openai_embed_dimensions == 1536
+    assert result.openai_chat_deployment is None
+    assert result.openai_embed_deployment is None
+
+
+@pytest.mark.asyncio
 async def test_get_azure_credentials(mock_session_env, mock_default_azure_credential):
     result = await get_azure_credentials()
     token = result.get_token("https://vault.azure.net")

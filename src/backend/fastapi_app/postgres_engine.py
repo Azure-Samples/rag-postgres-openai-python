@@ -30,7 +30,7 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
 
     engine = create_async_engine(
         DATABASE_URI,
-        echo=False,
+        echo=True,
     )
 
     @event.listens_for(engine.sync_engine, "do_connect")

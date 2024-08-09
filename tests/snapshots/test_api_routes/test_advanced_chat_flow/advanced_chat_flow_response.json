@@ -19,6 +19,12 @@
                 "title": "Prompt to generate search arguments",
                 "description": [
                     "{'role': 'system', 'content': 'Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching database rows.\\nYou have access to an Azure PostgreSQL database with an items table that has columns for title, description, brand, price, and type.\\nGenerate a search query based on the conversation and the new question.\\nIf the question is not in English, translate the question to English before generating the search query.\\nIf you cannot generate a search query, return the original user question.\\nDO NOT return anything besides the query.'}",
+                    "{'role': 'user', 'content': 'good options for climbing gear that can be used outside?'}",
+                    "{'role': 'assistant', 'tool_calls': [{'id': 'call_abc123', 'type': 'function', 'function': {'arguments': '{\"search_query\":\"climbing gear outside\"}', 'name': 'search_database'}}]}",
+                    "{'role': 'tool', 'tool_call_id': 'call_abc123', 'content': 'Search results for climbing gear that can be used outside: ...'}",
+                    "{'role': 'user', 'content': 'are there any shoes less than $50?'}",
+                    "{'role': 'assistant', 'tool_calls': [{'id': 'call_abc456', 'type': 'function', 'function': {'arguments': '{\"search_query\":\"shoes\",\"price_filter\":{\"comparison_operator\":\"<\",\"value\":50}}', 'name': 'search_database'}}]}",
+                    "{'role': 'tool', 'tool_call_id': 'call_abc456', 'content': 'Search results for shoes cheaper than 50: ...'}",
                     "{'role': 'user', 'content': 'What is the capital of France?'}"
                 ],
                 "props": {
@@ -64,5 +70,5 @@
         ],
         "followup_questions": null
     },
-    "session_state": null
+    "sessionState": null
 }

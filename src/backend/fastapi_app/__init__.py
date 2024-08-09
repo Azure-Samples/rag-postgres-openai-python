@@ -47,13 +47,15 @@ async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[State]:
 
 def create_app(testing: bool = False):
     if os.getenv("RUNNING_IN_PRODUCTION"):
-        logging.basicConfig(level=logging.WARNING)
+        # You may choose to reduce this to logging.WARNING for production
+        logging.basicConfig(level=logging.INFO)
     else:
         if not testing:
             load_dotenv(override=True)
         logging.basicConfig(level=logging.INFO)
     # Turn off particularly noisy INFO level logs from Azure Core SDK:
     logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
+    logging.getLogger("azure.identity").setLevel(logging.WARNING)
 
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
         logger.info("Configuring Azure Monitor")

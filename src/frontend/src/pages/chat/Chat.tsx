@@ -108,7 +108,8 @@ const Chat = () => {
                         prompt_template: promptTemplate.length === 0 ? undefined : promptTemplate,
                         temperature: temperature
                     }
-                }
+                },
+                sessionState: answers.length ? answers[answers.length - 1][1].sessionState : null
             };
             const chatClient: AIChatProtocolClient = new AIChatProtocolClient("/chat");
             if (shouldStream) {

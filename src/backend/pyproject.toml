@@ -1,7 +1,7 @@
 [project]
 name = "fastapi_app"
 version = "1.0.0"
-description = "Create a application with fastapi and postgres-flexible"
+description = "Create a RAG application with FastAPI and PostgreSQL"
 dependencies = [
     "fastapi>=0.111.0,<1.0.0",
     "python-dotenv>=1.0.1,<2.0.0",
@@ -13,7 +13,7 @@ dependencies = [
     "pgvector>=0.2.5,<0.3.0",
     "openai>=1.34.0,<2.0.0",
     "tiktoken>=0.7.0,<0.8.0",
-    "openai-messages-token-helper>=0.1.5,<0.2.0",
+    "openai-messages-token-helper>=0.1.8,<0.2.0",
     "azure-monitor-opentelemetry>=1.6.0,<2.0.0",
     "opentelemetry-instrumentation-sqlalchemy>=0.46b0,<1.0.0",
     "opentelemetry-instrumentation-aiohttp-client>=0.46b0,<1.0.0",

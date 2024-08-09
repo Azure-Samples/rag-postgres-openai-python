@@ -43,14 +43,16 @@ def monkeypatch_session():
 @pytest.fixture(scope="session")
 def mock_session_env(monkeypatch_session):
     """Mock the environment variables for testing."""
-    with mock.patch.dict(os.environ, clear=True):
+    # Note that this does *not* clear existing env variables by default-
+    # we used to specify clear=True but this caused issues with Playwright tests
+    # https://github.com/microsoft/playwright-python/issues/2506
+    with mock.patch.dict(os.environ):
         # Database
         monkeypatch_session.setenv("POSTGRES_HOST", POSTGRES_HOST)
         monkeypatch_session.setenv("POSTGRES_USERNAME", POSTGRES_USERNAME)
         monkeypatch_session.setenv("POSTGRES_DATABASE", POSTGRES_DATABASE)
         monkeypatch_session.setenv("POSTGRES_PASSWORD", POSTGRES_PASSWORD)
         monkeypatch_session.setenv("POSTGRES_SSL", POSTGRES_SSL)
-        monkeypatch_session.setenv("POSTGRESQL_DATABASE_URL", POSTGRESQL_DATABASE_URL)
         monkeypatch_session.setenv("RUNNING_IN_PRODUCTION", "False")
         # Azure Subscription
         monkeypatch_session.setenv("AZURE_SUBSCRIPTION_ID", "test-storage-subid")
@@ -65,11 +67,62 @@ def mock_session_env(monkeypatch_session):
         monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL", "text-embedding-ada-002")
         monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL_DIMENSIONS", "1536")
         monkeypatch_session.setenv("AZURE_OPENAI_KEY", "fakekey")
-        # Allowed Origin
-        monkeypatch_session.setenv("ALLOWED_ORIGIN", "https://frontend.com")
 
-        if os.getenv("AZURE_USE_AUTHENTICATION") is not None:
-            monkeypatch_session.delenv("AZURE_USE_AUTHENTICATION")
+        yield
+
+
+@pytest.fixture(scope="session")
+def mock_session_env_openai(monkeypatch_session):
+    """Mock the environment variables for testing."""
+    # Note that this does *not* clear existing env variables by default-
+    # we used to specify clear=True but this caused issues with Playwright tests
+    # https://github.com/microsoft/playwright-python/issues/2506
+    with mock.patch.dict(os.environ):
+        # Database
+        monkeypatch_session.setenv("POSTGRES_HOST", POSTGRES_HOST)
+        monkeypatch_session.setenv("POSTGRES_USERNAME", POSTGRES_USERNAME)
+        monkeypatch_session.setenv("POSTGRES_DATABASE", POSTGRES_DATABASE)
+        monkeypatch_session.setenv("POSTGRES_PASSWORD", POSTGRES_PASSWORD)
+        monkeypatch_session.setenv("POSTGRES_SSL", POSTGRES_SSL)
+        monkeypatch_session.setenv("RUNNING_IN_PRODUCTION", "False")
+        # Azure Subscription
+        monkeypatch_session.setenv("AZURE_SUBSCRIPTION_ID", "test-storage-subid")
+        # OpenAI.com OpenAI
+        monkeypatch_session.setenv("OPENAI_CHAT_HOST", "openai")
+        monkeypatch_session.setenv("OPENAI_EMBED_HOST", "openai")
+        monkeypatch_session.setenv("OPENAICOM_KEY", "fakekey")
+        monkeypatch_session.setenv("OPENAICOM_CHAT_MODEL", "gpt-3.5-turbo")
+        monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL", "text-embedding-ada-002")
+        monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL_DIMENSIONS", "1536")
+        monkeypatch_session.setenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_ada002")
+
+        yield
+
+
+@pytest.fixture(scope="session")
+def mock_session_env_ollama(monkeypatch_session):
+    """Mock the environment variables for testing."""
+    # Note that this does *not* clear existing env variables by default-
+    # we used to specify clear=True but this caused issues with Playwright tests
+    # https://github.com/microsoft/playwright-python/issues/2506
+    with mock.patch.dict(os.environ):
+        # Database
+        monkeypatch_session.setenv("POSTGRES_HOST", POSTGRES_HOST)
+        monkeypatch_session.setenv("POSTGRES_USERNAME", POSTGRES_USERNAME)
+        monkeypatch_session.setenv("POSTGRES_DATABASE", POSTGRES_DATABASE)
+        monkeypatch_session.setenv("POSTGRES_PASSWORD", POSTGRES_PASSWORD)
+        monkeypatch_session.setenv("POSTGRES_SSL", POSTGRES_SSL)
+        monkeypatch_session.setenv("RUNNING_IN_PRODUCTION", "False")
+        # Azure Subscription
+        monkeypatch_session.setenv("AZURE_SUBSCRIPTION_ID", "test-storage-subid")
+        # Ollama OpenAI
+        monkeypatch_session.setenv("OPENAI_CHAT_HOST", "ollama")
+        monkeypatch_session.setenv("OPENAI_EMBED_HOST", "ollama")
+        monkeypatch_session.setenv("OLLAMA_ENDPOINT", "http://host.docker.internal:11434/v1")
+        monkeypatch_session.setenv("OLLAMA_CHAT_MODEL", "llama3.1")
+        monkeypatch_session.setenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+        monkeypatch_session.setenv("OLLAMA_EMBEDDING_COLUMN", "embedding_nomic")
+
         yield
 
 
@@ -260,4 +313,5 @@ async def postgres_searcher(mock_session_env, mock_default_azure_credential, db_
         embed_deployment="text-embedding-ada-002",
         embed_model="text-embedding-ada-002",
         embed_dimensions=1536,
+        embedding_column="embedding_ada002",
     )

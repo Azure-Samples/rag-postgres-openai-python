@@ -73,4 +73,15 @@ jobs:
         - name: Run MyPy
           run: python3 -m mypy .
         - name: Run Pytest
-          run: python3 -m pytest
+          run: python3 -m pytest -s -vv --cov --cov-fail-under=85
+        - name: Run E2E tests with Playwright
+          id: e2e
+          run: |
+            playwright install chromium --with-deps
+            python3 -m pytest tests/e2e.py --tracing=retain-on-failure
+        - name: Upload test artifacts
+          if: ${{ failure() && steps.e2e.conclusion == 'failure' }}
+          uses: actions/upload-artifact@v4
+          with:
+            name: playwright-traces${{ matrix.python_version }}
+            path: test-results

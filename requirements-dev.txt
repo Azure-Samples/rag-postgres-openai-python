@@ -1,12 +1,14 @@
 -r src/backend/requirements.txt
 ruff
 mypy
+types-requests
 pre-commit
 pip-tools
 pip-compile-cross-platform
+playwright
 pytest
-pytest-cov
 pytest-asyncio
+pytest-cov
+pytest-playwright
 pytest-snapshot
-mypy
 locust
