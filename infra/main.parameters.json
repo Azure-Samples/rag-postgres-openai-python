@@ -17,6 +17,9 @@
       "runningOnGh": {
         "value": "${GITHUB_ACTIONS}"
       },
+      "openAILocation": {
+        "value": "${AZURE_OPENAI_LOCATION}"
+      },
       "deployAzureOpenAI": {
         "value": "${DEPLOY_AZURE_OPENAI=true}"
       },
