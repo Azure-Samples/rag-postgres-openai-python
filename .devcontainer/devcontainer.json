@@ -46,10 +46,6 @@
 						"source.fixAll": "explicit"
 					},
 					"editor.defaultFormatter": "charliermarsh.ruff"
-				},
-				"files.exclude": {
-					".ruff_cache": true,
-					".pytest_cache": true
 				}
 			}
 		}
