@@ -194,6 +194,7 @@ Further documentation is available in the `docs/` folder:
 * [Deploying with existing resources](docs/deploy_existing.md)
 * [Monitoring with Azure Monitor](docs/monitoring.md)
 * [Load testing](docs/loadtesting.md)
+* [Evaluation](docs/evaluation.md)
 
 Please post in the issue tracker with any questions or issues.
 

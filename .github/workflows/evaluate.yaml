@@ -1,0 +1,129 @@
+name: Evaluate
+
+on:
+  workflow_dispatch:
+
+# Set up permissions for deploying with secretless Azure federated credentials
+# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+      AZURE_OPENAI_API_VERSION: ${{ vars.AZURE_OPENAI_API_VERSION }}
+      AZURE_OPENAI_4_EVAL_DEPLOYMENT_NAME: ${{ vars.AZURE_OPENAI_4_EVAL_DEPLOYMENT_NAME }}
+      AZURE_OPENAI_DEPLOYMENT_NAME: ${{ vars.AZURE_OPENAI_DEPLOYMENT_NAME }}
+      AZURE_OPENAI_35_TURBO_DEPLOYMENT_NAME: ${{ vars.AZURE_OPENAI_35_TURBO_DEPLOYMENT_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      AZURE_SEARCH_ENDPOINT: ${{ vars.AZURE_SEARCH_ENDPOINT }}
+      AZURE_OPENAI_NAME: ${{ vars.AZURE_OPENAI_NAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for MacOS Runner
+        if: matrix.os == 'macos-latest-xlarge'
+        run: brew install postgresql@14
+      - name: Install pgvector on Windows using install-pgvector.bat
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+        run: .github\workflows\install-pgvector.bat
+
+      - name: Install PostgreSQL development libraries
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt update
+          sudo apt install postgresql-server-dev-14
+
+      - name: Setup postgres
+        uses: ikalnytskyi/action-setup-postgres@v6
+        with:
+          username: admin
+          password: postgres
+          database: postgres
+
+      - name: Install pgvector on MacOS/Linux using install-pgvector.sh
+        if: matrix.os != 'windows-latest'
+        run: .github/workflows/install-pgvector.sh
+
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # install the python version needed
+
+      - name: Install azd
+        uses: Azure/setup-azd@v1.0.0
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt
+
+      - name: Install app as editable app
+        run: |
+          python -m pip install -e src/backend
+
+      - name: Setup local database with seed data
+        run: |
+          cp .env.sample .env
+          python ./src/backend/fastapi_app/setup_postgres_database.py
+          python ./src/backend/fastapi_app/setup_postgres_seeddata.py
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Build frontend
+        run: |
+          cd ./src/frontend
+          npm install
+          npm run build
+
+      - name: Install python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set az account
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az account set --subscription ${{env.AZURE_SUBSCRIPTION_ID}}
+
+
+      - name: Run local server
+        run: |
+          python3 -m uvicorn fastapi_app:create_app --factory
+
+      - name: Evaluate local RAG flow
+        run: |
+          python evals/evaluate.py
+
+      - name: Upload eval results as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval_result
+          path: ./src/api/evaluate/eval_results.jsonl
+
+      - name: GitHub Summary Step
+        if: ${{ success() }}
+        working-directory: ./src/api
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "📊 Promptflow Evaluation Results" >> $GITHUB_STEP_SUMMARY
+          cat evaluate/eval_results.md >> $GITHUB_STEP_SUMMARY
