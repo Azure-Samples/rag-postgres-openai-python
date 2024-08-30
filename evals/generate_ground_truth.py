@@ -27,16 +27,16 @@ def source_retriever() -> Generator[dict, None, None]:
         item_types = session.scalars(select(Item.type).distinct())
         for item_type in item_types:
             records = list(session.scalars(select(Item).filter(Item.type == item_type).order_by(Item.id)))
-            logger.info(f"Processing database records for type: {item_type}")
-            yield {
-                "citations": " ".join([f"[{record.id}] - {record.name}" for record in records]),
-                "content": "\n\n".join([record.to_str_for_rag() for record in records]),
-            }
+            # logger.info(f"Processing database records for type: {item_type}")
+            # yield {
+            #    "citations": " ".join([f"[{record.id}] - {record.name}" for record in records]),
+            #    "content": "\n\n".join([record.to_str_for_rag() for record in records]),
+            # }
         # Fetch each item individually
-        # records = session.scalars(select(Item).order_by(Item.id))
-        # for record in records:
-        #    logger.info(f"Processing database record: {record.name}")
-        #    yield {"id": [record.id], "content": record.to_str_for_rag()}
+        records = session.scalars(select(Item).order_by(Item.id))
+        for record in records:
+            logger.info(f"Processing database record: {record.name}")
+            yield {"id": record.id, "content": record.to_str_for_rag()}
 
 
 def source_to_text(source) -> str:
@@ -44,7 +44,7 @@ def source_to_text(source) -> str:
 
 
 def answer_formatter(answer, source) -> str:
-    return f"{answer} {source['citations']}"
+    return f"{answer} [{source['id']}]"
 
 
 def get_openai_config_dict() -> dict:
@@ -85,11 +85,11 @@ if __name__ == "__main__":
     load_dotenv(".env", override=True)
 
     generate_test_qa_data(
-        get_openai_config_dict(),
-        10,
-        5,
-        Path(__file__).parent / "ground_truth.json",
-        source_retriever,
-        source_to_text,
-        answer_formatter,
+        openai_config=get_openai_config_dict(),
+        num_questions_total=202,
+        num_questions_per_source=2,
+        output_file=Path(__file__).parent / "ground_truth.jsonl",
+        source_retriever=source_retriever,
+        source_to_text=source_to_text,
+        answer_formatter=answer_formatter,
     )

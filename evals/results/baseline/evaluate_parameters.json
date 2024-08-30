@@ -1,0 +1,15 @@
+{
+    "evaluation_gpt_model": "chat",
+    "evaluation_timestamp": 1725037099,
+    "testdata_path": "/workspace/evals/ground_truth.jsonl",
+    "target_url": "http://host.docker.internal:8000/chat",
+    "target_parameters": {
+        "overrides": {
+            "use_advanced_flow": true,
+            "top": 3,
+            "retrieval_mode": "hybrid",
+            "temperature": 0.3
+        }
+    },
+    "num_questions": 20
+}
