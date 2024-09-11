@@ -95,7 +95,11 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
     azd auth login
     ```
 
-    If you have any issues with that command, you may also want to try `azd auth login --use-device-code`.
+    For GitHub Codespaces users, if the previous command fails, try:
+
+   ```shell
+    azd auth login --use-device-code 
+    ```
 
 2. Create a new azd environment:
 
