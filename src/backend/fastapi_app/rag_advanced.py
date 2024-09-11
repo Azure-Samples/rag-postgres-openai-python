@@ -78,7 +78,7 @@ class AdvancedRAGChat(RAGChatBase):
             query_response_token_limit=500,
         )
 
-        # Retrieve relevant items from the database with the GPT optimized query
+        # Retrieve relevant rows from the database with the GPT optimized query
         results = await self.searcher.search_and_embed(
             query_text,
             top=chat_params.top,

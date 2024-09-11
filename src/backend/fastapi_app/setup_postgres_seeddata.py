@@ -21,41 +21,34 @@ logger = logging.getLogger("ragapp")
 async def seed_data(engine):
     # Check if Item table exists
     async with engine.begin() as conn:
+        table_name = Item.__tablename__
         result = await conn.execute(
             text(
-                "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'items')"  # noqa
+                f"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name}')"  # noqa
             )
         )
         if not result.scalar():
-            logger.error("Items table does not exist. Please run the database setup script first.")
+            logger.error(f" {table_name} table does not exist. Please run the database setup script first.")
             return
 
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
-        # Insert the items from the JSON file into the database
+        # Insert the objects from the JSON file into the database
         current_dir = os.path.dirname(os.path.realpath(__file__))
         with open(os.path.join(current_dir, "seed_data.json")) as f:
-            catalog_items = json.load(f)
-            for catalog_item in catalog_items:
-                db_item = await session.execute(select(Item).filter(Item.id == catalog_item["id"]))
+            seed_data_objects = json.load(f)
+            for seed_data_object in seed_data_objects:
+                db_item = await session.execute(select(Item).filter(Item.id == seed_data_object["id"]))
                 if db_item.scalars().first():
                     continue
-                item = Item(
-                    id=catalog_item["id"],
-                    type=catalog_item["type"],
-                    brand=catalog_item["brand"],
-                    name=catalog_item["name"],
-                    description=catalog_item["description"],
-                    price=catalog_item["price"],
-                    embedding_ada002=catalog_item["embedding_ada002"],
-                    embedding_nomic=catalog_item.get("embedding_nomic"),
-                )
-                session.add(item)
+                attrs = {key: value for key, value in seed_data_object.items()}
+                row = Item(**attrs)
+                session.add(row)
             try:
                 await session.commit()
             except sqlalchemy.exc.IntegrityError:
                 pass
 
-    logger.info("Items table seeded successfully.")
+    logger.info(f"{table_name} table seeded successfully.")
 
 
 async def main():

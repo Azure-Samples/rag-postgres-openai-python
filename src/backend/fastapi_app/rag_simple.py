@@ -35,9 +35,9 @@ class SimpleRAGChat(RAGChatBase):
     async def prepare_context(
         self, chat_params: ChatParams
     ) -> tuple[list[ChatCompletionMessageParam], list[Item], list[ThoughtStep]]:
-        """Retrieve relevant items from the database and build a context for the chat model."""
+        """Retrieve relevant rows from the database and build a context for the chat model."""
 
-        # Retrieve relevant items from the database
+        # Retrieve relevant rows from the database
         results = await self.searcher.search_and_embed(
             chat_params.original_user_query,
             top=chat_params.top,
