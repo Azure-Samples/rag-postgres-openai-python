@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import json
 import logging
@@ -33,44 +34,37 @@ async def update_embeddings(in_seed_data=False):
     logger.info(f"Updating embeddings in column: {embedding_column}")
     if in_seed_data:
         current_dir = os.path.dirname(os.path.realpath(__file__))
-        items = []
+        rows = []
         with open(os.path.join(current_dir, "seed_data.json")) as f:
-            catalog_items = json.load(f)
-            for catalog_item in catalog_items:
-                item = Item(
-                    id=catalog_item["id"],
-                    type=catalog_item["type"],
-                    brand=catalog_item["brand"],
-                    name=catalog_item["name"],
-                    description=catalog_item["description"],
-                    price=catalog_item["price"],
-                    embedding_ada002=catalog_item["embedding_ada002"],
-                    embedding_nomic=catalog_item.get("embedding_nomic"),
-                )
+            seed_data_objects = json.load(f)
+            for seed_data_object in seed_data_objects:
+                # for each column in the JSON, store it in the same named attribute in the object
+                attrs = {key: value for key, value in seed_data_object.items()}
+                row = Item(**attrs)
                 embedding = await compute_text_embedding(
-                    item.to_str_for_embedding(),
+                    row.to_str_for_embedding(),
                     openai_client=openai_embed_client,
                     embed_model=common_params.openai_embed_model,
                     embed_deployment=common_params.openai_embed_deployment,
                     embedding_dimensions=common_params.openai_embed_dimensions,
                 )
-                setattr(item, embedding_column, embedding)
-                items.append(item)
-            # write to the file
+                setattr(row, embedding_column, embedding)
+                rows.append(row)
+            # Write updated seed data to the file
             with open(os.path.join(current_dir, "seed_data.json"), "w") as f:
-                json.dump([item.to_dict(include_embedding=True) for item in items], f, indent=4)
+                json.dump([row.to_dict(include_embedding=True) for row in rows], f, indent=4)
         return
 
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
         async with session.begin():
-            items_to_update = (await session.scalars(select(Item))).all()
+            rows_to_update = (await session.scalars(select(Item))).all()
 
-            for item in items_to_update:
+            for row_model in rows_to_update:
                 setattr(
-                    item,
+                    row_model,
                     embedding_column,
                     await compute_text_embedding(
-                        item.to_str_for_embedding(),
+                        row_model.to_str_for_embedding(),
                         openai_client=openai_embed_client,
                         embed_model=common_params.openai_embed_model,
                         embed_deployment=common_params.openai_embed_deployment,
@@ -84,4 +78,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
     logger.setLevel(logging.INFO)
     load_dotenv(override=True)
-    asyncio.run(update_embeddings())
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--in_seed_data", action="store_true")
+    args = parser.parse_args()
+    asyncio.run(update_embeddings(args.in_seed_data))
