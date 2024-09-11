@@ -17,7 +17,11 @@ class ChatUser(HttpUser):
                 "messages": [
                     {
                         "content": random.choice(
-                            ["Best shoe for hiking?", "Climbing shoe cheaper than $30?", "Waterproof camping gear?"]
+                            [
+                                "Summarize GitHub services shown in Python sessions",
+                                "Livestreams about Copilot",
+                                "In-person sessions about GitHub Actions",
+                            ]
                         ),
                         "role": "user",
                     }

@@ -3,9 +3,9 @@ import { Example } from "./Example";
 import styles from "./Example.module.css";
 
 const DEFAULT_EXAMPLES: string[] = [
-    "Best shoe for hiking?",
-    "Climbing gear cheaper than $30?",
-    "Waterproof camping gear?",
+    "Summarize GitHub services shown in Python sessions",
+    "Livestreams about Copilot",
+    "In-person sessions about GitHub Actions",
 ];
 
 interface Props {

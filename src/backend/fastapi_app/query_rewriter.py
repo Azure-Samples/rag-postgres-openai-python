@@ -12,31 +12,17 @@ def build_search_function() -> list[ChatCompletionToolParam]:
             "type": "function",
             "function": {
                 "name": "search_database",
-                "description": "Search PostgreSQL database for relevant products based on user query",
+                "description": "Search PostgreSQL database for relevant conference sessions based on user query",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "search_query": {
                             "type": "string",
-                            "description": "Query string to use for full text search, e.g. 'red shoes'",
+                            "description": "Query string to use for full text search, e.g. 'python AI'",
                         },
-                        "price_filter": {
+                        "mode_filter": {
                             "type": "object",
-                            "description": "Filter search results based on price of the product",
-                            "properties": {
-                                "comparison_operator": {
-                                    "type": "string",
-                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa
-                                },
-                                "value": {
-                                    "type": "number",
-                                    "description": "Value to compare against, e.g. 30",
-                                },
-                            },
-                        },
-                        "brand_filter": {
-                            "type": "object",
-                            "description": "Filter search results based on brand of the product",
+                            "description": "Filter search results based on mode of the session",
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
@@ -44,7 +30,7 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                                 },
                                 "value": {
                                     "type": "string",
-                                    "description": "Value to compare against, e.g. AirStrider",
+                                    "description": "Possible values are 'In-person', 'Livestream', or 'Recorded'.",
                                 },
                             },
                         },
@@ -69,22 +55,13 @@ def extract_search_arguments(original_user_query: str, chat_completion: ChatComp
                 arg = json.loads(function.arguments)
                 # Even though its required, search_query is not always specified
                 search_query = arg.get("search_query", original_user_query)
-                if "price_filter" in arg and arg["price_filter"]:
-                    price_filter = arg["price_filter"]
+                if "mode_filter" in arg and arg["mode_filter"]:
+                    mode_filter = arg["mode_filter"]
                     filters.append(
                         {
-                            "column": "price",
-                            "comparison_operator": price_filter["comparison_operator"],
-                            "value": price_filter["value"],
-                        }
-                    )
-                if "brand_filter" in arg and arg["brand_filter"]:
-                    brand_filter = arg["brand_filter"]
-                    filters.append(
-                        {
-                            "column": "brand",
-                            "comparison_operator": brand_filter["comparison_operator"],
-                            "value": brand_filter["value"],
+                            "column": "mode",
+                            "comparison_operator": mode_filter["comparison_operator"],
+                            "value": mode_filter["value"],
                         }
                     )
     elif query_text := response_message.content:
