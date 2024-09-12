@@ -9,9 +9,9 @@ This project is designed for deployment to Azure using [the Azure Developer CLI]
 
 * [Features](#features)
 * [Getting started](#getting-started)
-    * [GitHub Codespaces](#github-codespaces)
-    * [VS Code Dev Containers](#vs-code-dev-containers)
-    * [Local environment](#local-environment)
+  * [GitHub Codespaces](#github-codespaces)
+  * [VS Code Dev Containers](#vs-code-dev-containers)
+  * [Local environment](#local-environment)
 * [Deployment](#deployment)
 * [Local development](#local-development)
 * [Costs](#costs)
@@ -27,7 +27,13 @@ This project provides the following features:
 * OpenAI function calling to optionally convert user queries into query filter conditions, such as turning "Climbing gear cheaper than $30?" into "WHERE price < 30".
 * Conversion of user queries into vectors using the OpenAI embedding API.
 
-![Screenshot of chat app with question about climbing gear](docs/screenshot_chat.png)
+![Screenshot of chat app with question about climbing gear](docs/images/screenshot_chat.png)
+
+## Architecture diagram
+
+The deployed app uses a user-assigned managed identity to authenticate to Azure services, and stores logs in Log Analytics.
+
+![Architecture diagram: Azure Container Apps, Azure Container Registry, Managed Identity, Azure OpenAI, Azure Database for PostgreSQL](docs/images/architecture.png)
 
 ## Getting started
 
@@ -98,7 +104,7 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
     For GitHub Codespaces users, if the previous command fails, try:
 
    ```shell
-    azd auth login --use-device-code 
+    azd auth login --use-device-code
     ```
 
 2. Create a new azd environment:
@@ -111,7 +117,7 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
 
 3. (Optional) If you would like to customize the deployment to [use existing Azure resources](docs/deploy_existing.md), you can set the values now.
 
-3. Provision the resources and deploy the code:
+4. Provision the resources and deploy the code:
 
     ```shell
     azd up
@@ -195,6 +201,7 @@ Additionally, we have added a [GitHub Action](https://github.com/microsoft/secur
 
 Further documentation is available in the `docs/` folder:
 
+* [Understanding the RAG flow](docs/rag_flow.md)
 * [Customizing the data](docs/customize_data.md)
 * [Deploying with existing resources](docs/deploy_existing.md)
 * [Monitoring with Azure Monitor](docs/monitoring.md)
@@ -204,5 +211,6 @@ Please post in the issue tracker with any questions or issues.
 
 ## Resources
 
+* [RAGHack livestream: Building RAG with PostgreSQL](https://www.youtube.com/watch?v=Dk65oQjYAfo)
 * [RAG chat with Azure AI Search + Python](https://github.com/Azure-Samples/azure-search-openai-demo/)
 * [Develop Python apps that use Azure AI services](https://learn.microsoft.com/azure/developer/python/azure-ai-for-python-developers)

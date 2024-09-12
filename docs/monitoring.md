@@ -1,5 +1,4 @@
-
-# Monitoring with Azure Monitor
+# RAG on PostgreSQL: Monitoring with Azure Monitor
 
 By default, deployed apps use Application Insights for the tracing of each request, along with the logging of errors.
 
