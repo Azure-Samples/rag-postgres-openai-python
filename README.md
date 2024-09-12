@@ -33,7 +33,7 @@ This project provides the following features:
 
 The deployed app uses a user-assigned managed identity to authenticate to Azure services, and stores logs in Log Analytics.
 
-![Architecture diagram: Azure Container Apps, Azure Container Registry, Managed Identity, Azure OpenAI, Azure Database for PostgreSQL](docs/images/architecture.png)
+![Architecture diagram: Azure Container Apps, Azure Container Registry, Managed Identity, Azure OpenAI, Azure Database for PostgreSQL](docs/images/azure_architecture.png)
 
 ## Getting started
 

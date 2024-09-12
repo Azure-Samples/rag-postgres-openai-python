@@ -3,13 +3,15 @@ name: rag-postgres-openai-python
 metadata:
     template: rag-postgres-openai-python@0.0.1
 requiredVersions:
-    azd: ">= 1.9.5"
+    azd: ">= 1.10.0"
 services:
     web:
         project: ./src/backend
         language: py
         module: web
         host: containerapp
+        docker:
+            remoteBuild: true
         hooks:
             prebuild:
                 windows:
