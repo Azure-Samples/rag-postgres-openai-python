@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import asdict
-
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Index
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 # Define the models
-class Base(DeclarativeBase, MappedAsDataclass):
+class Base(DeclarativeBase):
     pass
 
 
@@ -20,11 +18,12 @@ class Item(Base):
     name: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
     price: Mapped[float] = mapped_column()
-    embedding_ada002: Mapped[Vector] = mapped_column(Vector(1536))  # ada-002
-    embedding_nomic: Mapped[Vector] = mapped_column(Vector(768))  # nomic-embed-text
+    # Embeddings for different models:
+    embedding_ada002: Mapped[Vector] = mapped_column(Vector(1536), nullable=True)  # ada-002
+    embedding_nomic: Mapped[Vector] = mapped_column(Vector(768), nullable=True)  # nomic-embed-text
 
     def to_dict(self, include_embedding: bool = False):
-        model_dict = asdict(self)
+        model_dict = {column.name: getattr(self, column.name) for column in self.__table__.columns}
         if include_embedding:
             model_dict["embedding_ada002"] = model_dict.get("embedding_ada002", [])
             model_dict["embedding_nomic"] = model_dict.get("embedding_nomic", [])
@@ -40,9 +39,13 @@ class Item(Base):
         return f"Name: {self.name} Description: {self.description} Type: {self.type}"
 
 
-# Define HNSW index to support vector similarity search through the vector_cosine_ops access method (cosine distance).
+# Define HNSW index to support vector similarity search
+# Use the vector_ip_ops access method (inner product) since these embeddings are normalized
+
+table_name = Item.__tablename__
+
 index_ada002 = Index(
-    "hnsw_index_for_innerproduct_item_embedding_ada002",
+    "hnsw_index_for_innerproduct_{table_name}_embedding_ada002",
     Item.embedding_ada002,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},
@@ -50,7 +53,7 @@ index_ada002 = Index(
 )
 
 index_nomic = Index(
-    "hnsw_index_for_innerproduct_item_embedding_nomic",
+    f"hnsw_index_for_innerproduct_{table_name}_embedding_nomic",
     Item.embedding_nomic,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},

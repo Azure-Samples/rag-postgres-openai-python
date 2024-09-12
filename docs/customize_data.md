@@ -1,6 +1,7 @@
 # RAG on PostgreSQL: Customizing the data
 
 This guide shows you how to bring in a table with a different schema than the sample table.
+For a full example of code changes needed, check out [this branch](https://github.com/Azure-Samples/rag-postgres-openai-python/compare/main...otherdata).
 
 ## Define the table schema
 
