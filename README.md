@@ -146,7 +146,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 1. Run these commands to install the web app as a local package (named `fastapi_app`), set up the local database, and seed it with test data:
 
     ```bash
-    python3 -m pip install -e src/backend
+    python -m pip install -e src/backend
     python ./src/backend/fastapi_app/setup_postgres_database.py
     python ./src/backend/fastapi_app/setup_postgres_seeddata.py
     ```
@@ -165,7 +165,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 3. Run the FastAPI backend (with hot reloading). This should be run from the root of the project:
 
     ```shell
-    python3 -m uvicorn fastapi_app:create_app --factory --reload
+    python -m uvicorn fastapi_app:create_app --factory --reload
     ```
 
     Or you can run "Backend" in the VS Code Run & Debug menu.
