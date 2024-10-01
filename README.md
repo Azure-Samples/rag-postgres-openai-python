@@ -204,6 +204,7 @@ Further documentation is available in the `docs/` folder:
 * [Understanding the RAG flow](docs/rag_flow.md)
 * [Customizing the data](docs/customize_data.md)
 * [Deploying with existing resources](docs/deploy_existing.md)
+* [Using Entra auth with PostgreSQL tools](docs/using_entra_auth.md)
 * [Monitoring with Azure Monitor](docs/monitoring.md)
 * [Load testing](docs/loadtesting.md)
 
