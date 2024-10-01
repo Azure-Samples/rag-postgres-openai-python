@@ -19,10 +19,16 @@ To follow security best practices, this project is setup to use passwordless aut
 2. Generate a token for the Azure Database for PostgreSQL Flexible Server.
 
     ```shell
-    azd auth token --scope https://ossrdbms-aad.database.windows.net/.default --tenant-id 1bd0d125-6c64-49d1-af0d-88fa60e18074 --output json
+    azd auth token --scope https://ossrdbms-aad.database.windows.net/.default --output json
     ```
 
-    This will output JSON with a token that you can use to connect to the database.
+    Once again, if you used a non-default tenant to run `azd up`, you may need to specify the tenant ID.
+
+    ```shell
+    azd auth token --scope https://ossrdbms-aad.database.windows.net/.default --tenant-id YOUR-TENANT-ID --output json
+    ```
+
+    This will output JSON with a token inside the "token" field. Copy the token.
 
 3. Set the `PGPASSWORD` environment variable to the token.
 
