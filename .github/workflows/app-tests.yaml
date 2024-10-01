@@ -3,8 +3,18 @@ name: App Tests
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
+      - ".azdo/**"
+      - ".devcontainer/**"
+      - ".github/**"
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
+      - ".azdo/**"
+      - ".devcontainer/**"
+      - ".github/**"
   workflow_dispatch:
 
 permissions:
