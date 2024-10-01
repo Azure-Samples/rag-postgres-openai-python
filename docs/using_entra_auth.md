@@ -47,7 +47,7 @@ To follow security best practices, this project is setup to use passwordless aut
     psql -h $(azd env get-value POSTGRES_HOST) -U $(azd env get-value POSTGRES_USERNAME) -d $(azd env get-value POSTGRES_DATABASE) -p 5432
     ```
 
-5. In psql, use `\d` to list the tables. When you `SELECT` from a table, select only the columns you're interested in, to avoid rendering the vector embeddings in the terminal.
+5. In psql, use `\d` to list the tables. When you `SELECT` from a table, select only the columns you're interested in, to avoid rendering the vector embeddings in the terminal. If you get an authentication error, you may need to refresh the token with a new one.
 
 ## Using Entra auth with pgAdmin
 
