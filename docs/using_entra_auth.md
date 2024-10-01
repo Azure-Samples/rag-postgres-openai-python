@@ -2,7 +2,10 @@
 
 To follow security best practices, this project is setup to use passwordless authentication with the Azure Database for PostgreSQL Flexible Server. This means that you can't connect to the database with a password, but instead need to use a token associated with a Microsoft Entra user. Locally, the user should be your own Azure account, whichever account was used to run `azd up`. In production, the user will be the managed identity assigned to the Azure Container App.
 
-## Using psql with Entra auth
+* [Using Entra auth with psql](#using-entra-auth-with-psql)
+* [Using Entra auth with pgAdmin](#using-entra-auth-with-pgadmin)
+
+## Using Entra auth with psql
 
 1. Make sure you are logged into the Azure Developer CLI with the same account that was used to run `azd up`.
 
@@ -46,7 +49,7 @@ To follow security best practices, this project is setup to use passwordless aut
 
 5. In psql, use `\d` to list the tables. When you `SELECT` from a table, select only the columns you're interested in, to avoid rendering the vector embeddings in the terminal.
 
-## Using pgAdmin with Entra auth
+## Using Entra auth with pgAdmin
 
 1. Make sure you are logged into the Azure Developer CLI with the same account that was used to run `azd up`.
 
