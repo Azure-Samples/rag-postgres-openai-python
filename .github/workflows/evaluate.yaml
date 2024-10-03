@@ -38,20 +38,10 @@ jobs:
       # Postgres environment variables are not needed, as they're passed in below
     steps:
       - uses: actions/checkout@v4
-      - name: Check for MacOS Runner
-        if: matrix.os == 'macos-latest-xlarge'
-        run: brew install postgresql@14
-      - name: Install pgvector on Windows using install-pgvector.bat
-        if: matrix.os == 'windows-latest'
-        shell: cmd
-        run: .github\workflows\install-pgvector.bat
-
       - name: Install PostgreSQL development libraries
-        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt update
           sudo apt install postgresql-server-dev-14
-
       - name: Setup postgres
         uses: ikalnytskyi/action-setup-postgres@v6
         with:
@@ -60,13 +50,12 @@ jobs:
           database: postgres
 
       - name: Install pgvector on MacOS/Linux using install-pgvector.sh
-        if: matrix.os != 'windows-latest'
         run: .github/workflows/install-pgvector.sh
 
       - name: Install python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # install the python version needed
+          python-version: '3.12'
 
       - name: Install azd
         uses: Azure/setup-azd@v1.0.0
