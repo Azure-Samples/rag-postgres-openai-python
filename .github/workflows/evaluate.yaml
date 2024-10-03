@@ -106,7 +106,7 @@ jobs:
 
       - name: Run local server in background
         run: |
-          nohup python3 -m uvicorn fastapi_app:create_app --factory &
+          RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory &)
 
       - name: Evaluate local RAG flow
         run: |
