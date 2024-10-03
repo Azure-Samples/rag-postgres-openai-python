@@ -78,7 +78,7 @@ class AdvancedRAGChat(RAGChatBase):
             query_response_token_limit=500,
         )
 
-        # Retrieve relevant items from the database with the GPT optimized query
+        # Retrieve relevant rows from the database with the GPT optimized query
         results = await self.searcher.search_and_embed(
             query_text,
             top=chat_params.top,
@@ -103,7 +103,7 @@ class AdvancedRAGChat(RAGChatBase):
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
-                description=[str(message) for message in query_messages],
+                description=query_messages,
                 props=(
                     {"model": self.chat_model, "deployment": self.chat_deployment}
                     if self.chat_deployment
@@ -154,7 +154,7 @@ class AdvancedRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[str(message) for message in contextual_messages],
+                        description=contextual_messages,
                         props=(
                             {"model": self.chat_model, "deployment": self.chat_deployment}
                             if self.chat_deployment
@@ -191,7 +191,7 @@ class AdvancedRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[str(message) for message in contextual_messages],
+                        description=contextual_messages,
                         props=(
                             {"model": self.chat_model, "deployment": self.chat_deployment}
                             if self.chat_deployment
