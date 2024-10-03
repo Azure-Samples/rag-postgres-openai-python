@@ -56,7 +56,7 @@ def get_openai_config_dict() -> dict:
             api_key = os.environ["AZURE_OPENAI_KEY"]
         else:
             logger.info("Using Azure OpenAI Service with Azure Developer CLI Credential")
-            azure_credential = DefaultAzureCredential()
+            azure_credential = DefaultAzureCredential(process_timeout=60)
             api_key = azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
         openai_config = {
             "api_type": "azure",

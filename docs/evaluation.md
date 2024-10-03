@@ -1,5 +1,30 @@
 # Evaluating the RAG answer quality
 
+## Deploy a GPT-4 model
+
+
+1. Run this command to tell `azd` to deploy a GPT-4 model for evaluation:
+
+    ```shell
+    azd env set DEPLOY_EVAL_MODEL true
+    ```
+
+2. Set the capacity to the highest possible value to ensure that the evaluation runs quickly.
+
+    ```shell
+    azd env set AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY 100
+    ```
+
+    By default, that will provision a `gpt-4` model, version `turbo-2024-04-09`. To change those settings, set the `AZURE_OPENAI_EVAL_DEPLOYMENT` and `AZURE_OPENAI_EVAL_DEPLOYMENT_VERSION` environment variables.
+
+3. Then, run the following command to provision the model:
+
+    ```shell
+    azd provision
+    ```
+
+## Setup the evaluation environment
+
 Install all the dependencies for the evaluation script by running the following command:
 
 ```bash

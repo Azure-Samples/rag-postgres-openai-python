@@ -19,6 +19,6 @@ async def test_create_openai_chat_client(mock_default_azure_credential, mock_ope
     openai_chat_client = await create_openai_chat_client(mock_default_azure_credential)
     assert openai_chat_client.chat.completions.create is not None
     response = await openai_chat_client.chat.completions.create(
-        model="gpt-35-turbo", messages=[{"content": "test", "role": "user"}]
+        model="gpt-4o-mini", messages=[{"content": "test", "role": "user"}]
     )
     assert response.choices[0].message.content == "The capital of France is Paris. [Benefit_Options-2.pdf]."

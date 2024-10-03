@@ -51,8 +51,8 @@
                     }
                 ],
                 "props": {
-                    "model": "gpt-35-turbo",
-                    "deployment": "gpt-35-turbo"
+                    "model": "gpt-4o-mini",
+                    "deployment": "gpt-4o-mini"
                 }
             }
         ],

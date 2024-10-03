@@ -16,7 +16,7 @@ from fastapi_app.dependencies import (
     FastAPIAppContext,
     common_parameters,
     create_async_sessionmaker,
-    get_azure_credentials,
+    get_azure_credential,
 )
 from fastapi_app.openai_clients import create_openai_chat_client, create_openai_embed_client
 from fastapi_app.postgres_engine import create_postgres_engine_from_env
@@ -34,7 +34,7 @@ class State(TypedDict):
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[State]:
     context = await common_parameters()
-    azure_credential = await get_azure_credentials()
+    azure_credential = await get_azure_credential()
     engine = await create_postgres_engine_from_env(azure_credential)
     sessionmaker = await create_async_sessionmaker(engine)
     chat_client = await create_openai_chat_client(azure_credential)
@@ -52,10 +52,10 @@ def create_app(testing: bool = False):
     else:
         if not testing:
             load_dotenv(override=True)
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.DEBUG)
     # Turn off particularly noisy INFO level logs from Azure Core SDK:
-    logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
-    logging.getLogger("azure.identity").setLevel(logging.WARNING)
+    # logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
+    # logging.getLogger("azure.identity").setLevel(logging.WARNING)
 
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
         logger.info("Configuring Azure Monitor")

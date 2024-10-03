@@ -33,34 +33,58 @@
         "value": "${OPENAI_CHAT_HOST=azure}"
       },
       "chatModelName": {
-        "value": "${AZURE_OPENAI_CHAT_MODEL}"
+        "value": "${AZURE_OPENAI_CHAT_MODEL=gpt-4o-mini}"
       },
       "chatDeploymentName": {
-        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT}"
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini}"
       },
       "chatDeploymentVersion":{
-        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION}"
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION=2024-07-18}"
+      },
+      "chatDeploymentSku": {
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_SKU=GlobalStandard}"
       },
       "chatDeploymentCapacity":{
-        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY}"
+        "value": "${AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY=30}"
+      },
+      "deployEvalModel": {
+        "value": "${DEPLOY_EVAL_MODEL=false}"
+      },
+      "evalModelName": {
+        "value": "${AZURE_OPENAI_EVAL_MODEL=gpt-4}"
+      },
+      "evalDeploymentName": {
+        "value": "${AZURE_OPENAI_EVAL_DEPLOYMENT=gpt-4}"
+      },
+      "evalDeploymentVersion":{
+        "value": "${AZURE_OPENAI_EVAL_DEPLOYMENT_VERSION=turbo-2024-04-09}"
+      },
+      "evalDeploymentSku": {
+        "value": "${AZURE_OPENAI_EVAL_DEPLOYMENT_SKU=GlobalStandard}"
+      },
+      "evalDeploymentCapacity":{
+        "value": "${AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY=80}"
       },
       "openAIEmbedHost": {
         "value": "${OPENAI_EMBED_HOST=azure}"
       },
       "embedModelName":{
-        "value": "${AZURE_OPENAI_EMBED_MODEL}"
+        "value": "${AZURE_OPENAI_EMBED_MODEL=text-embedding-ada-002}"
       },
       "embedDeploymentName": {
-        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT}"
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT=text-embedding-ada-002}"
       },
       "embedDeploymentVersion":{
-        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION}"
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION=2}"
+      },
+      "embedDeploymentSku": {
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_SKU=Standard}"
       },
       "embedDeploymentCapacity":{
-        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY}"
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY=30}"
       },
       "embedDimensions": {
-        "value": "${AZURE_OPENAI_EMBED_DIMENSIONS}"
+        "value": "${AZURE_OPENAI_EMBED_DIMENSIONS=1536}"
       },
       "openAIComKey": {
         "value": "${OPENAICOM_KEY}"
