@@ -104,9 +104,9 @@ jobs:
             az account set --subscription ${{env.AZURE_SUBSCRIPTION_ID}}
 
 
-      - name: Run local server
+      - name: Run local server in background
         run: |
-          python3 -m uvicorn fastapi_app:create_app --factory
+          nohup python3 -m uvicorn fastapi_app:create_app --factory &
 
       - name: Evaluate local RAG flow
         run: |
