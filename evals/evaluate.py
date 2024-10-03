@@ -50,6 +50,10 @@ if __name__ == "__main__":
     load_dotenv(".env", override=True)
 
     openai_config = get_openai_config()
+    # TODO: specify the localhost URL using argument
+    # TODO: specify the experiment name (based on PR number)
+    # TODO: Specify the num questions using argument
+
     run_evaluate_from_config(
         working_dir=Path(__file__).parent, config_path="eval_config.json", openai_config=openai_config, num_questions=2
     )
