@@ -126,6 +126,12 @@ jobs:
           name: server_logs
           path: ./serverlogs.out
 
+      - name: Upload server error logs as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server_error_logs
+          path: ./serverlogs.err
+
       - name: Upload eval results as build artifact
         uses: actions/upload-artifact@v4
         with:
