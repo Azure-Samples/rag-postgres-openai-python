@@ -23,19 +23,6 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-      OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
-      OPENAI_EMBED_HOST: ${{ vars.OPENAI_EMBED_HOST }}
-      AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
-      AZURE_OPENAI_VERSION: ${{ vars.AZURE_OPENAI_VERSION }}
-      AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
-      AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
-      AZURE_OPENAI_EMBED_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EMBED_DEPLOYMENT }}
-      AZURE_OPENAI_EMBED_MODEL: ${{ vars.AZURE_OPENAI_EMBED_MODEL }}
-      AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
-      AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
-      AZURE_OPENAI_EVAL_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EVAL_DEPLOYMENT }}
-      AZURE_OPENAI_EVAL_MODEL: ${{ vars.AZURE_OPENAI_EVAL_MODEL }}
-      # Postgres environment variables are not needed, as they're passed in below
     steps:
       - uses: actions/checkout@v4
       - name: Install PostgreSQL development libraries
@@ -115,11 +102,28 @@ jobs:
       - name: Run local server in background
         run: |
           RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory > serverlogs.out 2> serverlogs.err &)
-
+        env:
+          OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
+          OPENAI_EMBED_HOST: ${{ vars.OPENAI_EMBED_HOST }}
+          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_VERSION: ${{ vars.AZURE_OPENAI_VERSION }}
+          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
+          AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
+          AZURE_OPENAI_EMBED_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EMBED_DEPLOYMENT }}
+          AZURE_OPENAI_EMBED_MODEL: ${{ vars.AZURE_OPENAI_EMBED_MODEL }}
+          AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
+          AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
       - name: Evaluate local RAG flow
         run: |
           python evals/evaluate.py
-
+        env:
+          OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
+          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_VERSION: ${{ vars.AZURE_OPENAI_VERSION }}
+          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
+          AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
+          AZURE_OPENAI_EVAL_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EVAL_DEPLOYMENT }}
+          AZURE_OPENAI_EVAL_MODEL: ${{ vars.AZURE_OPENAI_EVAL_MODEL }}
       - name: Upload server logs as build artifact
         uses: actions/upload-artifact@v4
         with:
