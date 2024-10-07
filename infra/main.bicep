@@ -407,7 +407,7 @@ module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
 }
 
 // USER ROLES
-module openAIRoleUser 'core/security/role.bicep' = if (empty(runningOnGh)) {
+module openAIRoleUser 'core/security/role.bicep' = {
   scope: openAIResourceGroup
   name: 'openai-role-user'
   params: {
