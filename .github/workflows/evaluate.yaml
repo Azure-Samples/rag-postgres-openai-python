@@ -57,9 +57,14 @@ jobs:
 
       - name: Setup local database with seed data
         run: |
-          cp .env.sample .env
           python ./src/backend/fastapi_app/setup_postgres_database.py
           python ./src/backend/fastapi_app/setup_postgres_seeddata.py
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_USERNAME: admin
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: postgres
+          POSTGRES_SSL: disable
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -113,6 +118,11 @@ jobs:
           AZURE_OPENAI_EMBED_MODEL: ${{ vars.AZURE_OPENAI_EMBED_MODEL }}
           AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
           AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
+          POSTGRES_HOST: localhost
+          POSTGRES_USERNAME: admin
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: postgres
+          POSTGRES_SSL: disable
       - name: Evaluate local RAG flow
         run: |
           python evals/evaluate.py
