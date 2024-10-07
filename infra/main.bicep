@@ -413,7 +413,7 @@ module openAIRoleUser 'core/security/role.bicep' = {
   params: {
     principalId: principalId
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
-    principalType: 'User'
+    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
   }
 }
 
