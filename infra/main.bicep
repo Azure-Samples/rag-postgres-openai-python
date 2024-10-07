@@ -140,7 +140,7 @@ param embedDeploymentSku string // Set in main.parameters.json
 param embedDeploymentCapacity int // Set in main.parameters.json
 
 @description('Dimensions of the embedding model')
-param embedDimensions int = 0
+param embedDimensions int // Set in main.parameters.json
 
 
 param webAppExists bool = false
@@ -325,7 +325,7 @@ var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   }
   {
     name: 'AZURE_OPENAI_VERSION'
-    value: openAIEmbedHost == 'azure' ? azureOpenAIAPIVersion : ''
+    value: openAIChatHost == 'azure' ? azureOpenAIAPIVersion : ''
   }
 ])
 
@@ -442,11 +442,18 @@ output SERVICE_WEB_NAME string = web.outputs.SERVICE_WEB_NAME
 output SERVICE_WEB_URI string = web.outputs.SERVICE_WEB_URI
 output SERVICE_WEB_IMAGE_NAME string = web.outputs.SERVICE_WEB_IMAGE_NAME
 
+output OPENAI_CHAT_HOST string = openAIChatHost
+output OPENAI_EMBED_HOST string = openAIEmbedHost
 output AZURE_OPENAI_ENDPOINT string = !empty(azureOpenAIEndpoint)
   ? azureOpenAIEndpoint
   : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
+output AZURE_OPENAI_VERSION string = openAIEmbedHost == 'chat' ? azureOpenAIAPIVersion : ''
 output AZURE_OPENAI_CHAT_DEPLOYMENT string = deployAzureOpenAI ? chatDeploymentName : ''
+output AZURE_OPENAI_CHAT_MODEL string = deployAzureOpenAI ? chatModelName : ''
 output AZURE_OPENAI_EMBED_DEPLOYMENT string = deployAzureOpenAI ? embedDeploymentName : ''
+output AZURE_OPENAI_EMBED_MODEL string = deployAzureOpenAI ? embedModelName : ''
+output AZURE_OPENAI_EMBED_DIMENSIONS string = deployAzureOpenAI ? string(embedDimensions) : ''
+
 output AZURE_OPENAI_EVAL_DEPLOYMENT string = deployAzureOpenAI ? evalDeploymentName : ''
 output AZURE_OPENAI_EVAL_MODEL string = deployAzureOpenAI ? evalModelName : ''
 
