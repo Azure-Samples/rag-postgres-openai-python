@@ -114,11 +114,17 @@ jobs:
 
       - name: Run local server in background
         run: |
-          RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory &)
+          RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory > serverlogs.out 2> serverlogs.err &)
 
       - name: Evaluate local RAG flow
         run: |
           python evals/evaluate.py
+
+      - name: Upload server logs as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server_logs
+          path: ./serverlogs.out
 
       - name: Upload eval results as build artifact
         uses: actions/upload-artifact@v4
