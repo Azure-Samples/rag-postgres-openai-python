@@ -6,8 +6,8 @@ from tests.data import test_data
 
 
 @pytest.mark.asyncio
-async def test_compute_text_embedding(mock_default_azure_credential, mock_openai_embedding):
-    openai_embed_client = await create_openai_embed_client(mock_default_azure_credential)
+async def test_compute_text_embedding(mock_azure_credential, mock_openai_embedding):
+    openai_embed_client = await create_openai_embed_client(mock_azure_credential)
     result = await compute_text_embedding(
         q="test",
         openai_client=openai_embed_client,
@@ -18,8 +18,8 @@ async def test_compute_text_embedding(mock_default_azure_credential, mock_openai
 
 
 @pytest.mark.asyncio
-async def test_compute_text_embedding_dimensions(mock_default_azure_credential, mock_openai_embedding):
-    openai_embed_client = await create_openai_embed_client(mock_default_azure_credential)
+async def test_compute_text_embedding_dimensions(mock_azure_credential, mock_openai_embedding):
+    openai_embed_client = await create_openai_embed_client(mock_azure_credential)
     result = await compute_text_embedding(
         q="test",
         openai_client=openai_embed_client,

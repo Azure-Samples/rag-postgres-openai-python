@@ -34,7 +34,7 @@ async def test_get_common_parameters_openai(mock_session_env_openai):
 
 
 @pytest.mark.asyncio
-async def test_get_azure_credential(mock_session_env, mock_default_azure_credential):
+async def test_get_azure_credential(mock_session_env, mock_azure_credential):
     result = await get_azure_credential()
     token = result.get_token("https://vault.azure.net")
     assert token.expires_on == 9999999999

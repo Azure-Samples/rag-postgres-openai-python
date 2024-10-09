@@ -274,22 +274,22 @@ def mock_openai_chatcompletion(monkeypatch_session):
 
 
 @pytest.fixture(scope="function")
-def mock_default_azure_credential(mock_session_env):
+def mock_azure_credential(mock_session_env):
     """Mock the Azure credential for testing."""
-    with mock.patch("azure.identity.DefaultAzureCredential") as mock_default_azure_credential:
-        mock_default_azure_credential.return_value = MockAzureCredential()
-        yield mock_default_azure_credential
+    with mock.patch("azure.identity.AzureDeveloperCliCredential") as mock_azure_credential:
+        mock_azure_credential.return_value = MockAzureCredential()
+        yield mock_azure_credential
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_client(app, mock_default_azure_credential, mock_openai_embedding, mock_openai_chatcompletion):
+async def test_client(app, mock_azure_credential, mock_openai_embedding, mock_openai_chatcompletion):
     """Create a test client."""
     with TestClient(app) as test_client:
         yield test_client
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session(mock_session_env, mock_default_azure_credential):
+async def db_session(mock_session_env, mock_azure_credential):
     """Create a new database session with a rollback at the end of the test."""
     engine = await create_postgres_engine_from_env()
     async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -302,10 +302,10 @@ async def db_session(mock_session_env, mock_default_azure_credential):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def postgres_searcher(mock_session_env, mock_default_azure_credential, db_session, mock_openai_embedding):
+async def postgres_searcher(mock_session_env, mock_azure_credential, db_session, mock_openai_embedding):
     from fastapi_app.postgres_searcher import PostgresSearcher
 
-    openai_embed_client = await create_openai_embed_client(mock_default_azure_credential)
+    openai_embed_client = await create_openai_embed_client(mock_azure_credential)
 
     yield PostgresSearcher(
         db_session=db_session,

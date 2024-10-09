@@ -5,8 +5,8 @@ from tests.data import test_data
 
 
 @pytest.mark.asyncio
-async def test_create_openai_embed_client(mock_default_azure_credential, mock_openai_embedding):
-    openai_embed_client = await create_openai_embed_client(mock_default_azure_credential)
+async def test_create_openai_embed_client(mock_azure_credential, mock_openai_embedding):
+    openai_embed_client = await create_openai_embed_client(mock_azure_credential)
     assert openai_embed_client.embeddings.create is not None
     embeddings = await openai_embed_client.embeddings.create(
         model="text-embedding-ada-002", input="test", dimensions=1536
@@ -15,8 +15,8 @@ async def test_create_openai_embed_client(mock_default_azure_credential, mock_op
 
 
 @pytest.mark.asyncio
-async def test_create_openai_chat_client(mock_default_azure_credential, mock_openai_chatcompletion):
-    openai_chat_client = await create_openai_chat_client(mock_default_azure_credential)
+async def test_create_openai_chat_client(mock_azure_credential, mock_openai_chatcompletion):
+    openai_chat_client = await create_openai_chat_client(mock_azure_credential)
     assert openai_chat_client.chat.completions.create is not None
     response = await openai_chat_client.chat.completions.create(
         model="gpt-4o-mini", messages=[{"content": "test", "role": "user"}]
