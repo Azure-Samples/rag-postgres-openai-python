@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from fastapi_app.api_models import (
     ChatRequest,
+    ErrorResponse,
     ItemPublic,
     ItemWithDistance,
     RetrievalResponse,
@@ -89,7 +90,7 @@ async def search_handler(
     return [ItemPublic.model_validate(item.to_dict()) for item in results]
 
 
-@router.post("/chat", response_model=RetrievalResponse | dict)
+@router.post("/chat", response_model=RetrievalResponse | ErrorResponse)
 async def chat_handler(
     context: CommonDeps,
     database_session: DBSession,
@@ -130,7 +131,6 @@ async def chat_handler(
         )
         return response
     except Exception as e:
-        # return exception inside JSON
         return {"error": str(e)}
 
 
