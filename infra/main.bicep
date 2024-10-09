@@ -449,12 +449,21 @@ output AZURE_OPENAI_ENDPOINT string = !empty(azureOpenAIEndpoint)
   : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
 output AZURE_OPENAI_VERSION string = openAIEmbedHost == 'chat' ? azureOpenAIAPIVersion : ''
 output AZURE_OPENAI_CHAT_DEPLOYMENT string = deployAzureOpenAI ? chatDeploymentName : ''
+output AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION string = deployAzureOpenAI ? chatDeploymentVersion : ''
+output AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY int = deployAzureOpenAI ? chatDeploymentCapacity : 0
+output AZURE_OPENAI_CHAT_DEPLOYMENT_SKU string = deployAzureOpenAI ? chatDeploymentSku : ''
 output AZURE_OPENAI_CHAT_MODEL string = deployAzureOpenAI ? chatModelName : ''
 output AZURE_OPENAI_EMBED_DEPLOYMENT string = deployAzureOpenAI ? embedDeploymentName : ''
+output AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION string = deployAzureOpenAI ? embedDeploymentVersion : ''
+output AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY int = deployAzureOpenAI ? embedDeploymentCapacity : 0
+output AZURE_OPENAI_EMBED_DEPLOYMENT_SKU string = deployAzureOpenAI ? embedDeploymentSku : ''
 output AZURE_OPENAI_EMBED_MODEL string = deployAzureOpenAI ? embedModelName : ''
 output AZURE_OPENAI_EMBED_DIMENSIONS string = deployAzureOpenAI ? string(embedDimensions) : ''
 
 output AZURE_OPENAI_EVAL_DEPLOYMENT string = deployAzureOpenAI ? evalDeploymentName : ''
+output AZURE_OPENAI_EVAL_DEPLOYMENT_VERSION string = deployAzureOpenAI ? evalDeploymentVersion : ''
+output AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY string = deployAzureOpenAI ? evalDeploymentCapacity : ''
+output AZURE_OPENAI_EVAL_DEPLOYMENT_SKU string = deployAzureOpenAI ? evalDeploymentSku : ''
 output AZURE_OPENAI_EVAL_MODEL string = deployAzureOpenAI ? evalModelName : ''
 
 output POSTGRES_HOST string = postgresServer.outputs.POSTGRES_DOMAIN_NAME
