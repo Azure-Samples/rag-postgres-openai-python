@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from fastapi_app.api_models import (
     ChatRequest,
+    ErrorResponse,
     ItemPublic,
     ItemWithDistance,
     RetrievalResponse,
@@ -89,7 +90,7 @@ async def search_handler(
     return [ItemPublic.model_validate(item.to_dict()) for item in results]
 
 
-@router.post("/chat", response_model=RetrievalResponse)
+@router.post("/chat", response_model=RetrievalResponse | ErrorResponse)
 async def chat_handler(
     context: CommonDeps,
     database_session: DBSession,
@@ -97,37 +98,40 @@ async def chat_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    searcher = PostgresSearcher(
-        db_session=database_session,
-        openai_embed_client=openai_embed.client,
-        embed_deployment=context.openai_embed_deployment,
-        embed_model=context.openai_embed_model,
-        embed_dimensions=context.openai_embed_dimensions,
-        embedding_column=context.embedding_column,
-    )
-    rag_flow: SimpleRAGChat | AdvancedRAGChat
-    if chat_request.context.overrides.use_advanced_flow:
-        rag_flow = AdvancedRAGChat(
-            searcher=searcher,
-            openai_chat_client=openai_chat.client,
-            chat_model=context.openai_chat_model,
-            chat_deployment=context.openai_chat_deployment,
+    try:
+        searcher = PostgresSearcher(
+            db_session=database_session,
+            openai_embed_client=openai_embed.client,
+            embed_deployment=context.openai_embed_deployment,
+            embed_model=context.openai_embed_model,
+            embed_dimensions=context.openai_embed_dimensions,
+            embedding_column=context.embedding_column,
         )
-    else:
-        rag_flow = SimpleRAGChat(
-            searcher=searcher,
-            openai_chat_client=openai_chat.client,
-            chat_model=context.openai_chat_model,
-            chat_deployment=context.openai_chat_deployment,
+        rag_flow: SimpleRAGChat | AdvancedRAGChat
+        if chat_request.context.overrides.use_advanced_flow:
+            rag_flow = AdvancedRAGChat(
+                searcher=searcher,
+                openai_chat_client=openai_chat.client,
+                chat_model=context.openai_chat_model,
+                chat_deployment=context.openai_chat_deployment,
+            )
+        else:
+            rag_flow = SimpleRAGChat(
+                searcher=searcher,
+                openai_chat_client=openai_chat.client,
+                chat_model=context.openai_chat_model,
+                chat_deployment=context.openai_chat_deployment,
+            )
+
+        chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
+
+        contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+        response = await rag_flow.answer(
+            chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
         )
-
-    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
-
-    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
-    response = await rag_flow.answer(
-        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
-    )
-    return response
+        return response
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @router.post("/chat/stream")

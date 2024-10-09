@@ -123,7 +123,7 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
     azd up
     ```
 
-    You will be asked to select two locations, first a region for most of the resources (Container Apps, PostgreSQL), then a region specifically for the Azure OpenAI models. This project uses the gpt-3.5-turbo (version 0125) and text-embedding-ada-002 models which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region accordingly.
+    You will be asked to select two locations, first a region for most of the resources (Container Apps, PostgreSQL), then a region specifically for the Azure OpenAI models. This project uses the gpt-4o-mini and text-embedding-ada-002 models which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region accordingly.
 
 ## Local Development
 
@@ -207,6 +207,7 @@ Further documentation is available in the `docs/` folder:
 * [Using Entra auth with PostgreSQL tools](docs/using_entra_auth.md)
 * [Monitoring with Azure Monitor](docs/monitoring.md)
 * [Load testing](docs/loadtesting.md)
+* [Evaluation](docs/evaluation.md)
 
 Please post in the issue tracker with any questions or issues.
 

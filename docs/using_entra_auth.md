@@ -1,6 +1,8 @@
 # Using Entra auth with PostgreSQL tools
 
-To follow security best practices, this project is setup to use passwordless authentication with the Azure Database for PostgreSQL Flexible Server. This means that you can't connect to the database with a password, but instead need to use a token associated with a Microsoft Entra user. Locally, the user should be your own Azure account, whichever account was used to run `azd up`. In production, the user will be the managed identity assigned to the Azure Container App.
+To follow security best practices, this project is setup to use passwordless authentication with the Azure Database for PostgreSQL Flexible Server. This means that you can't connect to the database with a password, but instead need to use a token associated with a Microsoft Entra user. Locally, the user should be your own Azure account, whichever account was used to run `azd up`. In production, the user will be the managed identity assigned to the Azure Container App. 
+
+Besides the tips here, more generic instructions about passwordless authentication are available in [Use Microsoft Entra ID for authentication with Azure Database for PostgreSQL - Flexible Server](https://learn.microsoft.com/azure/postgresql/flexible-server/how-to-configure-sign-in-azure-ad-authentication).
 
 * [Using Entra auth with psql](#using-entra-auth-with-psql)
 * [Using Entra auth with pgAdmin](#using-entra-auth-with-pgadmin)

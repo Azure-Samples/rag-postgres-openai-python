@@ -80,6 +80,11 @@ jobs:
             cd ./src/frontend
             npm install
             npm run build
+        - name: cache mypy
+          uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+          with:
+            path: ./.mypy_cache
+            key: mypy${{ matrix.os }}-${{ matrix.python_version }}-${{ hashFiles('requirements-dev.txt', 'src/backend/requirements.txt', 'src/backend/pyproject.toml') }}
         - name: Run MyPy
           run: python3 -m mypy .
         - name: Run Pytest

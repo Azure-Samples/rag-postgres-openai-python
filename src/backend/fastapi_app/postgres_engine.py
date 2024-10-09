@@ -1,9 +1,11 @@
 import logging
 import os
 
-from azure.identity import DefaultAzureCredential
+from azure.identity import AzureDeveloperCliCredential
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+
+from fastapi_app.dependencies import get_azure_credential
 
 logger = logging.getLogger("ragapp")
 
@@ -44,7 +46,7 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
 
 async def create_postgres_engine_from_env(azure_credential=None) -> AsyncEngine:
     if azure_credential is None and os.environ["POSTGRES_HOST"].endswith(".database.azure.com"):
-        azure_credential = DefaultAzureCredential()
+        azure_credential = get_azure_credential()
 
     return await create_postgres_engine(
         host=os.environ["POSTGRES_HOST"],
@@ -58,7 +60,7 @@ async def create_postgres_engine_from_env(azure_credential=None) -> AsyncEngine:
 
 async def create_postgres_engine_from_args(args, azure_credential=None) -> AsyncEngine:
     if azure_credential is None and args.host.endswith(".database.azure.com"):
-        azure_credential = DefaultAzureCredential()
+        azure_credential = AzureDeveloperCliCredential(process_timeout=60)
 
     return await create_postgres_engine(
         host=args.host,

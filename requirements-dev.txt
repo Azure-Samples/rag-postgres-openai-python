@@ -12,3 +12,5 @@ pytest-cov
 pytest-playwright
 pytest-snapshot
 locust
+git+https://github.com/Azure-Samples/ai-rag-chat-evaluator/@installable
+psycopg2

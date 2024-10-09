@@ -52,6 +52,10 @@ class RAGContext(BaseModel):
     followup_questions: list[str] | None = None
 
 
+class ErrorResponse(BaseModel):
+    error: str
+
+
 class RetrievalResponse(BaseModel):
     message: Message
     context: RAGContext
