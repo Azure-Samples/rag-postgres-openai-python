@@ -17,12 +17,31 @@ param principalId string = ''
 
 @minLength(1)
 @description('Location for the OpenAI resource')
-// Look for gpt-35-turbo 0125 on the availability table:
-// https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#standard-deployment-model-availability
+// Look for desired models on the availability table:
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models#global-standard-model-availability
 @allowed([
+  'australiaeast'
+  'brazilsouth'
   'canadaeast'
+  'eastus'
+  'eastus2'
+  'francecentral'
+  'germanywestcentral'
+  'japaneast'
+  'koreacentral'
   'northcentralus'
+  'norwayeast'
+  'polandcentral'
+  'spaincentral'
+  'southafricanorth'
   'southcentralus'
+  'southindia'
+  'swedencentral'
+  'switzerlandnorth'
+  'uksouth'
+  'westeurope'
+  'westus'
+  'westus3'
 ])
 @metadata({
   azd: {
@@ -52,16 +71,6 @@ param openAIEmbedHost string = 'azure'
 @secure()
 param openAIComKey string = ''
 
-@description('Name of the GPT model to deploy')
-param chatModelName string = ''
-@description('Name of the model deployment')
-param chatDeploymentName string = ''
-
-@description('Version of the GPT model to deploy')
-// See version availability in this table:
-// https://learn.microsoft.com/azure/ai-services/openai/concepts/models#gpt-4-and-gpt-4-turbo-preview-models
-param chatDeploymentVersion string = ''
-
 param azureOpenAIAPIVersion string = '2024-03-01-preview'
 @secure()
 param azureOpenAIKey string = ''
@@ -69,30 +78,70 @@ param azureOpenAIKey string = ''
 @description('Azure OpenAI endpoint to use, if not using the one deployed here.')
 param azureOpenAIEndpoint string = ''
 
-@description('Capacity of the GPT deployment')
+// Chat completion model
+@description('Name of the chat model to deploy')
+param chatModelName string // Set in main.parameters.json
+@description('Name of the model deployment')
+param chatDeploymentName string // Set in main.parameters.json
+
+@description('Version of the chat model to deploy')
+// See version availability in this table:
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models#global-standard-model-availability
+param chatDeploymentVersion string // Set in main.parameters.json
+
+@description('Sku of the chat deployment')
+param chatDeploymentSku string // Set in main.parameters.json
+
+@description('Capacity of the chat deployment')
 // You can increase this, but capacity is limited per model/region, so you will get errors if you go over
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
-param chatDeploymentCapacity int = 0
-var chatConfig = {
-  modelName: !empty(chatModelName) ? chatModelName : (openAIChatHost == 'azure' ? 'gpt-35-turbo' : 'gpt-3.5-turbo')
-  deploymentName: !empty(chatDeploymentName) ? chatDeploymentName : 'gpt-35-turbo'
-  deploymentVersion: !empty(chatDeploymentVersion) ? chatDeploymentVersion : '0125'
-  deploymentCapacity: chatDeploymentCapacity != 0 ? chatDeploymentCapacity : 30
-}
+param chatDeploymentCapacity int // Set in main.parameters.json
 
-param embedModelName string = ''
-param embedDeploymentName string = ''
-param embedDeploymentVersion string = ''
-param embedDeploymentCapacity int = 0
-param embedDimensions int = 0
+@description('Whether to deploy the evaluation model')
+param deployEvalModel bool // Set in main.parameters.json
 
-var embedConfig = {
-  modelName: !empty(embedModelName) ? embedModelName : 'text-embedding-ada-002'
-  deploymentName: !empty(embedDeploymentName) ? embedDeploymentName : 'text-embedding-ada-002'
-  deploymentVersion: !empty(embedDeploymentVersion) ? embedDeploymentVersion : '2'
-  deploymentCapacity: embedDeploymentCapacity != 0 ? embedDeploymentCapacity : 30
-  dimensions: embedDimensions != 0 ? embedDimensions : 1536
-}
+// Chat completion model used for evaluations (use most powerful model)
+@description('Name of the chat model to use for evaluations')
+param evalModelName string // Set in main.parameters.json
+@description('Name of the model deployment for the evaluation model')
+param evalDeploymentName string // Set in main.parameters.json
+
+@description('Version of the chat model to deploy for evaluations')
+// See version availability in this table:
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models#global-standard-model-availability
+param evalDeploymentVersion string // Set in main.parameters.json
+
+@description('Sku of the model deployment for evaluations')
+param evalDeploymentSku string // Set in main.parameters.json
+
+@description('Capacity of the chat deployment for evaluations (Go as high as possible)')
+// You can increase this, but capacity is limited per model/region, so you will get errors if you go over
+// https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
+param evalDeploymentCapacity string // Set in main.parameters.json
+
+
+// Embedding model
+@description('Name of the embedding model to deploy')
+param embedModelName string // Set in main.parameters.json
+@description('Name of the embedding model deployment')
+param embedDeploymentName string // Set in main.parameters.json
+
+@description('Version of the embedding model to deploy')
+// See version availability in this table:
+// https://learn.microsoft.com/azure/ai-services/openai/concepts/models#embeddings-models
+param embedDeploymentVersion string // Set in main.parameters.json
+
+@description('Sku of the embeddings model deployment')
+param embedDeploymentSku string // Set in main.parameters.json
+
+@description('Capacity of the embedding deployment')
+// You can increase this, but capacity is limited per model/region, so you will get errors if you go over
+// https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
+param embedDeploymentCapacity int // Set in main.parameters.json
+
+@description('Dimensions of the embedding model')
+param embedDimensions int // Set in main.parameters.json
+
 
 param webAppExists bool = false
 
@@ -236,11 +285,11 @@ var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   }
   {
     name: 'AZURE_OPENAI_CHAT_DEPLOYMENT'
-    value: openAIChatHost == 'azure' ? chatConfig.deploymentName : ''
+    value: openAIChatHost == 'azure' ? chatDeploymentName : ''
   }
   {
     name: 'AZURE_OPENAI_CHAT_MODEL'
-    value: openAIChatHost == 'azure' ? chatConfig.modelName : ''
+    value: openAIChatHost == 'azure' ? chatModelName : ''
   }
   {
     name: 'OPENAICOM_CHAT_MODEL'
@@ -260,15 +309,15 @@ var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   }
   {
     name: 'AZURE_OPENAI_EMBED_MODEL'
-    value: openAIEmbedHost == 'azure' ? embedConfig.modelName : ''
+    value: openAIEmbedHost == 'azure' ? embedModelName : ''
   }
   {
     name: 'AZURE_OPENAI_EMBED_DEPLOYMENT'
-    value: openAIEmbedHost == 'azure' ? embedConfig.deploymentName : ''
+    value: openAIEmbedHost == 'azure' ? embedDeploymentName : ''
   }
   {
-    name: 'AZURE_OPENAI_EMBED_MODEL_DIMENSIONS'
-    value: openAIEmbedHost == 'azure' ? string(embedConfig.dimensions) : ''
+    name: 'AZURE_OPENAI_EMBED_DIMENSIONS'
+    value: openAIEmbedHost == 'azure' ? string(embedDimensions) : ''
   }
   {
     name: 'AZURE_OPENAI_ENDPOINT'
@@ -276,7 +325,7 @@ var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   }
   {
     name: 'AZURE_OPENAI_VERSION'
-    value: openAIEmbedHost == 'azure' ? azureOpenAIAPIVersion : ''
+    value: openAIChatHost == 'azure' ? azureOpenAIAPIVersion : ''
   }
 ])
 
@@ -300,6 +349,48 @@ resource openAIResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' exi
   name: !empty(openAIResourceGroupName) ? openAIResourceGroupName : resourceGroup.name
 }
 
+var defaultDeployments = [
+  {
+  name: chatDeploymentName
+  model: {
+    format: 'OpenAI'
+    name: chatModelName
+    version: chatDeploymentVersion
+  }
+  sku: {
+    name: chatDeploymentSku
+    capacity: chatDeploymentCapacity
+  }
+}
+{
+  name: embedDeploymentName
+  model: {
+    format: 'OpenAI'
+    name: embedModelName
+    version: embedDeploymentVersion
+  }
+  sku: {
+    name: embedDeploymentSku
+    capacity: embedDeploymentCapacity
+  }
+}]
+
+var evalDeployment = {
+  name: evalDeploymentName
+  model: {
+    format: 'OpenAI'
+    name: evalModelName
+    version: evalDeploymentVersion
+  }
+  sku: {
+    name: evalDeploymentSku
+    capacity: evalDeploymentCapacity
+  }
+}
+
+var openAiDeployments = deployEvalModel ? union([evalDeployment], defaultDeployments) : defaultDeployments
+
+
 module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
   name: 'openai'
   scope: openAIResourceGroup
@@ -311,43 +402,18 @@ module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
       name: 'S0'
     }
     disableLocalAuth: true
-    deployments: [
-      {
-        name: chatConfig.deploymentName
-        model: {
-          format: 'OpenAI'
-          name: chatConfig.modelName
-          version: chatConfig.deploymentVersion
-        }
-        sku: {
-          name: 'Standard'
-          capacity: chatConfig.deploymentCapacity
-        }
-      }
-      {
-        name: embedConfig.deploymentName
-        model: {
-          format: 'OpenAI'
-          name: embedConfig.modelName
-          version: embedConfig.deploymentVersion
-        }
-        sku: {
-          name: 'Standard'
-          capacity: embedConfig.deploymentCapacity
-        }
-      }
-    ]
+    deployments: openAiDeployments
   }
 }
 
 // USER ROLES
-module openAIRoleUser 'core/security/role.bicep' = if (empty(runningOnGh)) {
+module openAIRoleUser 'core/security/role.bicep' = {
   scope: openAIResourceGroup
   name: 'openai-role-user'
   params: {
     principalId: principalId
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
-    principalType: 'User'
+    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
   }
 }
 
@@ -363,6 +429,7 @@ module openAIRoleBackend 'core/security/role.bicep' = {
 }
 
 output AZURE_LOCATION string = location
+output AZURE_TENANT_ID string = tenant().tenantId
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName
 
 output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.environmentName
@@ -375,11 +442,29 @@ output SERVICE_WEB_NAME string = web.outputs.SERVICE_WEB_NAME
 output SERVICE_WEB_URI string = web.outputs.SERVICE_WEB_URI
 output SERVICE_WEB_IMAGE_NAME string = web.outputs.SERVICE_WEB_IMAGE_NAME
 
+output OPENAI_CHAT_HOST string = openAIChatHost
+output OPENAI_EMBED_HOST string = openAIEmbedHost
 output AZURE_OPENAI_ENDPOINT string = !empty(azureOpenAIEndpoint)
   ? azureOpenAIEndpoint
   : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
-output AZURE_OPENAI_CHAT_DEPLOYMENT string = deployAzureOpenAI ? chatConfig.deploymentName : ''
-output AZURE_OPENAI_EMBED_DEPLOYMENT string = deployAzureOpenAI ? embedConfig.deploymentName : ''
+output AZURE_OPENAI_VERSION string = openAIEmbedHost == 'chat' ? azureOpenAIAPIVersion : ''
+output AZURE_OPENAI_CHAT_DEPLOYMENT string = deployAzureOpenAI ? chatDeploymentName : ''
+output AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION string = deployAzureOpenAI ? chatDeploymentVersion : ''
+output AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY int = deployAzureOpenAI ? chatDeploymentCapacity : 0
+output AZURE_OPENAI_CHAT_DEPLOYMENT_SKU string = deployAzureOpenAI ? chatDeploymentSku : ''
+output AZURE_OPENAI_CHAT_MODEL string = deployAzureOpenAI ? chatModelName : ''
+output AZURE_OPENAI_EMBED_DEPLOYMENT string = deployAzureOpenAI ? embedDeploymentName : ''
+output AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION string = deployAzureOpenAI ? embedDeploymentVersion : ''
+output AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY int = deployAzureOpenAI ? embedDeploymentCapacity : 0
+output AZURE_OPENAI_EMBED_DEPLOYMENT_SKU string = deployAzureOpenAI ? embedDeploymentSku : ''
+output AZURE_OPENAI_EMBED_MODEL string = deployAzureOpenAI ? embedModelName : ''
+output AZURE_OPENAI_EMBED_DIMENSIONS string = deployAzureOpenAI ? string(embedDimensions) : ''
+
+output AZURE_OPENAI_EVAL_DEPLOYMENT string = deployAzureOpenAI ? evalDeploymentName : ''
+output AZURE_OPENAI_EVAL_DEPLOYMENT_VERSION string = deployAzureOpenAI ? evalDeploymentVersion : ''
+output AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY string = deployAzureOpenAI ? evalDeploymentCapacity : ''
+output AZURE_OPENAI_EVAL_DEPLOYMENT_SKU string = deployAzureOpenAI ? evalDeploymentSku : ''
+output AZURE_OPENAI_EVAL_MODEL string = deployAzureOpenAI ? evalModelName : ''
 
 output POSTGRES_HOST string = postgresServer.outputs.POSTGRES_DOMAIN_NAME
 output POSTGRES_USERNAME string = postgresEntraAdministratorName

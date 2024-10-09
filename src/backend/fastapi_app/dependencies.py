@@ -56,8 +56,8 @@ async def common_parameters():
         openai_embed_dimensions = int(os.getenv("OPENAICOM_EMBED_DIMENSIONS", 1536))
         embedding_column = os.getenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_ada002")
     if OPENAI_CHAT_HOST == "azure":
-        openai_chat_deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-35-turbo")
-        openai_chat_model = os.getenv("AZURE_OPENAI_CHAT_MODEL", "gpt-35-turbo")
+        openai_chat_deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4o-mini")
+        openai_chat_model = os.getenv("AZURE_OPENAI_CHAT_MODEL", "gpt-4o-mini")
     elif OPENAI_CHAT_HOST == "ollama":
         openai_chat_deployment = None
         openai_chat_model = os.getenv("OLLAMA_CHAT_MODEL", "phi3:3.8b")
@@ -75,8 +75,10 @@ async def common_parameters():
     )
 
 
-async def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential:
-    azure_credential: azure.identity.DefaultAzureCredential | azure.identity.ManagedIdentityCredential
+async def get_azure_credential() -> (
+    azure.identity.AzureDeveloperCliCredential | azure.identity.ManagedIdentityCredential
+):
+    azure_credential: azure.identity.AzureDeveloperCliCredential | azure.identity.ManagedIdentityCredential
     try:
         if client_id := os.getenv("APP_IDENTITY_ID"):
             # Authenticate using a user-assigned managed identity on Azure
@@ -87,7 +89,12 @@ async def get_azure_credentials() -> azure.identity.DefaultAzureCredential | azu
             )
             azure_credential = azure.identity.ManagedIdentityCredential(client_id=client_id)
         else:
-            azure_credential = azure.identity.DefaultAzureCredential()
+            if tenant_id := os.getenv("AZURE_TENANT_ID"):
+                logger.info("Authenticating to Azure using Azure Developer CLI Credential for tenant %s", tenant_id)
+                azure_credential = azure.identity.AzureDeveloperCliCredential(tenant_id=tenant_id, process_timeout=60)
+            else:
+                logger.info("Authenticating to Azure using Azure Developer CLI Credential")
+                azure_credential = azure.identity.AzureDeveloperCliCredential(process_timeout=60)
         return azure_credential
     except Exception as e:
         logger.warning("Failed to authenticate to Azure: %s", e)

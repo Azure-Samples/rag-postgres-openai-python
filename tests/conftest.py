@@ -61,11 +61,11 @@ def mock_session_env(monkeypatch_session):
         monkeypatch_session.setenv("OPENAI_EMBED_HOST", "azure")
         monkeypatch_session.setenv("AZURE_OPENAI_ENDPOINT", "https://api.openai.com")
         monkeypatch_session.setenv("AZURE_OPENAI_VERSION", "2024-03-01-preview")
-        monkeypatch_session.setenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-35-turbo")
-        monkeypatch_session.setenv("AZURE_OPENAI_CHAT_MODEL", "gpt-35-turbo")
+        monkeypatch_session.setenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4o-mini")
+        monkeypatch_session.setenv("AZURE_OPENAI_CHAT_MODEL", "gpt-4o-mini")
         monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DEPLOYMENT", "text-embedding-ada-002")
         monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL", "text-embedding-ada-002")
-        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL_DIMENSIONS", "1536")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DIMENSIONS", "1536")
         monkeypatch_session.setenv("AZURE_OPENAI_KEY", "fakekey")
 
         yield
@@ -170,7 +170,7 @@ def mock_openai_chatcompletion(monkeypatch_session):
     class AsyncChatCompletionIterator:
         def __init__(self, answer: str):
             chunk_id = "test-id"
-            model = "gpt-35-turbo"
+            model = "gpt-4o-mini"
             self.responses = [
                 {"object": "chat.completion.chunk", "choices": [], "id": chunk_id, "model": model, "created": 1},
                 {
@@ -274,22 +274,22 @@ def mock_openai_chatcompletion(monkeypatch_session):
 
 
 @pytest.fixture(scope="function")
-def mock_default_azure_credential(mock_session_env):
+def mock_azure_credential(mock_session_env):
     """Mock the Azure credential for testing."""
-    with mock.patch("azure.identity.DefaultAzureCredential") as mock_default_azure_credential:
-        mock_default_azure_credential.return_value = MockAzureCredential()
-        yield mock_default_azure_credential
+    with mock.patch("azure.identity.AzureDeveloperCliCredential") as mock_azure_credential:
+        mock_azure_credential.return_value = MockAzureCredential()
+        yield mock_azure_credential
 
 
 @pytest_asyncio.fixture(scope="function")
-async def test_client(app, mock_default_azure_credential, mock_openai_embedding, mock_openai_chatcompletion):
+async def test_client(app, mock_azure_credential, mock_openai_embedding, mock_openai_chatcompletion):
     """Create a test client."""
     with TestClient(app) as test_client:
         yield test_client
 
 
 @pytest_asyncio.fixture(scope="function")
-async def db_session(mock_session_env, mock_default_azure_credential):
+async def db_session(mock_session_env, mock_azure_credential):
     """Create a new database session with a rollback at the end of the test."""
     engine = await create_postgres_engine_from_env()
     async_sesion = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -302,10 +302,10 @@ async def db_session(mock_session_env, mock_default_azure_credential):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def postgres_searcher(mock_session_env, mock_default_azure_credential, db_session, mock_openai_embedding):
+async def postgres_searcher(mock_session_env, mock_azure_credential, db_session, mock_openai_embedding):
     from fastapi_app.postgres_searcher import PostgresSearcher
 
-    openai_embed_client = await create_openai_embed_client(mock_default_azure_credential)
+    openai_embed_client = await create_openai_embed_client(mock_azure_credential)
 
     yield PostgresSearcher(
         db_session=db_session,
