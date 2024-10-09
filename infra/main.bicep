@@ -146,7 +146,7 @@ param embedDimensions int // Set in main.parameters.json
 param webAppExists bool = false
 
 var resourceToken = toLower(uniqueString(subscription().id, name, location))
-var prefix = '${name}-${resourceToken}'
+var prefix = '${toLower(name)}-${resourceToken}'
 var tags = { 'azd-env-name': name }
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
