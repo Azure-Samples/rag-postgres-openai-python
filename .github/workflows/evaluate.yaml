@@ -2,20 +2,18 @@ name: Evaluate
 
 on:
   workflow_dispatch:
-  # TODO: change later
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  issue_comment:
+    types: [created]
 
 # Set up permissions for deploying with secretless Azure federated credentials
-# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
+# https://learn.microsoft.com/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
   id-token: write
   contents: read
 
 jobs:
   evaluate:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '#evaluate')
     runs-on: ubuntu-latest
     env:
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
@@ -24,6 +22,11 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
     steps:
+      - name: Check for evaluate hash tag
+        if: contains(github.event.comment.body, '#evaluate')
+        run: |
+          echo "Comment contains #evaluate hashtag"
+
       - uses: actions/checkout@v4
       - name: Install PostgreSQL development libraries
         run: |

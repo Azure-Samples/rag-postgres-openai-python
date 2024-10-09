@@ -2,11 +2,9 @@ name: Deploy with azd
 
 on:
   workflow_dispatch:
-  # TODO: change later
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+
 # GitHub Actions workflow to deploy to Azure using azd
 # To configure required secrets for connecting to Azure, simply run `azd pipeline config`
 

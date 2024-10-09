@@ -20,7 +20,7 @@
 			"version": "1.10.1"
 		},
 		"ghcr.io/prulloac/devcontainer-features/ollama:1": {},
-		// az feature
+		// az CLI is helpful for being able to login correctly with DefaultAzureCredential:
 		"ghcr.io/devcontainers/features/azure-cli": {}
     },
 	// Configure tool-specific properties.
