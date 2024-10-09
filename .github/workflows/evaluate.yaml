@@ -64,7 +64,7 @@ jobs:
           python ./src/backend/fastapi_app/setup_postgres_seeddata.py
         env:
           POSTGRES_HOST: localhost
-          POSTGRES_USERNAME: admin
+          POSTGRES_USERNAME: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DATABASE: postgres
           POSTGRES_SSL: disable
@@ -122,7 +122,7 @@ jobs:
           AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
           AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
           POSTGRES_HOST: localhost
-          POSTGRES_USERNAME: admin
+          POSTGRES_USERNAME: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DATABASE: postgres
           POSTGRES_SSL: disable
