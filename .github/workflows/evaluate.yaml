@@ -40,7 +40,7 @@ jobs:
         run: sudo systemctl start postgresql
 
       - name: Create vector extension
-      - run: sudo -u postgres psql -c 'CREATE EXTENSION vector'
+        run: sudo -u postgres psql -c 'CREATE EXTENSION vector'
 
       - name: Install python
         uses: actions/setup-python@v5
