@@ -38,6 +38,8 @@ jobs:
       AZURE_OPENAI_EMBED_MODEL: ${{ vars.AZURE_OPENAI_EMBED_MODEL }}
       AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
       AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
+      AZURE_OPENAI_EVAL_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EVAL_DEPLOYMENT }}
+      AZURE_OPENAI_EVAL_MODEL: ${{ vars.AZURE_OPENAI_EVAL_MODEL }}
     steps:
       - name: Check for evaluate hash tag
         if: contains(github.event.comment.body, '#evaluate')
