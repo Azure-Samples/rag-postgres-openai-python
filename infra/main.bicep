@@ -447,7 +447,7 @@ output OPENAI_EMBED_HOST string = openAIEmbedHost
 output AZURE_OPENAI_ENDPOINT string = !empty(azureOpenAIEndpoint)
   ? azureOpenAIEndpoint
   : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
-output AZURE_OPENAI_VERSION string = openAIEmbedHost == 'chat' ? azureOpenAIAPIVersion : ''
+output AZURE_OPENAI_VERSION string = azureOpenAIAPIVersion
 output AZURE_OPENAI_CHAT_DEPLOYMENT string = deployAzureOpenAI ? chatDeploymentName : ''
 output AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION string = deployAzureOpenAI ? chatDeploymentVersion : ''
 output AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY int = deployAzureOpenAI ? chatDeploymentCapacity : 0
