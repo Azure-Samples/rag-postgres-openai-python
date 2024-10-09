@@ -53,6 +53,22 @@ async def seed_data(engine):
                 pass
 
     logger.info(f"{table_name} table seeded successfully.")
+    # Do a simple query with <=>
+    # Check cosine distance of every item with the first item
+    async with async_sessionmaker(engine, expire_on_commit=False)() as session:
+        first_item = (await session.execute(select(Item).order_by(Item.id).limit(1))).scalars().first()
+        result = (
+            await session.execute(
+                text(
+                    f"SELECT id, {Item.__tablename__}.embedding_ada002 <=> :embedding AS distance "
+                    f"FROM {Item.__tablename__} ORDER BY distance LIMIT 2"
+                ),
+                {"embedding": first_item.embedding_ada002},
+            )
+        ).fetchall()
+        logger.info("Test query: cosine distance of first two items with the first item:")
+        for row in result:
+            logger.info(row)
 
 
 async def main():
