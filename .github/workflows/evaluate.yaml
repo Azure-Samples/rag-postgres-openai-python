@@ -65,7 +65,7 @@ jobs:
         env:
           POSTGRES_HOST: localhost
           POSTGRES_USERNAME: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD:
           POSTGRES_DATABASE: postgres
           POSTGRES_SSL: disable
 
@@ -123,7 +123,7 @@ jobs:
           AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
           POSTGRES_HOST: localhost
           POSTGRES_USERNAME: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD:
           POSTGRES_DATABASE: postgres
           POSTGRES_SSL: disable
       - name: Evaluate local RAG flow
