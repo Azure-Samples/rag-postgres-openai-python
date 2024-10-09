@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   issue_comment:
     types: [created]
+  pull_request:
+    branches: [ main ]
 
 # Set up permissions for deploying with secretless Azure federated credentials
 # https://learn.microsoft.com/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
