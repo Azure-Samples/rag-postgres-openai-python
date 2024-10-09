@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   evaluate:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '#evaluate')
+    #if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '#evaluate')
     runs-on: ubuntu-latest
     env:
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
