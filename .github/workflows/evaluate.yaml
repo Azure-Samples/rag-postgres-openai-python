@@ -104,6 +104,11 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
 
+      - name: Provision Infrastructure
+        run: azd provision --no-prompt
+        env:
+          AZD_INITIAL_ENVIRONMENT_CONFIG: ${{ secrets.AZD_INITIAL_ENVIRONMENT_CONFIG }}
+
       - name: Run local server in background
         run: |
           RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory > serverlogs.out 2> serverlogs.err &)
