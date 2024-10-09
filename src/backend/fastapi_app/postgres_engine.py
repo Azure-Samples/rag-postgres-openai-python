@@ -2,7 +2,9 @@ import logging
 import os
 
 from azure.identity import AzureDeveloperCliCredential
+from pgvector.asyncpg import register_vector
 from sqlalchemy import event
+from sqlalchemy.engine import AdaptedConnection
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from fastapi_app.dependencies import get_azure_credential
@@ -34,6 +36,10 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
         DATABASE_URI,
         echo=False,
     )
+
+    @event.listens_for(engine.sync_engine, "connect")
+    def register_custom_types(dbapi_connection: AdaptedConnection, *args):
+        dbapi_connection.run_async(register_vector)
 
     @event.listens_for(engine.sync_engine, "do_connect")
     def update_password_token(dialect, conn_rec, cargs, cparams):
