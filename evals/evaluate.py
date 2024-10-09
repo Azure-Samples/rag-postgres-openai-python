@@ -1,9 +1,9 @@
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 import azure.identity
-from azure.ai.evaluation import AzureOpenAIModelConfiguration, OpenAIModelConfiguration
 from dotenv import load_dotenv
 from evaltools.eval.evaluate import run_evaluate_from_config
 from rich.logging import RichHandler
@@ -12,12 +12,13 @@ logger = logging.getLogger("ragapp")
 
 
 def get_openai_config() -> dict:
+    openai_config: dict[str, Any]
     if os.environ.get("OPENAI_CHAT_HOST") == "azure":
         azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
-        azure_deployment = os.environ.get("AZURE_OPENAI_EVAL_DEPLOYMENT")
+        azure_deployment = os.environ["AZURE_OPENAI_EVAL_DEPLOYMENT"]
         if os.environ.get("AZURE_OPENAI_KEY"):
             logger.info("Using Azure OpenAI Service with API Key from AZURE_OPENAI_KEY")
-            openai_config: AzureOpenAIModelConfiguration = {
+            openai_config = {
                 "azure_endpoint": azure_endpoint,
                 "azure_deployment": azure_deployment,
                 "api_key": os.environ["AZURE_OPENAI_KEY"],
@@ -29,7 +30,7 @@ def get_openai_config() -> dict:
             else:
                 logger.info("Authenticating to Azure using Azure Developer CLI Credential")
                 azure_credential = azure.identity.AzureDeveloperCliCredential(process_timeout=60)
-            openai_config: AzureOpenAIModelConfiguration = {
+            openai_config = {
                 "azure_endpoint": azure_endpoint,
                 "azure_deployment": azure_deployment,
                 "credential": azure_credential,
@@ -39,7 +40,7 @@ def get_openai_config() -> dict:
         openai_config["model"] = os.environ["AZURE_OPENAI_EVAL_MODEL"]
     else:
         logger.info("Using OpenAI Service with API Key from OPENAICOM_KEY")
-        openai_config: OpenAIModelConfiguration = {"api_key": os.environ["OPENAICOM_KEY"], "model": "gpt-4"}
+        openai_config = {"api_key": os.environ["OPENAICOM_KEY"], "model": "gpt-4"}
     return openai_config
 
 

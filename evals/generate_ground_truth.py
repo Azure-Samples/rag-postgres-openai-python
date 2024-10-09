@@ -33,7 +33,7 @@ def source_retriever() -> Generator[dict, None, None]:
             #    "content": "\n\n".join([record.to_str_for_rag() for record in records]),
             # }
         # Fetch each item individually
-        records = session.scalars(select(Item).order_by(Item.id))
+        records = list(session.scalars(select(Item).order_by(Item.id)))
         for record in records:
             logger.info(f"Processing database record: {record.name}")
             yield {"id": record.id, "content": record.to_str_for_rag()}
