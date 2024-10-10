@@ -102,10 +102,6 @@ jobs:
           npm install
           npm run build
 
-      - name: Install python packages
-        run: |
-          uv pip install -r requirements-dev.txt
-
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -131,6 +127,10 @@ jobs:
       - name: Run local server in background
         run: |
           RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory > serverlogs.out 2> serverlogs.err &)
+
+      - name: Install evaluate dependencies
+        run: |
+          uv pip install -r evals/requirements.txt
 
       - name: Evaluate local RAG flow
         run: |
