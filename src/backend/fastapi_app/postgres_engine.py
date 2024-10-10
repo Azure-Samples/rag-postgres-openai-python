@@ -39,6 +39,7 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
 
     @event.listens_for(engine.sync_engine, "connect")
     def register_custom_types(dbapi_connection: AdaptedConnection, *args):
+        logger.info("Registering pgvector extension...")
         dbapi_connection.run_async(register_vector)
 
     @event.listens_for(engine.sync_engine, "do_connect")
