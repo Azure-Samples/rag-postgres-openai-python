@@ -1,5 +1,5 @@
+import numpy as np
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from pgvector.utils import to_db
 from sqlalchemy import Float, Integer, column, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -84,10 +84,22 @@ class PostgresSearcher:
         else:
             raise ValueError("Both query text and query vector are empty")
 
+        first_item = (await self.db_session.execute(select(Item).order_by(Item.id).limit(1))).scalars().first()
+        # Will it work?
+        (
+            await self.db_session.execute(
+                text(
+                    f"SELECT id, {Item.__tablename__}.embedding_ada002 <=> :embedding AS distance "
+                    f"FROM {Item.__tablename__} ORDER BY distance LIMIT 2"
+                ),
+                {"embedding": first_item.embedding_ada002},
+            )
+        ).fetchall()
+
         results = (
             await self.db_session.execute(
                 sql,
-                {"embedding": to_db(query_vector), "query": query_text, "k": 60},
+                {"embedding": np.array(query_vector), "query": query_text, "k": 60},
             )
         ).fetchall()
 

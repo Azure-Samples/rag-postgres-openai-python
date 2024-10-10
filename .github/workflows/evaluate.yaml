@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   issue_comment:
     types: [created]
+  pull_request:
+    branches: [ main ]
 
 # Set up permissions for deploying with secretless Azure federated credentials
 # https://learn.microsoft.com/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
@@ -13,14 +15,32 @@ permissions:
 
 jobs:
   evaluate:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '#evaluate')
+    #if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '#evaluate')
     runs-on: ubuntu-latest
     env:
+      UV_SYSTEM_PYTHON: 1
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      POSTGRES_HOST: localhost
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DATABASE: postgres
+      POSTGRES_SSL: disable
+      OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
+      OPENAI_EMBED_HOST: ${{ vars.OPENAI_EMBED_HOST }}
+      AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+      AZURE_OPENAI_VERSION: ${{ vars.AZURE_OPENAI_VERSION }}
+      AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
+      AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
+      AZURE_OPENAI_EMBED_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EMBED_DEPLOYMENT }}
+      AZURE_OPENAI_EMBED_MODEL: ${{ vars.AZURE_OPENAI_EMBED_MODEL }}
+      AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
+      AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
+      AZURE_OPENAI_EVAL_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EVAL_DEPLOYMENT }}
+      AZURE_OPENAI_EVAL_MODEL: ${{ vars.AZURE_OPENAI_EVAL_MODEL }}
     steps:
       - name: Check for evaluate hash tag
         if: contains(github.event.comment.body, '#evaluate')
@@ -28,46 +48,48 @@ jobs:
           echo "Comment contains #evaluate hashtag"
 
       - uses: actions/checkout@v4
-      - name: Install PostgreSQL development libraries
-        run: |
-          sudo apt update
-          sudo apt install postgresql-server-dev-14
-      - name: Setup postgres
-        uses: ikalnytskyi/action-setup-postgres@v6
-        with:
-          username: admin
-          password: postgres
-          database: postgres
 
-      - name: Install pgvector on MacOS/Linux using install-pgvector.sh
-        run: .github/workflows/install-pgvector.sh
+      - name: Install pgvector
+        run: |
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install postgresql-14-pgvector
+
+      - name: Start postgres
+        run: sudo systemctl start postgresql
+
+      - name: Set password for postgres user
+        run: sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'root'"
+
+      - name: Create vector extension
+        run: sudo -u postgres psql -c 'CREATE EXTENSION vector'
 
       - name: Install python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          version: "0.4.20"
+          cache-dependency-glob: "requirements**.txt"
+
       - name: Install azd
         uses: Azure/setup-azd@v1.0.0
 
       - name: Install dependencies
         run: |
-          python -m pip install -r requirements-dev.txt
+          uv pip install -r requirements-dev.txt
 
       - name: Install app as editable app
         run: |
-          python -m pip install -e src/backend
+          uv pip install -e src/backend
 
       - name: Setup local database with seed data
         run: |
           python ./src/backend/fastapi_app/setup_postgres_database.py
           python ./src/backend/fastapi_app/setup_postgres_seeddata.py
-        env:
-          POSTGRES_HOST: localhost
-          POSTGRES_USERNAME: admin
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DATABASE: postgres
-          POSTGRES_SSL: disable
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -79,11 +101,6 @@ jobs:
           cd ./src/frontend
           npm install
           npm run build
-
-      - name: Install python packages
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -107,41 +124,18 @@ jobs:
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
 
-      - name: Provision Infrastructure
-        run: azd provision --no-prompt
-        env:
-          AZD_INITIAL_ENVIRONMENT_CONFIG: ${{ secrets.AZD_INITIAL_ENVIRONMENT_CONFIG }}
-
       - name: Run local server in background
         run: |
           RUNNER_TRACKING_ID="" && (nohup python3 -m uvicorn fastapi_app:create_app --factory > serverlogs.out 2> serverlogs.err &)
-        env:
-          OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
-          OPENAI_EMBED_HOST: ${{ vars.OPENAI_EMBED_HOST }}
-          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
-          AZURE_OPENAI_VERSION: ${{ vars.AZURE_OPENAI_VERSION }}
-          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
-          AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
-          AZURE_OPENAI_EMBED_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EMBED_DEPLOYMENT }}
-          AZURE_OPENAI_EMBED_MODEL: ${{ vars.AZURE_OPENAI_EMBED_MODEL }}
-          AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
-          AZURE_OPENAI_EMBEDDING_COLUMN: ${{ vars.AZURE_OPENAI_EMBEDDING_COLUMN }}
-          POSTGRES_HOST: localhost
-          POSTGRES_USERNAME: admin
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DATABASE: postgres
-          POSTGRES_SSL: disable
+
+      - name: Install evaluate dependencies
+        run: |
+          uv pip install -r evals/requirements.txt
+
       - name: Evaluate local RAG flow
         run: |
           python evals/evaluate.py
-        env:
-          OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
-          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
-          AZURE_OPENAI_VERSION: ${{ vars.AZURE_OPENAI_VERSION }}
-          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
-          AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
-          AZURE_OPENAI_EVAL_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EVAL_DEPLOYMENT }}
-          AZURE_OPENAI_EVAL_MODEL: ${{ vars.AZURE_OPENAI_EVAL_MODEL }}
+
       - name: Upload server logs as build artifact
         uses: actions/upload-artifact@v4
         with:
