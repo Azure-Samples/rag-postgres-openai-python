@@ -84,6 +84,18 @@ class PostgresSearcher:
         else:
             raise ValueError("Both query text and query vector are empty")
 
+        first_item = (await self.db_session.execute(select(Item).order_by(Item.id).limit(1))).scalars().first()
+        # Will it work?
+        (
+            await self.db_session.execute(
+                text(
+                    f"SELECT id, {Item.__tablename__}.embedding_ada002 <=> :embedding AS distance "
+                    f"FROM {Item.__tablename__} ORDER BY distance LIMIT 2"
+                ),
+                {"embedding": first_item.embedding_ada002},
+            )
+        ).fetchall()
+
         results = (
             await self.db_session.execute(
                 sql,
