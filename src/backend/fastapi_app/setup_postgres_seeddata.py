@@ -4,6 +4,7 @@ import json
 import logging
 import os
 
+import numpy as np
 import sqlalchemy.exc
 from dotenv import load_dotenv
 from sqlalchemy import select, text
@@ -41,14 +42,33 @@ async def seed_data(engine):
                 if db_item.scalars().first():
                     continue
                 attrs = {key: value for key, value in seed_data_object.items()}
-                row = Item(**attrs)
-                session.add(row)
+                attrs["embedding_ada002"] = np.array(seed_data_object["embedding_ada002"])
+                attrs["embedding_nomic"] = np.array(seed_data_object["embedding_nomic"])
+                column_names = ", ".join(attrs.keys())
+                values = ", ".join([f":{key}" for key in attrs.keys()])
+                await session.execute(text(f"INSERT INTO {table_name} ({column_names}) VALUES ({values})"), attrs)
             try:
                 await session.commit()
             except sqlalchemy.exc.IntegrityError:
                 pass
 
     logger.info(f"{table_name} table seeded successfully.")
+    # Do a simple query with <=>
+    # Check cosine distance of every item with the first item
+    async with async_sessionmaker(engine, expire_on_commit=False)() as session:
+        first_item = (await session.execute(select(Item).order_by(Item.id).limit(1))).scalars().first()
+        result = (
+            await session.execute(
+                text(
+                    f"SELECT id, {Item.__tablename__}.embedding_ada002 <=> :embedding AS distance "
+                    f"FROM {Item.__tablename__} ORDER BY distance LIMIT 2"
+                ),
+                {"embedding": first_item.embedding_ada002},
+            )
+        ).fetchall()
+        logger.info("Test query: cosine distance of first two items with the first item:")
+        for row in result:
+            logger.info(row)
 
 
 async def main():

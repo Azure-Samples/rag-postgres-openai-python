@@ -139,7 +139,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     ```
 
 3. To use OpenAI.com OpenAI, set `OPENAI_CHAT_HOST` and `OPENAI_EMBED_HOST` to "openai". Then fill in the value for `OPENAICOM_KEY`.
-4. To use Ollama, set `OPENAI_CHAT_HOST` to "ollama". Then update the values for `OLLAMA_ENDPOINT` and `OLLAMA_CHAT_MODEL` to match your local setup and model. Note that most Ollama models are not compatible with the "Advanced flow", due to the need for function calling support, so you'll need to disable that in _Developer Settings_ in the UI. In addition, the database rows are embedded using the default OpenAI embedding model, so you can't search them using an Ollama embedding model. You can either choose to set `OPENAI_EMBED_HOST` to "azure" or "openai", or turn off vector search in _Developer Settings_.
+4. To use Ollama, set `OPENAI_CHAT_HOST` to "ollama". Then update the values for `OLLAMA_ENDPOINT` and `OLLAMA_CHAT_MODEL` to match your local setup and model. We recommend using "llama3.1" for the chat model, since it has support for function calling, and "nomic-embed-text" for the embedding model, since the sample data has already been embedded with this model. If you cannot use function calling, then turn off "Advanced flow" in the Developer Settings. If you cannot use the embedding model, then turn off vector search in the Developer Settings.
 
 ### Running the frontend and backend
 
