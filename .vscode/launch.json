@@ -19,7 +19,7 @@
         "request": "launch",
         "cwd": "${workspaceFolder}",
         "module": "uvicorn",
-        "args": ["fastapi_app:create_app", "--factory", "--reload"],
+        "args": ["rag_app:create_app", "--factory", "--reload"],
         "justMyCode": false
     }
   ],

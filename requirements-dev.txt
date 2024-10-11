@@ -1,16 +1,6 @@
--r src/backend/requirements.txt
 ruff
 mypy
 types-requests
 pre-commit
 pip-tools
 pip-compile-cross-platform
-playwright
-pytest
-pytest-asyncio
-pytest-cov
-pytest-playwright
-pytest-snapshot
-locust
-git+https://github.com/Azure-Samples/ai-rag-chat-evaluator/@installable
-psycopg2
