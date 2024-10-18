@@ -8,7 +8,7 @@ from dotenv_azd import load_azd_env
 logger = logging.getLogger("ragapp")
 
 
-def delete_deployments(resource_name: str, resource_group: str, subscription_id: str, tenant_id: str = None):
+def delete_deployments(resource_name: str, resource_group: str, subscription_id: str, tenant_id: str | None = None):
     """
     Delete all deployments for an Azure OpenAI resource
     """
