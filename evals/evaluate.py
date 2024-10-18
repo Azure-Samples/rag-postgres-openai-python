@@ -56,5 +56,5 @@ if __name__ == "__main__":
     # TODO: Specify the num questions using argument
 
     run_evaluate_from_config(
-        working_dir=Path(__file__).parent, config_path="eval_config.json", openai_config=openai_config, num_questions=2
+        working_dir=Path(__file__).parent, config_path="eval_config.json", openai_config=openai_config, num_questions=10
     )
