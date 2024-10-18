@@ -53,8 +53,8 @@ if __name__ == "__main__":
     openai_config = get_openai_config()
     # TODO: specify the localhost URL using argument
     # TODO: specify the experiment name (based on PR number)
-    # TODO: Specify the num questions using argument
+    # TODO: Specify the num questions using arg CLI
 
     run_evaluate_from_config(
-        working_dir=Path(__file__).parent, config_path="eval_config.json", openai_config=openai_config, num_questions=10
+        working_dir=Path(__file__).parent, config_path="eval_config.json", openai_config=openai_config
     )
