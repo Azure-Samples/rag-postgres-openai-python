@@ -32,10 +32,7 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
     if sslmode:
         DATABASE_URI += f"?ssl={sslmode}"
 
-    engine = create_async_engine(
-        DATABASE_URI,
-        echo=True,
-    )
+    engine = create_async_engine(DATABASE_URI, echo=False)
 
     @event.listens_for(engine.sync_engine, "connect")
     def register_custom_types(dbapi_connection: AdaptedConnection, *args):
