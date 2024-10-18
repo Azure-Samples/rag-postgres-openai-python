@@ -156,9 +156,6 @@ jobs:
 
       - name: GitHub Summary Step
         if: ${{ success() }}
-        working-directory: ./src/api
         run: |
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "📊 Promptflow Evaluation Results" >> $GITHUB_STEP_SUMMARY
-          cat evaluate/eval_results.md >> $GITHUB_STEP_SUMMARY
+          echo "📊 Evaluation Results" >> $GITHUB_STEP_SUMMARY
+          python -m evaltools summary evals/results --output=markdown >> $GITHUB_STEP_SUMMARY
