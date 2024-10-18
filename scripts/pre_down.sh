@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
-
 . ./scripts/load_python_env.sh
 
 # Get the directory of the current script
