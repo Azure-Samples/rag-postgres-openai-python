@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Run evaluation with OpenAI configuration.")
     parser.add_argument("--targeturl", type=str, help="Specify the target URL.")
-    parser.add_argument("--resultsdir", type=str, help="Specify the results directory.")
+    parser.add_argument("--resultsdir", type=Path, help="Specify the results directory.")
     parser.add_argument("--numquestions", type=int, help="Specify the number of questions.")
 
     args = parser.parse_args()
