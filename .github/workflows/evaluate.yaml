@@ -136,7 +136,7 @@ jobs:
 
       - name: Evaluate local RAG flow
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; /^refs\/pull/ { print $3 }')
           python evals/evaluate.py --targeturl=http://127.0.0.1:8000/chat --numquestions=2 --resultsdir=results/pr$PR_NUMBER
 
       - name: Upload server logs as build artifact
@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: eval_result
-          path: ./evals/results/pr${{ github.event.pull_request.number }}
+          path: ./evals/results/pr$PR_NUMBER
 
       - name: GitHub Summary Step
         if: ${{ success() }}
