@@ -52,9 +52,13 @@ jobs:
             username: admin
             password: postgres
             database: postgres
+
         - name: Install pgvector on MacOS/Linux using install-pgvector.sh
           if: matrix.os != 'windows-latest'
-          run: .github/workflows/install-pgvector.sh
+          run: |
+            sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+            sudo apt-get install postgresql-14-pgvector
+
         - name: Setup python
           uses: actions/setup-python@v5
           with:
