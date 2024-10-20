@@ -444,6 +444,8 @@ output SERVICE_WEB_IMAGE_NAME string = web.outputs.SERVICE_WEB_IMAGE_NAME
 
 output OPENAI_CHAT_HOST string = openAIChatHost
 output OPENAI_EMBED_HOST string = openAIEmbedHost
+output AZURE_OPENAI_SERVICE string = deployAzureOpenAI ? openAI.outputs.name : ''
+output AZURE_OPENAI_RESOURCE_GROUP string = deployAzureOpenAI ? openAIResourceGroup.name : ''
 output AZURE_OPENAI_ENDPOINT string = !empty(azureOpenAIEndpoint)
   ? azureOpenAIEndpoint
   : (deployAzureOpenAI ? openAI.outputs.endpoint : '')
