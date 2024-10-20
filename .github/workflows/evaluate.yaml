@@ -1,13 +1,8 @@
 name: Evaluate
 
 on:
-  workflow_dispatch:
   issue_comment:
     types: [created]
-  pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main, test-eval ]
 
 # Set up permissions for deploying with secretless Azure federated credentials
 # https://learn.microsoft.com/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
@@ -17,7 +12,7 @@ permissions:
 
 jobs:
   evaluate:
-    #if: github.event_name == 'workflow_dispatch' || contains(github.event.comment.body, '#evaluate')
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '#evaluate')
     runs-on: ubuntu-latest
     env:
       UV_SYSTEM_PYTHON: 1
@@ -136,8 +131,7 @@ jobs:
 
       - name: Evaluate local RAG flow
         run: |
-          PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; /^refs\/pull/ { print $3 }')
-          python evals/evaluate.py --targeturl=http://127.0.0.1:8000/chat --numquestions=2 --resultsdir=results/pr$PR_NUMBER
+          python evals/evaluate.py --targeturl=http://127.0.0.1:8000/chat --numquestions=2 --resultsdir=results/pr${{ github.event.issue.number }}
 
       - name: Upload server logs as build artifact
         uses: actions/upload-artifact@v4
@@ -155,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: eval_result
-          path: ./evals/results/pr$PR_NUMBER
+          path: ./evals/results/pr${{ github.event.issue.number }}
 
       - name: GitHub Summary Step
         if: ${{ success() }}
