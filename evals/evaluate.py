@@ -63,8 +63,8 @@ if __name__ == "__main__":
     run_evaluate_from_config(
         working_dir=Path(__file__).parent,
         config_path="eval_config.json",
-        num_questions=args.num_questions,
-        target_url=args.target_url,
-        results_dir=args.results_dir,
+        num_questions=args.numquestions,
+        target_url=args.targeturl,
+        results_dir=args.resultsdir,
         openai_config=openai_config,
     )
