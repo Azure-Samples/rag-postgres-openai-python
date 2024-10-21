@@ -40,14 +40,17 @@ jobs:
             python_version: "3.10"
     steps:
         - uses: actions/checkout@v4
-        - name: Check for MacOS Runner
-          if: matrix.os == 'macos-latest-xlarge'
-          run: brew install postgresql@14
-        - name: Install pgvector on Windows using install-pgvector.bat
-          if: matrix.os == 'windows-latest'
-          shell: cmd
-          run: .github\workflows\install-pgvector.bat
-        - name: Setup postgres
+
+        - name: (MacOS) Install postgreSQL and pgvector using brew
+          if: matrix.os == 'macos-13'
+          run: |
+            brew install postgresql@14
+            brew link --overwrite postgresql@14
+            brew install pgvector
+            brew services start postgresql@17 && sleep 1
+            psql -d postgres -c 'CREATE EXTENSION vector'
+
+        - name: (MacOSLarge) Install postgreSQL using action-setup-postgres
           if: matrix.os == 'macos-latest-xlarge'
           uses: ikalnytskyi/action-setup-postgres@v6
           with:
@@ -55,20 +58,19 @@ jobs:
             password: postgres
             database: postgres
 
-        - name: Install pgvector
-          if: matrix.os != 'windows-latest'
+        - name: (Windows) Install pgvector using install-pgvector.bat
+          if: matrix.os == 'windows-latest'
+          shell: cmd
+          run: .github\workflows\install-pgvector.bat
+
+        - name: (Linux) Install pgvector and set password
+          if: matrix.os == 'ubuntu-latest'
           run: |
             sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
             sudo apt-get install postgresql-14-pgvector
-
-        - name: Start postgres
-          run: sudo systemctl start postgresql
-
-        - name: Set password for postgres user
-          run: sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'root'"
-
-        - name: Create vector extension
-          run: sudo -u postgres psql -c 'CREATE EXTENSION vector'
+            sudo systemctl start postgresql
+            sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'root'"
+            sudo -u postgres psql -c 'CREATE EXTENSION vector'
 
         - name: Setup python
           uses: actions/setup-python@v5
@@ -79,36 +81,45 @@ jobs:
         - name: Install dependencies
           run: |
             python -m pip install -r requirements-dev.txt
+
         - name: Install app as editable app
           run: |
             python -m pip install -e src/backend
+
         - name: Setup local database with seed data
           run: |
             python ./src/backend/fastapi_app/setup_postgres_database.py
             python ./src/backend/fastapi_app/setup_postgres_seeddata.py
+
         - name: Setup node
           uses: actions/setup-node@v4
           with:
             node-version: 18
+
         - name: Build frontend
           run: |
             cd ./src/frontend
             npm install
             npm run build
-        - name: cache mypy
+
+        - name: Setup mypy cache
           uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
           with:
             path: ./.mypy_cache
             key: mypy${{ matrix.os }}-${{ matrix.python_version }}-${{ hashFiles('requirements-dev.txt', 'src/backend/requirements.txt', 'src/backend/pyproject.toml') }}
+
         - name: Run MyPy
           run: python3 -m mypy .
+
         - name: Run Pytest
           run: python3 -m pytest -s -vv --cov --cov-fail-under=85
+
         - name: Run E2E tests with Playwright
           id: e2e
           run: |
             playwright install chromium --with-deps
             python3 -m pytest tests/e2e.py --tracing=retain-on-failure
+
         - name: Upload test artifacts
           if: ${{ failure() && steps.e2e.conclusion == 'failure' }}
           uses: actions/upload-artifact@v4
