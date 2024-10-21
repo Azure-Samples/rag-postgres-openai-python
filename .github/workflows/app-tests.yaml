@@ -52,6 +52,7 @@ jobs:
             brew services start postgresql@14 && sleep 1
             createuser -s ${{ env.POSTGRES_USERNAME }}
             psql -d postgres -c "ALTER USER ${{ env.POSTGRES_USERNAME }} WITH PASSWORD '${{ env.POSTGRES_PASSWORD }}'"
+            psql -d postgres -c 'CREATE EXTENSION vector'
 
         - name: (MacOSLarge) Install postgreSQL using action-setup-postgres
           if: matrix.os == 'macos-latest-xlarge'
