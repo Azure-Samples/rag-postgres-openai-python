@@ -44,7 +44,7 @@ jobs:
         - uses: actions/checkout@v4
 
         - name: (MacOS) Install postgreSQL and pgvector using brew
-          if: matrix.os == 'macos-13'
+          if: matrix.os == 'macos-13' || matrix.os == 'macos-latest-xlarge'
           run: |
             brew install postgresql@14
             brew link --overwrite postgresql@14
@@ -54,13 +54,13 @@ jobs:
             psql -d postgres -c "ALTER USER ${{ env.POSTGRES_USERNAME }} WITH PASSWORD '${{ env.POSTGRES_PASSWORD }}'"
             psql -d postgres -c 'CREATE EXTENSION vector'
 
-        - name: (MacOSLarge) Install postgreSQL using action-setup-postgres
-          if: matrix.os == 'macos-latest-xlarge'
-          uses: ikalnytskyi/action-setup-postgres@v6
-          with:
-            username: ${{ env.POSTGRES_USERNAME }}
-            password: ${{ env.POSTGRES_PASSWORD }}
-            database: ${{ env.POSTGRES_DATABASE }}
+        # - name: (MacOSLarge) Install postgreSQL using action-setup-postgres
+        #   if: matrix.os == 'macos-latest-xlarge'
+        #   uses: ikalnytskyi/action-setup-postgres@v6
+        #   with:
+        #     username: ${{ env.POSTGRES_USERNAME }}
+        #     password: ${{ env.POSTGRES_PASSWORD }}
+        #     database: ${{ env.POSTGRES_DATABASE }}
 
         - name: (Windows) Install pgvector using install-pgvector.bat
           if: matrix.os == 'windows-latest'
