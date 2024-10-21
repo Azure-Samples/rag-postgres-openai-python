@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   evaluate:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '#evaluate') }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/evaluate') }}
     runs-on: ubuntu-latest
     env:
       UV_SYSTEM_PYTHON: 1
