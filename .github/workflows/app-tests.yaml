@@ -49,14 +49,15 @@ jobs:
             brew install pgvector
             brew services start postgresql@14 && sleep 1
             psql -d postgres -c 'CREATE EXTENSION vector'
+            psql -d postgres -c "ALTER USER $(whoami) WITH PASSWORD '${{ secrets.POSTGRES_PASSWORD }}'"
 
         - name: (MacOSLarge) Install postgreSQL using action-setup-postgres
           if: matrix.os == 'macos-latest-xlarge'
           uses: ikalnytskyi/action-setup-postgres@v6
           with:
-            username: admin
-            password: postgres
-            database: postgres
+            username: ${{ env.POSTGRES_USERNAME }}
+            password: ${{ env.POSTGRES_PASSWORD }}
+            database: ${{ env.POSTGRES_DATABASE }}
 
         - name: (Windows) Install pgvector using install-pgvector.bat
           if: matrix.os == 'windows-latest'
