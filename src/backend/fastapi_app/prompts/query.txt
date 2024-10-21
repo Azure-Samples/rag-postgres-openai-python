@@ -3,4 +3,4 @@ You have access to an Azure PostgreSQL database with an items table that has col
 Generate a search query based on the conversation and the new question.
 If the question is not in English, translate the question to English before generating the search query.
 If you cannot generate a search query, return the original user question.
-DO NOT return anything besides the query!!!
+DO NOT return anything besides the query.
