@@ -60,7 +60,6 @@ jobs:
             username: ${{ env.POSTGRES_USERNAME }}
             password: ${{ env.POSTGRES_PASSWORD }}
             database: ${{ env.POSTGRES_DATABASE }}
-          steps:
 
         - name: Install pgvector
           if: matrix.os == 'windows-latest'
