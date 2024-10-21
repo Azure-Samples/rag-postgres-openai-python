@@ -1,4 +1,4 @@
-name: Evaluate RAG answer quality
+name: Evaluate RAG answer flow
 
 on:
   issue_comment:
@@ -133,7 +133,7 @@ jobs:
 
       - name: Evaluate local RAG flow
         run: |
-          python evals/evaluate.py --targeturl=http://127.0.0.1:8000/chat --numquestions=2 --resultsdir=results/pr${{ github.event.issue.number }}
+          python evals/evaluate.py --targeturl=http://127.0.0.1:8000/chat --numquestions=2 --resultsdir=evals/results/pr${{ github.event.issue.number }}
 
       - name: Upload server logs as build artifact
         uses: actions/upload-artifact@v4
@@ -163,10 +163,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { GITHUB_STEP_SUMMARY } = process.env;
+            const fs = require('fs');
+            const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+            const summary = fs.readFileSync(summaryPath, 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: GITHUB_STEP_SUMMARY
+              body: summary
             })

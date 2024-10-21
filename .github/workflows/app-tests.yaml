@@ -53,11 +53,6 @@ jobs:
             psql -d postgres -c "ALTER USER ${{ env.POSTGRES_USERNAME }} WITH PASSWORD '${{ env.POSTGRES_PASSWORD }}'"
             psql -d postgres -c 'CREATE EXTENSION vector'
 
-        - name: (Windows) Install pgvector using install-pgvector.bat
-          if: matrix.os == 'windows-latest'
-          shell: cmd
-          run: .github\workflows\install-pgvector.bat
-
         - name: (Windows) Start postgreSQL
           if: matrix.os == 'windows-latest'
           uses: ikalnytskyi/action-setup-postgres@v6
@@ -65,6 +60,21 @@ jobs:
             username: ${{ env.POSTGRES_USERNAME }}
             password: ${{ env.POSTGRES_PASSWORD }}
             database: ${{ env.POSTGRES_DATABASE }}
+          steps:
+
+        - name: Install pgvector
+          if: matrix.os == 'windows-latest'
+          shell: cmd
+          run: |
+              call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+              cd %TEMP%
+              git clone --branch v0.7.4 https://github.com/pgvector/pgvector.git
+              cd pgvector
+              nmake /NOLOGO /F Makefile.win
+              nmake /NOLOGO /F Makefile.win install
+              sc config postgresql-x64-14 start=auto
+              net start postgresql-x64-14
+              "%PGBIN%/psql" -d postgres -c "CREATE EXTENSION vector"
 
         - name: (Linux) Install pgvector and set password
           if: matrix.os == 'ubuntu-latest'
