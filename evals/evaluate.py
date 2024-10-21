@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 from pathlib import Path
@@ -50,11 +51,20 @@ if __name__ == "__main__":
     )
     load_dotenv(".env", override=True)
 
+    parser = argparse.ArgumentParser(description="Run evaluation with OpenAI configuration.")
+    parser.add_argument("--targeturl", type=str, help="Specify the target URL.")
+    parser.add_argument("--resultsdir", type=Path, help="Specify the results directory.")
+    parser.add_argument("--numquestions", type=int, help="Specify the number of questions.")
+
+    args = parser.parse_args()
+
     openai_config = get_openai_config()
-    # TODO: specify the localhost URL using argument
-    # TODO: specify the experiment name (based on PR number)
-    # TODO: Specify the num questions using argument
 
     run_evaluate_from_config(
-        working_dir=Path(__file__).parent, config_path="eval_config.json", openai_config=openai_config, num_questions=2
+        working_dir=Path(__file__).parent,
+        config_path="eval_config.json",
+        num_questions=args.numquestions,
+        target_url=args.targeturl,
+        results_dir=args.resultsdir,
+        openai_config=openai_config,
     )

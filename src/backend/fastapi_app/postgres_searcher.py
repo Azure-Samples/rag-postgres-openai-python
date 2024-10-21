@@ -1,5 +1,5 @@
+import numpy as np
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from pgvector.utils import to_db
 from sqlalchemy import Float, Integer, column, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -87,7 +87,7 @@ class PostgresSearcher:
         results = (
             await self.db_session.execute(
                 sql,
-                {"embedding": to_db(query_vector), "query": query_text, "k": 60},
+                {"embedding": np.array(query_vector), "query": query_text, "k": 60},
             )
         ).fetchall()
 
