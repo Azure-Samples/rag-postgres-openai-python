@@ -21,9 +21,9 @@ async def test_create_postgres_engine(mock_session_env, mock_azure_credential):
         azure_credential=mock_azure_credential,
     )
     assert engine.url.host == "localhost"
-    assert engine.url.username == "admin"
-    assert engine.url.database == "postgres"
-    assert engine.url.password == "postgres"
+    assert engine.url.username == os.environ["POSTGRES_USERNAME"]
+    assert engine.url.database == os.environ["POSTGRES_DATABASE"]
+    assert engine.url.password == os.environ.get("POSTGRES_PASSWORD")
     assert engine.url.query["ssl"] == "prefer"
 
 
@@ -33,9 +33,9 @@ async def test_create_postgres_engine_from_env(mock_session_env, mock_azure_cred
         azure_credential=mock_azure_credential,
     )
     assert engine.url.host == "localhost"
-    assert engine.url.username == "admin"
-    assert engine.url.database == "postgres"
-    assert engine.url.password == "postgres"
+    assert engine.url.username == os.environ["POSTGRES_USERNAME"]
+    assert engine.url.database == os.environ["POSTGRES_DATABASE"]
+    assert engine.url.password == os.environ.get("POSTGRES_PASSWORD")
     assert engine.url.query["ssl"] == "prefer"
 
 
@@ -57,7 +57,7 @@ async def test_create_postgres_engine_from_args(mock_azure_credential):
         azure_credential=mock_azure_credential,
     )
     assert engine.url.host == "localhost"
-    assert engine.url.username == "admin"
-    assert engine.url.database == "postgres"
-    assert engine.url.password == "postgres"
+    assert engine.url.username == os.environ["POSTGRES_USERNAME"]
+    assert engine.url.database == os.environ["POSTGRES_DATABASE"]
+    assert engine.url.password == os.environ.get("POSTGRES_PASSWORD")
     assert engine.url.query["ssl"] == "prefer"
