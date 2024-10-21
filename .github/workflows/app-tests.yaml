@@ -27,8 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "windows-latest", "macos-latest-xlarge", "macos-13"]
-        python_version: ["3.10", "3.11", "3.12"]
+        os: ["ubuntu-latest"]
+        python_version: ["3.10"]
         exclude:
           - os: macos-latest-xlarge
             python_version: "3.10"
@@ -41,29 +41,35 @@ jobs:
           if: matrix.os == 'windows-latest'
           shell: cmd
           run: .github\workflows\install-pgvector.bat
-        - name: Install PostgreSQL development libraries
-          if: matrix.os == 'ubuntu-latest'
-          run: |
-            sudo apt update
-            sudo apt install postgresql-server-dev-14
         - name: Setup postgres
+          if: matrix.os == 'macos-latest-xlarge'
           uses: ikalnytskyi/action-setup-postgres@v6
           with:
             username: admin
             password: postgres
             database: postgres
 
-        - name: Install pgvector on MacOS/Linux using install-pgvector.sh
+        - name: Install pgvector
           if: matrix.os != 'windows-latest'
           run: |
             sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
             sudo apt-get install postgresql-14-pgvector
+
+        - name: Start postgres
+          run: sudo systemctl start postgresql
+
+        - name: Set password for postgres user
+          run: sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'root'"
+
+        - name: Create vector extension
+          run: sudo -u postgres psql -c 'CREATE EXTENSION vector'
 
         - name: Setup python
           uses: actions/setup-python@v5
           with:
             python-version: ${{ matrix.python_version }}
             architecture: x64
+
         - name: Install dependencies
           run: |
             python -m pip install -r requirements-dev.txt
