@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   evaluate:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '#evaluate')
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '#evaluate') }}
     runs-on: ubuntu-latest
     env:
       UV_SYSTEM_PYTHON: 1
@@ -156,3 +156,15 @@ jobs:
         run: |
           echo "📊 Evaluation Results" >> $GITHUB_STEP_SUMMARY
           python -m evaltools summary evals/results --output=markdown >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment on pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { GITHUB_STEP_SUMMARY } = process.env;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: GITHUB_STEP_SUMMARY
+            })
