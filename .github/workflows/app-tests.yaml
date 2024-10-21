@@ -47,7 +47,7 @@ jobs:
             brew install postgresql@14
             brew link --overwrite postgresql@14
             brew install pgvector
-            brew services start postgresql@17 && sleep 1
+            brew services start postgresql@14 && sleep 1
             psql -d postgres -c 'CREATE EXTENSION vector'
 
         - name: (MacOSLarge) Install postgreSQL using action-setup-postgres
