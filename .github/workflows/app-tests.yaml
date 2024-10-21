@@ -24,6 +24,12 @@ jobs:
   test-package:
     name: Test ${{ matrix.os }} Python ${{ matrix.python_version }}
     runs-on: ${{ matrix.os }}
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DATABASE: postgres
+      POSTGRES_SSL: disable
     strategy:
       fail-fast: false
       matrix:
@@ -78,7 +84,6 @@ jobs:
             python -m pip install -e src/backend
         - name: Setup local database with seed data
           run: |
-            cp .env.sample .env
             python ./src/backend/fastapi_app/setup_postgres_database.py
             python ./src/backend/fastapi_app/setup_postgres_seeddata.py
         - name: Setup node
