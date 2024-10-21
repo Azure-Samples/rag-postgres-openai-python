@@ -53,13 +53,13 @@ jobs:
             psql -d postgres -c "ALTER USER ${{ env.POSTGRES_USERNAME }} WITH PASSWORD '${{ env.POSTGRES_PASSWORD }}'"
             psql -d postgres -c 'CREATE EXTENSION vector'
 
-        - name: (Windows) Start postgreSQL
-          if: matrix.os == 'windows-latest'
-          uses: ikalnytskyi/action-setup-postgres@v6
-          with:
-            username: ${{ env.POSTGRES_USERNAME }}
-            password: ${{ env.POSTGRES_PASSWORD }}
-            database: ${{ env.POSTGRES_DATABASE }}
+        # - name: (Windows) Start postgreSQL
+        #   if: matrix.os == 'windows-latest'
+        #   uses: ikalnytskyi/action-setup-postgres@v6
+        #   with:
+        #     username: ${{ env.POSTGRES_USERNAME }}
+        #     password: ${{ env.POSTGRES_PASSWORD }}
+        #     database: ${{ env.POSTGRES_DATABASE }}
 
         - name: Install pgvector
           if: matrix.os == 'windows-latest'
