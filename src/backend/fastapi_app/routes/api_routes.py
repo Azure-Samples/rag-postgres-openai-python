@@ -64,7 +64,6 @@ async def similar_handler(
         )
     ).fetchall()
 
-    # Convert results to ItemWithDistance models,
     items = [dict(row._mapping) for row in closest]
     return [ItemWithDistance.model_validate(item) for item in items]
 
