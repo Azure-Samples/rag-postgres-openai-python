@@ -37,8 +37,8 @@ jobs:
     env:
       UV_SYSTEM_PYTHON: 1
       POSTGRES_HOST: localhost
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_USERNAME: admin
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DATABASE: postgres
       POSTGRES_SSL: disable
     steps:
