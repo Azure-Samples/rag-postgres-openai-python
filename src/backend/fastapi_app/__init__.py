@@ -60,7 +60,7 @@ def create_app(testing: bool = False):
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
         logger.info("Configuring Azure Monitor")
         configure_azure_monitor(logger_name="ragapp")
-        # OpenAI SDK requests use httpx and are thus not auto-instrumented:
+        # OpenAI SDK requests use httpx, so are thus not auto-instrumented:
         OpenAIInstrumentor().instrument()
 
     app = fastapi.FastAPI(docs_url="/docs", lifespan=lifespan)
