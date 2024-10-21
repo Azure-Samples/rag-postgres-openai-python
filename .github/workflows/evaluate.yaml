@@ -1,4 +1,4 @@
-name: Evaluate
+name: Evaluate RAG answer quality
 
 on:
   issue_comment:
