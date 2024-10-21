@@ -5,7 +5,7 @@ from collections.abc import AsyncGenerator
 import fastapi
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from fastapi_app.api_models import (
     ChatRequest,
@@ -54,15 +54,19 @@ async def similar_handler(
     if not item:
         raise HTTPException(detail=f"Item with ID {id} not found.", status_code=404)
 
-    closest = await database_session.execute(
-        select(Item, Item.embedding_ada002.l2_distance(item.embedding_ada002))
-        .filter(Item.id != id)
-        .order_by(Item.embedding_ada002.l2_distance(item.embedding_ada002))
-        .limit(n)
-    )
-    return [
-        ItemWithDistance.model_validate(item.to_dict() | {"distance": round(distance, 2)}) for item, distance in closest
-    ]
+    closest = (
+        await database_session.execute(
+            text(
+                f"SELECT *, {context.embedding_column} <=> :embedding as DISTANCE FROM {Item.__tablename__} "
+                "WHERE id <> :item_id ORDER BY distance LIMIT :n"
+            ),
+            {"embedding": item.embedding_ada002, "n": n, "item_id": id},
+        )
+    ).fetchall()
+
+    # Convert results to ItemWithDistance models,
+    items = [dict(row._mapping) for row in closest]
+    return [ItemWithDistance.model_validate(item) for item in items]
 
 
 @router.get("/search", response_model=list[ItemPublic])

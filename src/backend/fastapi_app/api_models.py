@@ -80,6 +80,10 @@ class ItemPublic(BaseModel):
 class ItemWithDistance(ItemPublic):
     distance: float
 
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.distance = round(self.distance, 2)
+
 
 class ChatParams(ChatRequestOverrides):
     prompt_template: str
