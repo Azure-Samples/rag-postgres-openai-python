@@ -62,7 +62,7 @@ async def create_openai_embed_client(
     openai_embed_client: openai.AsyncAzureOpenAI | openai.AsyncOpenAI
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     if OPENAI_EMBED_HOST == "azure":
-        api_version = os.environ["AZURE_OPENAI_VERSION"]
+        api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-03-01-preview"
         azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
         azure_deployment = os.environ["AZURE_OPENAI_EMBED_DEPLOYMENT"]
         if api_key := os.getenv("AZURE_OPENAI_KEY"):

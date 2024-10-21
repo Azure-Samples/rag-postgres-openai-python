@@ -24,10 +24,11 @@ from fastapi_app.setup_postgres_seeddata import seed_data
 from tests.data import test_data
 from tests.mocks import MockAzureCredential
 
+# Always use localhost for testing
 POSTGRES_HOST = "localhost"
-POSTGRES_USERNAME = "admin"
-POSTGRES_DATABASE = "postgres"
-POSTGRES_PASSWORD = "postgres"
+POSTGRES_USERNAME = os.getenv("POSTGRES_USERNAME", "admin")
+POSTGRES_DATABASE = os.getenv("POSTGRES_DATABASE", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
 POSTGRES_SSL = "prefer"
 POSTGRESQL_DATABASE_URL = (
     f"postgresql+asyncpg://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{POSTGRES_DATABASE}"
