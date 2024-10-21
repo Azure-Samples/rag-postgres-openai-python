@@ -151,7 +151,7 @@ jobs:
           name: eval_result
           path: ./evals/results/pr${{ github.event.issue.number }}
 
-      - name: GitHub Summary Step
+      - name: Summarize results
         if: ${{ success() }}
         run: |
           echo "📊 Evaluation Results" >> $GITHUB_STEP_SUMMARY
