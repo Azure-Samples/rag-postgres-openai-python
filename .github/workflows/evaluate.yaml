@@ -9,10 +9,12 @@ on:
 permissions:
   id-token: write
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   evaluate:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '#evaluate') }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/evaluate') }}
     runs-on: ubuntu-latest
     env:
       UV_SYSTEM_PYTHON: 1
@@ -151,7 +153,7 @@ jobs:
           name: eval_result
           path: ./evals/results/pr${{ github.event.issue.number }}
 
-      - name: GitHub Summary Step
+      - name: Summarize results
         if: ${{ success() }}
         run: |
           echo "📊 Evaluation Results" >> $GITHUB_STEP_SUMMARY
