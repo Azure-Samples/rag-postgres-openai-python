@@ -24,7 +24,7 @@ class RetrievalMode(str, Enum):
 
 class ChatRequestOverrides(BaseModel):
     top: int = 3
-    temperature: float = 0.3
+    temperature: float = 1.0
     retrieval_mode: RetrievalMode = RetrievalMode.HYBRID
     use_advanced_flow: bool = True
     prompt_template: str | None = None
