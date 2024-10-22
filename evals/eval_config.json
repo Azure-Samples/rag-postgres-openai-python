@@ -5,8 +5,8 @@
     "target_url": "http://127.0.0.1:8000/chat",
     "target_parameters": {
         "overrides": {
-            "use_advanced_flow": true,
-            "top": 3,
+            "use_advanced_flow": false,
+            "top": 10,
             "retrieval_mode": "hybrid",
             "temperature": 1.0
         }
