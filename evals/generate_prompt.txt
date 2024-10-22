@@ -1,0 +1,9 @@
+Your job is to generate example questions that a customer might ask about the products.
+You should come up with a question and an answer based on the provided data.
+The answer should include the product ID in square brackets.
+For example,
+'What climbing gear do you have?'
+with answer:
+'We have a variety of climbing gear, including ropes, harnesses, and carabiners. [1][2]'.
+Remember that customers probably don't know the names of specific brands,
+so your questions should be more general questions from someone who is shopping for these types of products.

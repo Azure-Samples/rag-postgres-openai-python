@@ -1,8 +1,8 @@
 {
-    "evaluation_gpt_model": "chat",
-    "evaluation_timestamp": 1725037099,
+    "evaluation_gpt_model": "gpt-4",
+    "evaluation_timestamp": 1729623083,
     "testdata_path": "/workspace/evals/ground_truth.jsonl",
-    "target_url": "http://host.docker.internal:8000/chat",
+    "target_url": "http://127.0.0.1:8000/chat",
     "target_parameters": {
         "overrides": {
             "use_advanced_flow": true,
@@ -11,5 +11,5 @@
             "temperature": 0.3
         }
     },
-    "num_questions": 20
+    "num_questions": null
 }

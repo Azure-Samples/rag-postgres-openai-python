@@ -33,17 +33,19 @@ pip install -r requirements-dev.txt
 
 ## Generate ground truth data
 
+Modify the prompt in `evals/generate.txt` to match your database table and RAG scenario.
+
 Generate ground truth data by running the following command:
 
 ```bash
-python evals/generate.py
+python evals/generate_ground_truth_data.py
 ```
 
 Review the generated data after running that script, removing any question/answer pairs that don't seem like realistic user input.
 
 ## Evaluate the RAG answer quality
 
-Review the configuration in `evals/eval_config.json` to ensure that everything is correctly setup. You may want to adjust the metrics used. [TODO: link to evaluator docs]
+Review the configuration in `evals/eval_config.json` to ensure that everything is correctly setup. You may want to adjust the metrics used. See [the ai-rag-chat-evaluator README](https://github.com/Azure-Samples/ai-rag-chat-evaluator) for more information on the available metrics.
 
 By default, the evaluation script will evaluate every question in the ground truth data.
 Run the evaluation script by running the following command:
@@ -68,8 +70,6 @@ Compare answers across runs by running the following command:
 python -m evaltools diff evals/results/baseline/
 ```
 
-## Run the evaluation in GitHub actions
+## Run the evaluation on a PR
 
-
-# TODO: Add GPT-4 deployment with high capacity for evaluation
-# TODO: Add CI workflow that can be triggered to run the evaluate on the local app
+To run the evaluation on the changes in a PR, you can add a `/evaluate` comment to the PR. This will trigger the evaluation workflow to run the evaluation on the PR changes, and will post the results to the PR.
