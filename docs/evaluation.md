@@ -72,4 +72,4 @@ python -m evaltools diff evals/results/baseline/
 
 ## Run the evaluation on a PR
 
-To run the evaluation on the changes in a PR, you can add a `/evaluate` comment to the PR. This will trigger the evaluation workflow to run the evaluation on the PR changes and will post the results to the PR.
+To run the evaluation on the changes in a PR, you can add a `/evaluate` comment to the PR. This will trigger the evaluation workflow to run the evaluation on the PR changes, and will post the results to the PR.
