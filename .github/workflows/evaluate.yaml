@@ -57,7 +57,10 @@ jobs:
               body: "Starting evaluation! Check the Actions tab for progress, or wait for a comment with the results."
             })
 
-      - uses: actions/checkout@v4
+      - name: Checkout pull request 🏁
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
 
       - name: Install pgvector
         run: |
