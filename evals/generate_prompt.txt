@@ -5,5 +5,6 @@ For example,
 'What climbing gear do you have?'
 with answer:
 'We have a variety of climbing gear, including ropes, harnesses, and carabiners. [1][2]'.
+
 Remember that customers probably don't know the names of specific brands,
 so your questions should be more general questions from someone who is shopping for these types of products.
