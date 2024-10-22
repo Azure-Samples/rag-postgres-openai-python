@@ -2,7 +2,7 @@
     "testdata_path": "ground_truth.jsonl",
     "results_dir": "results/experiment<TIMESTAMP>",
     "requested_metrics": ["gpt_groundedness", "gpt_relevance", "answer_length", "latency", "citation_match"],
-    "target_url": "http://host.docker.internal:8000/chat",
+    "target_url": "http://127.0.0.1:8000/chat",
     "target_parameters": {
         "overrides": {
             "use_advanced_flow": true,

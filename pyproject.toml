@@ -19,8 +19,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 [[tool.mypy.overrides]]
 module = [
     "pgvector.*",
-    "evaltools.*",
-    "dotenv_azd.*",
+    "evaltools.*"
 ]
 ignore_missing_imports = true
 
