@@ -7,6 +7,7 @@ from pathlib import Path
 from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provider
 from dotenv_azd import load_azd_env
 from openai import AzureOpenAI, OpenAI
+from openai.types.chat import ChatCompletionToolParam
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
@@ -15,7 +16,7 @@ from fastapi_app.postgres_models import Item
 logger = logging.getLogger("ragapp")
 
 
-def qa_pairs_tool(num_questions: int = 1) -> dict:
+def qa_pairs_tool(num_questions: int = 1) -> ChatCompletionToolParam:
     return {
         "type": "function",
         "function": {
@@ -45,7 +46,7 @@ def qa_pairs_tool(num_questions: int = 1) -> dict:
     }
 
 
-def source_retriever() -> Generator[dict, None, None]:
+def source_retriever() -> Generator[str, None, None]:
     # Connect to the database
     DBHOST = os.environ["POSTGRES_HOST"]
     DBUSER = os.environ["POSTGRES_USERNAME"]
@@ -76,8 +77,9 @@ def answer_formatter(answer, source) -> str:
     return f"{answer} [{source['id']}]"
 
 
-def get_openai_client() -> AzureOpenAI | OpenAI:
+def get_openai_client() -> tuple[AzureOpenAI | OpenAI, str]:
     """Return an OpenAI client based on the environment variables"""
+    openai_client: AzureOpenAI | OpenAI
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_CHAT_HOST == "azure":
         if api_key := os.getenv("AZURE_OPENAI_KEY"):
@@ -101,8 +103,7 @@ def get_openai_client() -> AzureOpenAI | OpenAI:
         raise NotImplementedError("Ollama OpenAI Service is not supported. Switch to Azure or OpenAI.com")
     else:
         logger.info("Using OpenAI Service with API Key from OPENAICOM_KEY")
-        openai_config = {"api_type": "openai", "api_key": os.environ["OPENAICOM_KEY"]}
-        openai_client = OpenAI(**openai_config)
+        openai_client = OpenAI(api_key=os.environ["OPENAICOM_KEY"])
         model = os.environ["OPENAICOM_CHAT_MODEL"]
     return openai_client, model
 
@@ -127,6 +128,9 @@ def generate_ground_truth_data(num_questions_total: int, num_questions_per_sourc
             ],
             tools=[qa_pairs_tool(num_questions=2)],
         )
+        if not result.choices[0].message.tool_calls:
+            logger.warning("No tool calls found in response, skipping")
+            continue
         qa_pairs = json.loads(result.choices[0].message.tool_calls[0].function.arguments)["qa_list"]
         qa_pairs = [{"question": qa_pair["question"], "truth": qa_pair["answer"]} for qa_pair in qa_pairs]
         qa.extend(qa_pairs)
