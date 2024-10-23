@@ -1,15 +1,42 @@
 import argparse
 import logging
 import os
+import re
 from pathlib import Path
 from typing import Any
 
 import azure.identity
 from dotenv import load_dotenv
 from evaltools.eval.evaluate import run_evaluate_from_config
+from evaltools.eval.evaluate_metrics import register_metric
+from evaltools.eval.evaluate_metrics.base_metric import BaseMetric
 from rich.logging import RichHandler
 
 logger = logging.getLogger("ragapp")
+
+
+class CitationsMatchedMetric(BaseMetric):
+    METRIC_NAME = "citations_matched"
+
+    @classmethod
+    def evaluator_fn(cls, **kwargs):
+        def citations_overlap(*, response, ground_truth, **kwargs):
+            if response is None:
+                logger.warning("Received response of None, can't compute citation_match metric. Setting to -1.")
+                return {cls.METRIC_NAME: -1}
+            truth_citations = set(re.findall(r"\[(\d+)\]", ground_truth))
+            response_citations = set(re.findall(r"\[(\d+)\]", response))
+            # Count the percentage of citations that are present in the response
+            num_citations = len(truth_citations)
+            num_matched_citations = len(truth_citations.intersection(response_citations))
+            return {cls.METRIC_NAME: num_matched_citations / num_citations}
+
+        return citations_overlap
+
+    @classmethod
+    def get_aggregate_stats(cls, df):
+        df = df[df[cls.METRIC_NAME] != -1]
+        return {"mean": round(df[cls.METRIC_NAME].mean(), 2)}
 
 
 def get_openai_config() -> dict:
@@ -60,6 +87,7 @@ if __name__ == "__main__":
 
     openai_config = get_openai_config()
 
+    register_metric(CitationsMatchedMetric)
     run_evaluate_from_config(
         working_dir=Path(__file__).parent,
         config_path="eval_config.json",

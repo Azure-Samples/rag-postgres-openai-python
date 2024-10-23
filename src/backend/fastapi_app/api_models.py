@@ -28,6 +28,7 @@ class ChatRequestOverrides(BaseModel):
     retrieval_mode: RetrievalMode = RetrievalMode.HYBRID
     use_advanced_flow: bool = True
     prompt_template: str | None = None
+    seed: int | None = None
 
 
 class ChatRequestContext(BaseModel):

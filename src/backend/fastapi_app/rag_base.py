@@ -36,6 +36,7 @@ class RAGChatBase(ABC):
         return ChatParams(
             top=overrides.top,
             temperature=overrides.temperature,
+            seed=overrides.seed,
             retrieval_mode=overrides.retrieval_mode,
             use_advanced_flow=overrides.use_advanced_flow,
             response_token_limit=response_token_limit,
