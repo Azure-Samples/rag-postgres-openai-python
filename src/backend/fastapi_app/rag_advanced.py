@@ -35,7 +35,11 @@ class AdvancedRAGChat(RAGChatBase):
         self.chat_token_limit = get_token_limit(chat_model, default_to_minimum=True)
 
     async def generate_search_query(
-        self, original_user_query: str, past_messages: list[ChatCompletionMessageParam], query_response_token_limit: int
+        self,
+        original_user_query: str,
+        past_messages: list[ChatCompletionMessageParam],
+        query_response_token_limit: int,
+        seed: int | None = None,
     ) -> tuple[list[ChatCompletionMessageParam], Any | str | None, list]:
         """Generate an optimized keyword search query based on the chat history and the last question"""
 
@@ -63,6 +67,7 @@ class AdvancedRAGChat(RAGChatBase):
             n=1,
             tools=tools,
             tool_choice=tool_choice,
+            seed=seed,
         )
 
         query_text, filters = extract_search_arguments(original_user_query, chat_completion)
@@ -76,6 +81,7 @@ class AdvancedRAGChat(RAGChatBase):
             original_user_query=chat_params.original_user_query,
             past_messages=chat_params.past_messages,
             query_response_token_limit=500,
+            seed=chat_params.seed,
         )
 
         # Retrieve relevant rows from the database with the GPT optimized query
@@ -142,6 +148,7 @@ class AdvancedRAGChat(RAGChatBase):
             max_tokens=chat_params.response_token_limit,
             n=1,
             stream=False,
+            seed=chat_params.seed,
         )
 
         return RetrievalResponse(
