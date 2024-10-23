@@ -64,7 +64,12 @@ async def create_postgres_engine_from_env(azure_credential=None) -> AsyncEngine:
 
 async def create_postgres_engine_from_args(args, azure_credential=None) -> AsyncEngine:
     if azure_credential is None and args.host.endswith(".database.azure.com"):
-        azure_credential = AzureDeveloperCliCredential(process_timeout=60)
+        if tenant_id := args.tenant_id:
+            logger.info("Authenticating to Azure using Azure Developer CLI Credential for tenant %s", tenant_id)
+            azure_credential = AzureDeveloperCliCredential(tenant_id=tenant_id, process_timeout=60)
+        else:
+            logger.info("Authenticating to Azure using Azure Developer CLI Credential")
+            azure_credential = AzureDeveloperCliCredential(process_timeout=60)
 
     return await create_postgres_engine(
         host=args.host,

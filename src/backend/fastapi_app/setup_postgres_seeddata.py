@@ -62,6 +62,7 @@ async def main():
     parser.add_argument("--password", type=str, help="Postgres password")
     parser.add_argument("--database", type=str, help="Postgres database")
     parser.add_argument("--sslmode", type=str, help="Postgres sslmode")
+    parser.add_argument("--tenant-id", type=str, help="Azure tenant ID", default=None)
 
     # if no args are specified, use environment variables
     args = parser.parse_args()
