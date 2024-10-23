@@ -10,17 +10,19 @@
         "mean_rating": 5.0
     },
     "answer_length": {
-        "mean": 978.9,
-        "max": 1393,
-        "min": 676
+        "mean": 1017.6,
+        "max": 1477,
+        "min": 604
     },
     "latency": {
-        "mean": 2.51,
-        "max": 3.966702,
-        "min": 1.810424
+        "mean": 2.56,
+        "max": 3.364008,
+        "min": 1.892771
     },
-    "citation_match": {
-        "total": 10,
-        "rate": 1.0
+    "citations_matched": {
+        "mean": 0.73
+    },
+    "num_questions": {
+        "total": 10
     }
 }
