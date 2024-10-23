@@ -28,6 +28,7 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "python.envFile": "",
     "files.exclude": {
         ".ruff_cache": true,
         ".pytest_cache": true,
