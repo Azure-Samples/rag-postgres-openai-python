@@ -170,20 +170,26 @@ jobs:
       - name: Summarize results
         if: ${{ success() }}
         run: |
-          echo "📊 Evaluation Results" >> $GITHUB_STEP_SUMMARY
-          python -m evaltools summary evals/results --output=markdown >> eval-results.md
-          cat eval-results.md >> $GITHUB_STEP_SUMMARY
+          echo "## Evaluation results" >> eval-summary.md
+          python -m evaltools summary evals/results --output=markdown >> eval-summary.md
+          echo "## Answer differences across runs" >> run-diff.md
+          python -m evaltools diff evals/results/baseline evals/results/pr${{ github.event.issue.number }} --output=markdown >> run-diff.md
+          cat eval-summary.md >> $GITHUB_STEP_SUMMARY
+          cat run-diff.md >> $GITHUB_STEP_SUMMARY
 
       - name: Comment on pull request
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const summaryPath = "eval-results.md";
+            const summaryPath = "eval-summary.md";
             const summary = fs.readFileSync(summaryPath, 'utf8');
+            const runId = process.env.GITHUB_RUN_ID;
+            const repo = process.env.GITHUB_REPOSITORY;
+            const actionsUrl = `https://github.com/${repo}/actions/runs/${runId}`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: summary
+              body: `${summary}\n\n[Check the Actions tab for more details](${actionsUrl}).`
             })
