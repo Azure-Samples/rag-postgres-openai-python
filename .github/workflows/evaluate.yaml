@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout actual pull request
-        run: hub pr checkout ${{ github.event.issue.number }}
+        run: gh pr checkout ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
