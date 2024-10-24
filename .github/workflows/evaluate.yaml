@@ -56,13 +56,10 @@ jobs:
               body: "Starting evaluation! Check the Actions tab for progress, or wait for a comment with the results."
             })
 
-      - name: Checkout default branch
+      - name: Checkout pull request
         uses: actions/checkout@v4
-
-      - name: Checkout actual pull request
-        run: gh pr checkout ${{ github.event.issue.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
 
       - name: Install pgvector
         run: |
@@ -195,12 +192,3 @@ jobs:
               repo: context.repo.repo,
               body: `${summary}\n\n[Check the workflow run for more details](${actionsUrl}).`
             })
-
-      - name: Commit and push eval results
-        if: ${{ success() }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add evals/results/pr${{ github.event.issue.number }}
-          git commit -m "Add evaluation results for PR #${{ github.event.issue.number }}"
-          git push
