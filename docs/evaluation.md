@@ -42,12 +42,12 @@ pip install -r requirements-dev.txt
 
 ## Generate ground truth data
 
-Modify the prompt in `evals/generate.txt` to match your database table and RAG scenario.
+Modify the prompt in `evals/generate_prompt.txt` to match your database table and RAG scenario.
 
 Generate ground truth data by running the following command:
 
 ```bash
-python evals/generate_ground_truth_data.py
+python evals/generate_ground_truth.py --numquestions=50 --persource=50
 ```
 
 Review the generated data after running that script, removing any question/answer pairs that don't seem like realistic user input.

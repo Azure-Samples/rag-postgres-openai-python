@@ -48,7 +48,7 @@ class ThoughtStep(BaseModel):
 
 
 class RAGContext(BaseModel):
-    data_points: dict[int, dict[str, Any]]
+    data_points: dict[str, dict[str, Any]]
     thoughts: list[ThoughtStep]
     followup_questions: list[str] | None = None
 
@@ -70,12 +70,15 @@ class RetrievalResponseDelta(BaseModel):
 
 
 class ItemPublic(BaseModel):
-    id: int
-    type: str
-    brand: str
-    name: str
+    # This should match postgres_models.py
+    id: str
+    title: str
     description: str
-    price: float
+    speakers: list[str]
+    tracks: list[str]
+    day: str
+    time: str
+    mode: str
 
 
 class ItemWithDistance(ItemPublic):

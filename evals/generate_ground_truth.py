@@ -1,3 +1,4 @@
+import argparse
 import json
 import logging
 import os
@@ -8,12 +9,16 @@ from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provide
 from dotenv_azd import load_azd_env
 from openai import AzureOpenAI, OpenAI
 from openai.types.chat import ChatCompletionToolParam
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, func
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
+from jinja2 import Environment, FileSystemLoader
+from rich.logging import RichHandler
 
 from fastapi_app.postgres_models import Item
 
 logger = logging.getLogger("ragapp")
+
 
 
 def qa_pairs_tool(num_questions: int = 1) -> ChatCompletionToolParam:
@@ -47,7 +52,7 @@ def qa_pairs_tool(num_questions: int = 1) -> ChatCompletionToolParam:
 
 
 def source_retriever() -> Generator[str, None, None]:
-    # Connect to the database
+    # Connect to the local database
     DBHOST = os.environ["POSTGRES_HOST"]
     DBUSER = os.environ["POSTGRES_USERNAME"]
     DBPASS = os.environ["POSTGRES_PASSWORD"]
@@ -55,18 +60,11 @@ def source_retriever() -> Generator[str, None, None]:
     DATABASE_URI = f"postgresql://{DBUSER}:{DBPASS}@{DBHOST}/{DBNAME}"
     engine = create_engine(DATABASE_URI, echo=False)
     with Session(engine) as session:
-        # Fetch all products for a particular type
-        item_types = session.scalars(select(Item.type).distinct())
-        for item_type in item_types:
-            records = list(session.scalars(select(Item).filter(Item.type == item_type).order_by(Item.id)))
-            logger.info(f"Processing database records for type: {item_type}")
-            yield "\n\n".join([f"## Product ID: [{record.id}]\n" + record.to_str_for_rag() for record in records])
-        # Fetch each item individually
-        # records = list(session.scalars(select(Item).order_by(Item.id)))
-        # for record in records:
-        #    logger.info(f"Processing database record: {record.name}")
-        #    yield f"## Product ID: [{record.id}]\n" + record.to_str_for_rag()
-        # await self.openai_chat_client.chat.completions.create(
+        while True:
+            # Fetch all the rows from the database
+            random_rows = list(session.scalars(select(Item).order_by(func.random())))
+            logger.info("Fetched %d random rows", len(random_rows))
+            yield "\n\n".join([f"## Row ID: [{row.id}]\n" + row.to_str_for_rag() for row in random_rows])
 
 
 def source_to_text(source) -> str:
@@ -108,31 +106,36 @@ def get_openai_client() -> tuple[AzureOpenAI | OpenAI, str]:
     return openai_client, model
 
 
-def generate_ground_truth_data(num_questions_total: int, num_questions_per_source: int = 5):
+def generate_ground_truth_data(num_questions_total: int, num_questions_per_source):
     logger.info("Generating %d questions total", num_questions_total)
     openai_client, model = get_openai_client()
     current_dir = Path(__file__).parent
-    generate_prompt = open(current_dir / "generate_prompt.txt").read()
+
+    # Load the template from the file system
+    jinja_file_loader = FileSystemLoader(current_dir)
+    jinja_env = Environment(loader=jinja_file_loader)
+    prompt_template = jinja_env.get_template('generate_prompt.jinja2')
+
     output_file = Path(__file__).parent / "ground_truth.jsonl"
 
     qa: list[dict] = []
-    for source in source_retriever():
-        if len(qa) > num_questions_total:
-            logger.info("Generated enough questions already, stopping")
-            break
+    while len(qa) < num_questions_total:
+        sources = next(source_retriever())
+        previous_questions = [qa_pair["question"] for qa_pair in qa]
         result = openai_client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": generate_prompt},
-                {"role": "user", "content": json.dumps(source)},
+                {"role": "system", "content": prompt_template.render(num_questions=num_questions_per_source, previous_questions=previous_questions)},
+                {"role": "user", "content": json.dumps(sources)},
             ],
-            tools=[qa_pairs_tool(num_questions=2)],
+            tools=[qa_pairs_tool(num_questions=num_questions_per_source)],
         )
         if not result.choices[0].message.tool_calls:
             logger.warning("No tool calls found in response, skipping")
             continue
         qa_pairs = json.loads(result.choices[0].message.tool_calls[0].function.arguments)["qa_list"]
         qa_pairs = [{"question": qa_pair["question"], "truth": qa_pair["answer"]} for qa_pair in qa_pairs]
+        logger.info("Received %d suggested questions", len(qa_pairs))
         qa.extend(qa_pairs)
 
     logger.info("Writing %d questions to %s", num_questions_total, output_file)
@@ -145,8 +148,16 @@ def generate_ground_truth_data(num_questions_total: int, num_questions_per_sourc
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(
+        level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+    )
     logger.setLevel(logging.INFO)
-    load_azd_env()
+    load_dotenv(".env", override=True)
 
-    generate_ground_truth_data(num_questions_total=10)
+    parser = argparse.ArgumentParser(description="Run evaluation with OpenAI configuration.")
+    parser.add_argument("--numquestions", type=int, help="Specify the number of questions.", default=50)
+    parser.add_argument("--persource", type=int, help="Specify the number of questions per retrieved sources.", default=5)
+
+    args = parser.parse_args()
+
+    generate_ground_truth_data(num_questions_total=args.numquestions, num_questions_per_source=args.persource)

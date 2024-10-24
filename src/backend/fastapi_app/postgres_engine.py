@@ -36,11 +36,12 @@ async def create_postgres_engine(*, host, username, database, password, sslmode,
 
     @event.listens_for(engine.sync_engine, "connect")
     def register_custom_types(dbapi_connection: AdaptedConnection, *args):
-        logger.info("Registering pgvector extension...")
+        logger.info("Registering pgvector extension data types...")
         try:
             dbapi_connection.run_async(register_vector)
         except ValueError:
             logger.warning("Could not register pgvector data type yet as vector extension has not been CREATEd")
+
 
     @event.listens_for(engine.sync_engine, "do_connect")
     def update_password_token(dialect, conn_rec, cargs, cparams):

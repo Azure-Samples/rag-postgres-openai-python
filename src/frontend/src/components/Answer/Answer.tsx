@@ -68,8 +68,7 @@ export const Answer = ({
                             return (
                                 <li key={rowId}>
                                     <h4>{citation.name}</h4>
-                                    <p className={styles.referenceMetadata}>Brand: {citation.brand}</p>
-                                    <p className={styles.referenceMetadata}>Price: {citation.price}</p>
+                                    <p className={styles.referenceMetadata}>Day: {citation.day}</p>
                                     <p>{citation.description}</p>
                                 </li>
                             );
