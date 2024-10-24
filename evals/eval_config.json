@@ -8,7 +8,7 @@
             "use_advanced_flow": true,
             "top": 3,
             "retrieval_mode": "hybrid",
-            "temperature": 0.3,
+            "temperature": 1.0,
             "seed": 42
         }
     },
