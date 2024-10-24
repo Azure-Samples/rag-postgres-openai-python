@@ -56,7 +56,7 @@ jobs:
               body: "Starting evaluation! Check the Actions tab for progress, or wait for a comment with the results."
             })
 
-      - name: Checkout pull request 🏁
+      - name: Checkout pull request
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
