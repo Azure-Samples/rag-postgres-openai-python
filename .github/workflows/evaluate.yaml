@@ -75,7 +75,7 @@ jobs:
       - name: Set password for postgres user
         run: sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'root'"
 
-      - name: Create vector extension
+      - name: Create pgvector extension
         run: sudo -u postgres psql -c 'CREATE EXTENSION vector'
 
       - name: Install python
