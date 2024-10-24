@@ -67,7 +67,7 @@ export const Answer = ({
                             if (!citation) return null;
                             return (
                                 <li key={rowId}>
-                                    <h4>{citation.name}</h4>
+                                    <h4>{citation.title}</h4>
                                     <p className={styles.referenceMetadata}>Day: {citation.day}</p>
                                     <p>{citation.description}</p>
                                 </li>
