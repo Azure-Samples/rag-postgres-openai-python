@@ -193,12 +193,25 @@ jobs:
               body: `${summary}\n\n[Check the workflow run for more details](${actionsUrl}).`
             })
 
+      - name: Get PR branch name
+        id: get_pr_branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const { data: pr } = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            return { branch: pr.head.ref };
+
       - name: Commit and push eval results
         if: ${{ success() }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout ${{ github.head_ref }}
+          git checkout -b temp-branch
           git add evals/results/pr${{ github.event.issue.number }}
           git commit -m "Add evaluation results for PR #${{ github.event.issue.number }}"
-          git push
+          git push origin temp-branch:${{ steps.get_pr_branch.outputs.branch }}
