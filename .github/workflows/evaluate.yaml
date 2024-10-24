@@ -14,7 +14,10 @@ permissions:
 
 jobs:
   evaluate:
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/evaluate') }}
+    if: |
+      contains('["OWNER", "CONTRIBUTOR", "COLLABORATOR", "MEMBER"]', github.event.comment.author_association) &&
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/evaluate'
     runs-on: ubuntu-latest
     env:
       UV_SYSTEM_PYTHON: 1
@@ -41,10 +44,6 @@ jobs:
       AZURE_OPENAI_EVAL_DEPLOYMENT: ${{ vars.AZURE_OPENAI_EVAL_DEPLOYMENT }}
       AZURE_OPENAI_EVAL_MODEL: ${{ vars.AZURE_OPENAI_EVAL_MODEL }}
     steps:
-      - name: Check for evaluate hash tag
-        if: contains(github.event.comment.body, '#evaluate')
-        run: |
-          echo "Comment contains #evaluate hashtag"
 
       - name: Comment on pull request
         uses: actions/github-script@v7
@@ -193,3 +192,13 @@ jobs:
               repo: context.repo.repo,
               body: `${summary}\n\n[Check the workflow run for more details](${actionsUrl}).`
             })
+
+      - name: Commit and push eval results
+        if: ${{ success() }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout ${{ github.head_ref }}
+          git add evals/results/pr${{ github.event.issue.number }}
+          git commit -m "Add evaluation results for PR #${{ github.event.issue.number }}"
+          git push
