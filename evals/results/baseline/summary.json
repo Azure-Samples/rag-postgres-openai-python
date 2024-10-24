@@ -1,28 +1,33 @@
 {
     "gpt_groundedness": {
-        "pass_count": 10,
+        "pass_count": 20,
         "pass_rate": 1.0,
         "mean_rating": 5.0
     },
     "gpt_relevance": {
-        "pass_count": 10,
+        "pass_count": 20,
         "pass_rate": 1.0,
-        "mean_rating": 5.0
+        "mean_rating": 4.95
+    },
+    "f1_score": {
+        "mean": 0.43,
+        "max": 0.63,
+        "min": 0.23
     },
     "answer_length": {
-        "mean": 1017.6,
-        "max": 1477,
-        "min": 604
+        "mean": 609.1,
+        "max": 840,
+        "min": 335
     },
     "latency": {
-        "mean": 2.56,
-        "max": 3.364008,
-        "min": 1.892771
+        "mean": 2.67,
+        "max": 11.880154,
+        "min": 1.447183
     },
     "citations_matched": {
-        "mean": 0.73
+        "mean": 0.63
     },
     "num_questions": {
-        "total": 10
+        "total": 20
     }
 }

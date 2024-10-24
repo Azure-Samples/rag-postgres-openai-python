@@ -24,9 +24,13 @@ class CitationsMatchedMetric(BaseMetric):
             if response is None:
                 logger.warning("Received response of None, can't compute citation_match metric. Setting to -1.")
                 return {cls.METRIC_NAME: -1}
-            truth_citations = set(re.findall(r"\[(\d+)\]", ground_truth))
-            response_citations = set(re.findall(r"\[(\d+)\]", response))
-            # Count the percentage of citations that are present in the response
+            citation_pattern = r"\[(\d+)\]"
+            truth_citations = set(re.findall(citation_pattern, ground_truth))
+            response_citations = set(re.findall(citation_pattern, response))
+            # Return the percentage of citations that are present in the response
+            if len(truth_citations) == 0:
+                logger.warning("No citations found in ground truth, setting metric to 1.0.")
+                return {cls.METRIC_NAME: 1.0}
             num_citations = len(truth_citations)
             num_matched_citations = len(truth_citations.intersection(response_citations))
             return {cls.METRIC_NAME: num_matched_citations / num_citations}
@@ -74,8 +78,10 @@ def get_openai_config() -> dict:
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+        level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
     )
+    logging.getLogger("evaltools").setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
     load_dotenv(".env", override=True)
 
     parser = argparse.ArgumentParser(description="Run evaluation with OpenAI configuration.")

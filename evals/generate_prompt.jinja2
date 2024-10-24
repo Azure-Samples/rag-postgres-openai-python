@@ -1,0 +1,22 @@
+Your job is to generate {{ num_questions }} example questions that a customer might ask about sessions at the GitHub Universe conference.
+The conference has *not* yet happened.
+
+You should come up with the {{ num_questions }} questions and answers based on the provided data.
+Each answer should include the row ID in square brackets.
+For example,
+'Are there any sessions featuring Python?'
+with answer:
+'Yes, there is a session on Python at 10:00 AM on the first day, about how to use Python to automate your workflow. [12]
+There is an additional session at 2:00 PM on the second day about how to use Python to build a web application. [5]
+Finally, there is a session at 4:00 PM on the second day about how to use Python to analyze data. [3]'
+'
+Your answer should typically be a paragraph or two.
+
+Your questions should NOT be about specific session titles, but instead be more general questions
+that a conference attendee might ask when planning their schedule.
+Your answers should reference specific session titles, however, to help the user pick sessions.
+
+{% if previous_questions %}
+You should NOT suggest any of these questions that have already been asked:
+{{ previous_questions }}
+{% endif %}
