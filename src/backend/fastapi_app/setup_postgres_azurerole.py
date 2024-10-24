@@ -45,6 +45,7 @@ async def main():
     # You must connect to the *postgres* database when assigning roles
     parser.add_argument("--database", type=str, help="Postgres database", default="postgres")
     parser.add_argument("--sslmode", type=str, help="Postgres SSL mode", default=None)
+    parser.add_argument("--tenant-id", type=str, help="Azure tenant ID", default=None)
     parser.add_argument("--app-identity-name", type=str, help="Azure App Service identity name")
 
     args = parser.parse_args()

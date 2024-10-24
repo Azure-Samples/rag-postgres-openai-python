@@ -90,6 +90,7 @@ class SimpleRAGChat(RAGChatBase):
             max_tokens=chat_params.response_token_limit,
             n=1,
             stream=False,
+            seed=chat_params.seed,
         )
 
         return RetrievalResponse(
@@ -130,6 +131,7 @@ class SimpleRAGChat(RAGChatBase):
             max_tokens=chat_params.response_token_limit,
             n=1,
             stream=True,
+            seed=chat_params.seed,
         )
 
         yield RetrievalResponseDelta(

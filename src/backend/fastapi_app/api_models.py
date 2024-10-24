@@ -28,6 +28,7 @@ class ChatRequestOverrides(BaseModel):
     retrieval_mode: RetrievalMode = RetrievalMode.HYBRID
     use_advanced_flow: bool = True
     prompt_template: str | None = None
+    seed: int | None = None
 
 
 class ChatRequestContext(BaseModel):
@@ -50,6 +51,10 @@ class RAGContext(BaseModel):
     data_points: dict[str, dict[str, Any]]
     thoughts: list[ThoughtStep]
     followup_questions: list[str] | None = None
+
+
+class ErrorResponse(BaseModel):
+    error: str
 
 
 class RetrievalResponse(BaseModel):
@@ -78,6 +83,10 @@ class ItemPublic(BaseModel):
 
 class ItemWithDistance(ItemPublic):
     distance: float
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.distance = round(self.distance, 2)
 
 
 class ChatParams(ChatRequestOverrides):

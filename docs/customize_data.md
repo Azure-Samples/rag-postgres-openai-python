@@ -1,6 +1,7 @@
-# Customizing the data
+# RAG on PostgreSQL: Customizing the data
 
 This guide shows you how to bring in a table with a different schema than the sample table.
+For a full example of code changes needed, check out [this branch](https://github.com/Azure-Samples/rag-postgres-openai-python/compare/main...otherdata).
 
 ## Define the table schema
 
@@ -30,6 +31,7 @@ If you don't yet have any embeddings in `seed_data.json`:
 
 ## Add the seed data to the database
 
+Now that you have the new table schema and `seed_data.json` populated with embeddings, you can add the seed data to the database:
 
     ```shell
     python src/backend/fastapi_app/setup_postgres_seeddata.py

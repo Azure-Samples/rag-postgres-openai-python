@@ -5,10 +5,11 @@ from collections.abc import AsyncGenerator
 import fastapi
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from fastapi_app.api_models import (
     ChatRequest,
+    ErrorResponse,
     ItemPublic,
     ItemWithDistance,
     RetrievalResponse,
@@ -53,15 +54,18 @@ async def similar_handler(
     if not item:
         raise HTTPException(detail=f"Item with ID {id} not found.", status_code=404)
 
-    closest = await database_session.execute(
-        select(Item, Item.embedding_ada002.l2_distance(item.embedding_ada002))
-        .filter(Item.id != id)
-        .order_by(Item.embedding_ada002.l2_distance(item.embedding_ada002))
-        .limit(n)
-    )
-    return [
-        ItemWithDistance.model_validate(item.to_dict() | {"distance": round(distance, 2)}) for item, distance in closest
-    ]
+    closest = (
+        await database_session.execute(
+            text(
+                f"SELECT *, {context.embedding_column} <=> :embedding as DISTANCE FROM {Item.__tablename__} "
+                "WHERE id <> :item_id ORDER BY distance LIMIT :n"
+            ),
+            {"embedding": item.embedding_ada002, "n": n, "item_id": id},
+        )
+    ).fetchall()
+
+    items = [dict(row._mapping) for row in closest]
+    return [ItemWithDistance.model_validate(item) for item in items]
 
 
 @router.get("/search", response_model=list[ItemPublic])
@@ -89,7 +93,7 @@ async def search_handler(
     return [ItemPublic.model_validate(item.to_dict()) for item in results]
 
 
-@router.post("/chat", response_model=RetrievalResponse)
+@router.post("/chat", response_model=RetrievalResponse | ErrorResponse)
 async def chat_handler(
     context: CommonDeps,
     database_session: DBSession,
@@ -97,37 +101,40 @@ async def chat_handler(
     openai_chat: ChatClient,
     chat_request: ChatRequest,
 ):
-    searcher = PostgresSearcher(
-        db_session=database_session,
-        openai_embed_client=openai_embed.client,
-        embed_deployment=context.openai_embed_deployment,
-        embed_model=context.openai_embed_model,
-        embed_dimensions=context.openai_embed_dimensions,
-        embedding_column=context.embedding_column,
-    )
-    rag_flow: SimpleRAGChat | AdvancedRAGChat
-    if chat_request.context.overrides.use_advanced_flow:
-        rag_flow = AdvancedRAGChat(
-            searcher=searcher,
-            openai_chat_client=openai_chat.client,
-            chat_model=context.openai_chat_model,
-            chat_deployment=context.openai_chat_deployment,
+    try:
+        searcher = PostgresSearcher(
+            db_session=database_session,
+            openai_embed_client=openai_embed.client,
+            embed_deployment=context.openai_embed_deployment,
+            embed_model=context.openai_embed_model,
+            embed_dimensions=context.openai_embed_dimensions,
+            embedding_column=context.embedding_column,
         )
-    else:
-        rag_flow = SimpleRAGChat(
-            searcher=searcher,
-            openai_chat_client=openai_chat.client,
-            chat_model=context.openai_chat_model,
-            chat_deployment=context.openai_chat_deployment,
+        rag_flow: SimpleRAGChat | AdvancedRAGChat
+        if chat_request.context.overrides.use_advanced_flow:
+            rag_flow = AdvancedRAGChat(
+                searcher=searcher,
+                openai_chat_client=openai_chat.client,
+                chat_model=context.openai_chat_model,
+                chat_deployment=context.openai_chat_deployment,
+            )
+        else:
+            rag_flow = SimpleRAGChat(
+                searcher=searcher,
+                openai_chat_client=openai_chat.client,
+                chat_model=context.openai_chat_model,
+                chat_deployment=context.openai_chat_deployment,
+            )
+
+        chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
+
+        contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+        response = await rag_flow.answer(
+            chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
         )
-
-    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
-
-    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
-    response = await rag_flow.answer(
-        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
-    )
-    return response
+        return response
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @router.post("/chat/stream")

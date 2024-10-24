@@ -1,4 +1,4 @@
-## Load testing
+# RAG on PostgreSQL: Load testing
 
 We recommend running a loadtest for your expected number of users.
 You can use the [locust tool](https://docs.locust.io/) with the `locustfile.py` in this sample

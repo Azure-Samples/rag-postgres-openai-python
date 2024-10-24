@@ -27,5 +27,14 @@
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "python.envFile": "",
+    "files.exclude": {
+        ".ruff_cache": true,
+        ".pytest_cache": true,
+        "__pycache__": true,
+        "htmlcov": true,
+        ".mypy_cache": true,
+        ".coverage": true
+    }
 }

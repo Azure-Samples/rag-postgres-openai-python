@@ -9,9 +9,9 @@ This project is designed for deployment to Azure using [the Azure Developer CLI]
 
 * [Features](#features)
 * [Getting started](#getting-started)
-    * [GitHub Codespaces](#github-codespaces)
-    * [VS Code Dev Containers](#vs-code-dev-containers)
-    * [Local environment](#local-environment)
+  * [GitHub Codespaces](#github-codespaces)
+  * [VS Code Dev Containers](#vs-code-dev-containers)
+  * [Local environment](#local-environment)
 * [Deployment](#deployment)
 * [Local development](#local-development)
 * [Costs](#costs)
@@ -27,7 +27,13 @@ This project provides the following features:
 * OpenAI function calling to optionally convert user queries into query filter conditions, such as turning "Climbing gear cheaper than $30?" into "WHERE price < 30".
 * Conversion of user queries into vectors using the OpenAI embedding API.
 
-![Screenshot of chat app with question about climbing gear](docs/screenshot_chat.png)
+![Screenshot of chat app with question about climbing gear](docs/images/screenshot_chat.png)
+
+## Architecture diagram
+
+The deployed app uses a user-assigned managed identity to authenticate to Azure services, and stores logs in Log Analytics.
+
+![Architecture diagram: Azure Container Apps, Azure Container Registry, Managed Identity, Azure OpenAI, Azure Database for PostgreSQL](docs/images/azure_architecture.png)
 
 ## Getting started
 
@@ -95,7 +101,11 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
     azd auth login
     ```
 
-    If you have any issues with that command, you may also want to try `azd auth login --use-device-code`.
+    For GitHub Codespaces users, if the previous command fails, try:
+
+   ```shell
+    azd auth login --use-device-code
+    ```
 
 2. Create a new azd environment:
 
@@ -107,13 +117,13 @@ Once you've opened the project in [Codespaces](#github-codespaces), [Dev Contain
 
 3. (Optional) If you would like to customize the deployment to [use existing Azure resources](docs/deploy_existing.md), you can set the values now.
 
-3. Provision the resources and deploy the code:
+4. Provision the resources and deploy the code:
 
     ```shell
     azd up
     ```
 
-    You will be asked to select two locations, first a region for most of the resources (Container Apps, PostgreSQL), then a region specifically for the Azure OpenAI models. This project uses the gpt-3.5-turbo (version 0125) and text-embedding-ada-002 models which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region accordingly.
+    You will be asked to select two locations, first a region for most of the resources (Container Apps, PostgreSQL), then a region specifically for the Azure OpenAI models. This project uses the gpt-4o-mini and text-embedding-ada-002 models which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region accordingly.
 
 ## Local Development
 
@@ -129,14 +139,14 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
     ```
 
 3. To use OpenAI.com OpenAI, set `OPENAI_CHAT_HOST` and `OPENAI_EMBED_HOST` to "openai". Then fill in the value for `OPENAICOM_KEY`.
-4. To use Ollama, set `OPENAI_CHAT_HOST` to "ollama". Then update the values for `OLLAMA_ENDPOINT` and `OLLAMA_CHAT_MODEL` to match your local setup and model. Note that most Ollama models are not compatible with the "Advanced flow", due to the need for function calling support, so you'll need to disable that in _Developer Settings_ in the UI. In addition, the database rows are embedded using the default OpenAI embedding model, so you can't search them using an Ollama embedding model. You can either choose to set `OPENAI_EMBED_HOST` to "azure" or "openai", or turn off vector search in _Developer Settings_.
+4. To use Ollama, set `OPENAI_CHAT_HOST` to "ollama". Then update the values for `OLLAMA_ENDPOINT` and `OLLAMA_CHAT_MODEL` to match your local setup and model. We recommend using "llama3.1" for the chat model, since it has support for function calling, and "nomic-embed-text" for the embedding model, since the sample data has already been embedded with this model. If you cannot use function calling, then turn off "Advanced flow" in the Developer Settings. If you cannot use the embedding model, then turn off vector search in the Developer Settings.
 
 ### Running the frontend and backend
 
 1. Run these commands to install the web app as a local package (named `fastapi_app`), set up the local database, and seed it with test data:
 
     ```bash
-    python3 -m pip install -e src/backend
+    python -m pip install -e src/backend
     python ./src/backend/fastapi_app/setup_postgres_database.py
     python ./src/backend/fastapi_app/setup_postgres_seeddata.py
     ```
@@ -155,7 +165,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 3. Run the FastAPI backend (with hot reloading). This should be run from the root of the project:
 
     ```shell
-    python3 -m uvicorn fastapi_app:create_app --factory --reload
+    python -m uvicorn fastapi_app:create_app --factory --reload
     ```
 
     Or you can run "Backend" in the VS Code Run & Debug menu.
@@ -191,14 +201,18 @@ Additionally, we have added a [GitHub Action](https://github.com/microsoft/secur
 
 Further documentation is available in the `docs/` folder:
 
+* [Understanding the RAG flow](docs/rag_flow.md)
 * [Customizing the data](docs/customize_data.md)
 * [Deploying with existing resources](docs/deploy_existing.md)
+* [Using Entra auth with PostgreSQL tools](docs/using_entra_auth.md)
 * [Monitoring with Azure Monitor](docs/monitoring.md)
 * [Load testing](docs/loadtesting.md)
+* [Evaluation](docs/evaluation.md)
 
 Please post in the issue tracker with any questions or issues.
 
 ## Resources
 
+* [RAGHack livestream: Building RAG with PostgreSQL](https://www.youtube.com/watch?v=Dk65oQjYAfo)
 * [RAG chat with Azure AI Search + Python](https://github.com/Azure-Samples/azure-search-openai-demo/)
 * [Develop Python apps that use Azure AI services](https://learn.microsoft.com/azure/developer/python/azure-ai-for-python-developers)

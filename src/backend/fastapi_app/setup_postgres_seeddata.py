@@ -4,6 +4,7 @@ import json
 import logging
 import os
 
+import numpy as np
 import sqlalchemy.exc
 from dotenv import load_dotenv
 from sqlalchemy import select, text
@@ -41,8 +42,11 @@ async def seed_data(engine):
                 if db_item.scalars().first():
                     continue
                 attrs = {key: value for key, value in seed_data_object.items()}
-                row = Item(**attrs)
-                session.add(row)
+                attrs["embedding_ada002"] = np.array(seed_data_object["embedding_ada002"])
+                attrs["embedding_nomic"] = np.array(seed_data_object["embedding_nomic"])
+                column_names = ", ".join(attrs.keys())
+                values = ", ".join([f":{key}" for key in attrs.keys()])
+                await session.execute(text(f"INSERT INTO {table_name} ({column_names}) VALUES ({values})"), attrs)
             try:
                 await session.commit()
             except sqlalchemy.exc.IntegrityError:
@@ -58,6 +62,7 @@ async def main():
     parser.add_argument("--password", type=str, help="Postgres password")
     parser.add_argument("--database", type=str, help="Postgres database")
     parser.add_argument("--sslmode", type=str, help="Postgres sslmode")
+    parser.add_argument("--tenant-id", type=str, help="Azure tenant ID", default=None)
 
     # if no args are specified, use environment variables
     args = parser.parse_args()

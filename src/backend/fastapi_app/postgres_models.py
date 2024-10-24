@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Index, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import Index, ARRAY, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -44,20 +43,24 @@ class Item(Base):
         return f"Name: {self.title} Description: {self.description} Tracks: {self.tracks} Day: {self.day} Mode: {self.mode}"  # noqa
 
 
-# Define HNSW index to support vector similarity search through the vector_cosine_ops access method (cosine distance).
+# Define HNSW index to support vector similarity search
+# Use vector_cosine_ops operator since that works for both normalized and non-normalized embeddings
+# and matches the operator used in postgres_searcher.py
+
+table_name = Item.__tablename__
+
 index_ada002 = Index(
-    # TODO: generate based off table name
-    "hnsw_index_for_innerproduct_session_embedding_ada002",
+    f"hnsw_index_for_innerproduct_{table_name}_embedding_ada002",
     Item.embedding_ada002,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},
-    postgresql_ops={"embedding_ada002": "vector_ip_ops"},
+    postgresql_ops={"embedding_ada002": "vector_cosine_ops"},
 )
 
 index_nomic = Index(
-    "hnsw_index_for_innerproduct_session_embedding_nomic",
+    f"hnsw_index_for_innerproduct_{table_name}_embedding_nomic",
     Item.embedding_nomic,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},
-    postgresql_ops={"embedding_nomic": "vector_ip_ops"},
+    postgresql_ops={"embedding_nomic": "vector_cosine_ops"},
 )

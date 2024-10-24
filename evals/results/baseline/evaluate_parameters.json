@@ -1,0 +1,16 @@
+{
+    "evaluation_gpt_model": "gpt-4",
+    "evaluation_timestamp": 1729724614,
+    "testdata_path": "/workspace/evals/ground_truth.jsonl",
+    "target_url": "http://127.0.0.1:8000/chat",
+    "target_parameters": {
+        "overrides": {
+            "use_advanced_flow": true,
+            "top": 3,
+            "retrieval_mode": "hybrid",
+            "temperature": 0.3,
+            "seed": 42
+        }
+    },
+    "num_questions": null
+}

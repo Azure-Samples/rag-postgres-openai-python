@@ -22,7 +22,9 @@ jobs:
       - name: Build Bicep for linting
         uses: azure/CLI@v2
         with:
-          inlineScript: az config set bicep.use_binary_from_path=false && az bicep build -f infra/main.bicep --stdout
+          inlineScript: |
+            export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+            az config set bicep.use_binary_from_path=false && az bicep build -f infra/main.bicep --stdout
 
       - name: Run Microsoft Security DevOps Analysis
         uses: microsoft/security-devops-action@preview
