@@ -56,10 +56,10 @@ jobs:
               body: "Starting evaluation! Check the Actions tab for progress, or wait for a comment with the results."
             })
 
-      - name: Checkout pull request
+      - name: Checkout default branch
         uses: actions/checkout@v4
 
-      - name: Checkout Pull Request
+      - name: Checkout actual pull request
         run: hub pr checkout ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
