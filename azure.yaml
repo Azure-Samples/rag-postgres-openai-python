@@ -36,15 +36,6 @@ hooks:
             run: ./scripts/setup_postgres_database.sh;./scripts/setup_postgres_azurerole.sh;./scripts/setup_postgres_seeddata.sh
             interactive: true
             continueOnError: false
-    predown:
-      windows:
-        shell: pwsh
-        run: ./scripts/pre_down.ps1
-        continueOnError: true
-      posix:
-        shell: sh
-        run: ./scripts/pre_down.sh
-        continueOnError: true
 pipeline:
   variables:
     - DEPLOY_AZURE_OPENAI
