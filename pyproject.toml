@@ -1,13 +1,13 @@
 [tool.ruff]
 line-length = 120
-target-version = "py312"
+target-version = "py39"
 lint.select = ["E", "F", "I", "UP"]
 lint.ignore = ["D203"]
 lint.isort.known-first-party = ["fastapi_app"]
 
 [tool.mypy]
 check_untyped_defs = true
-python_version = 3.12
+python_version = 3.9
 exclude = [".venv/*"]
 
 [tool.pytest.ini_options]
