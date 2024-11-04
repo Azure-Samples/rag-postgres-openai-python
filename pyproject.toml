@@ -1,6 +1,6 @@
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py312"
 lint.select = ["E", "F", "I", "UP"]
 lint.ignore = ["D203"]
 lint.isort.known-first-party = ["fastapi_app"]
