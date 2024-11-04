@@ -31,7 +31,9 @@ jobs:
         python_version: ["3.9", "3.10", "3.11", "3.12"]
         exclude:
           - os: macos-latest-xlarge
-            python_version: ["3.9", "3.10"]
+            python_version: "3.9"
+          - os: macos-latest-xlarge
+            python_version: "3.10"
     env:
       UV_SYSTEM_PYTHON: 1
       POSTGRES_HOST: localhost
