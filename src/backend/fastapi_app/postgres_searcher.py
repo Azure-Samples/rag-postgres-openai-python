@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 import numpy as np
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 from sqlalchemy import Float, Integer, column, select, text
@@ -11,10 +13,10 @@ class PostgresSearcher:
     def __init__(
         self,
         db_session: AsyncSession,
-        openai_embed_client: AsyncOpenAI | AsyncAzureOpenAI,
-        embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
+        openai_embed_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
+        embed_deployment: Optional[str],  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
-        embed_dimensions: int | None,
+        embed_dimensions: Optional[int],
         embedding_column: str,
     ):
         self.db_session = db_session
@@ -38,7 +40,7 @@ class PostgresSearcher:
         return "", ""
 
     async def search(
-        self, query_text: str | None, query_vector: list[float] | list, top: int = 5, filters: list[dict] | None = None
+        self, query_text: Optional[str], query_vector: list[float], top: int = 5, filters: Optional[list[dict]] = None
     ):
         filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
         table_name = Item.__tablename__
@@ -100,11 +102,11 @@ class PostgresSearcher:
 
     async def search_and_embed(
         self,
-        query_text: str | None = None,
+        query_text: Optional[str] = None,
         top: int = 5,
         enable_vector_search: bool = False,
         enable_text_search: bool = False,
-        filters: list[dict] | None = None,
+        filters: Optional[list[dict]] = None,
     ) -> list[Item]:
         """
         Search rows by query text. Optionally converts the query text to a vector if enable_vector_search is True.

@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from typing import Optional, Union
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam
@@ -22,9 +23,9 @@ class SimpleRAGChat(RAGChatBase):
         self,
         *,
         searcher: PostgresSearcher,
-        openai_chat_client: AsyncOpenAI | AsyncAzureOpenAI,
+        openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
         chat_model: str,
-        chat_deployment: str | None,  # Not needed for non-Azure OpenAI
+        chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
     ):
         self.searcher = searcher
         self.openai_chat_client = openai_chat_client

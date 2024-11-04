@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import AsyncGenerator
-from typing import Annotated
+from typing import Annotated, Optional, Union
 
 import azure.identity
 from fastapi import Depends, Request
@@ -17,7 +17,7 @@ class OpenAIClient(BaseModel):
     OpenAI client
     """
 
-    client: AsyncOpenAI | AsyncAzureOpenAI
+    client: Union[AsyncOpenAI, AsyncAzureOpenAI]
     model_config = {"arbitrary_types_allowed": True}
 
 
@@ -28,9 +28,9 @@ class FastAPIAppContext(BaseModel):
 
     openai_chat_model: str
     openai_embed_model: str
-    openai_embed_dimensions: int | None
-    openai_chat_deployment: str | None
-    openai_embed_deployment: str | None
+    openai_embed_dimensions: Optional[int]
+    openai_chat_deployment: Optional[str]
+    openai_embed_deployment: Optional[str]
     embedding_column: str
 
 
@@ -77,9 +77,9 @@ async def common_parameters():
 
 
 async def get_azure_credential() -> (
-    azure.identity.AzureDeveloperCliCredential | azure.identity.ManagedIdentityCredential
+    Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential]
 ):
-    azure_credential: azure.identity.AzureDeveloperCliCredential | azure.identity.ManagedIdentityCredential
+    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential]
     try:
         if client_id := os.getenv("APP_IDENTITY_ID"):
             # Authenticate using a user-assigned managed identity on Azure

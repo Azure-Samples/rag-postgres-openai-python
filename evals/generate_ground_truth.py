@@ -3,6 +3,7 @@ import logging
 import os
 from collections.abc import Generator
 from pathlib import Path
+from typing import Union
 
 from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provider
 from dotenv_azd import load_azd_env
@@ -77,9 +78,9 @@ def answer_formatter(answer, source) -> str:
     return f"{answer} [{source['id']}]"
 
 
-def get_openai_client() -> tuple[AzureOpenAI | OpenAI, str]:
+def get_openai_client() -> tuple[Union[AzureOpenAI, OpenAI], str]:
     """Return an OpenAI client based on the environment variables"""
-    openai_client: AzureOpenAI | OpenAI
+    openai_client: Union[AzureOpenAI, OpenAI]
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_CHAT_HOST == "azure":
         if api_key := os.getenv("AZURE_OPENAI_KEY"):

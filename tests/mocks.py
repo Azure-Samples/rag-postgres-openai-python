@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from azure.core.credentials import AccessToken, TokenCredential
 
@@ -7,8 +7,8 @@ class MockAzureCredential(TokenCredential):
     def get_token(
         self,
         *scopes: str,
-        claims: str | None = None,
-        tenant_id: str | None = None,
+        claims: Optional[str] = None,
+        tenant_id: Optional[str] = None,
         enable_cae: bool = False,
         **kwargs: Any,
     ) -> AccessToken:
@@ -22,8 +22,8 @@ class MockAzureCredentialExpired(TokenCredential):
     def get_token(
         self,
         *scopes: str,
-        claims: str | None = None,
-        tenant_id: str | None = None,
+        claims: Optional[str] = None,
+        tenant_id: Optional[str] = None,
         enable_cae: bool = False,
         **kwargs: Any,
     ) -> AccessToken:
