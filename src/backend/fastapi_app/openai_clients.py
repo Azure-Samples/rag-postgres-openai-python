@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Union
 
 import azure.identity
 import openai
@@ -8,9 +9,9 @@ logger = logging.getLogger("ragapp")
 
 
 async def create_openai_chat_client(
-    azure_credential: azure.identity.AzureDeveloperCliCredential | azure.identity.ManagedIdentityCredential,
-) -> openai.AsyncAzureOpenAI | openai.AsyncOpenAI:
-    openai_chat_client: openai.AsyncAzureOpenAI | openai.AsyncOpenAI
+    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential],
+) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
+    openai_chat_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_CHAT_HOST == "azure":
         api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-03-01-preview"
@@ -57,9 +58,9 @@ async def create_openai_chat_client(
 
 
 async def create_openai_embed_client(
-    azure_credential: azure.identity.AzureDeveloperCliCredential | azure.identity.ManagedIdentityCredential,
-) -> openai.AsyncAzureOpenAI | openai.AsyncOpenAI:
-    openai_embed_client: openai.AsyncAzureOpenAI | openai.AsyncOpenAI
+    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential],
+) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
+    openai_embed_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     if OPENAI_EMBED_HOST == "azure":
         api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-03-01-preview"

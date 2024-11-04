@@ -1,16 +1,14 @@
-from typing import (
-    TypedDict,
-)
+from typing import Optional, TypedDict, Union
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 
 
 async def compute_text_embedding(
     q: str,
-    openai_client: AsyncOpenAI | AsyncAzureOpenAI,
+    openai_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
     embed_model: str,
-    embed_deployment: str | None = None,
-    embedding_dimensions: int | None = None,
+    embed_deployment: Optional[str] = None,
+    embedding_dimensions: Optional[int] = None,
 ) -> list[float]:
     SUPPORTED_DIMENSIONS_MODEL = {
         "text-embedding-ada-002": False,

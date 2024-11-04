@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from typing import Any, Final
+from typing import Any, Final, Optional, Union
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam
@@ -24,9 +24,9 @@ class AdvancedRAGChat(RAGChatBase):
         self,
         *,
         searcher: PostgresSearcher,
-        openai_chat_client: AsyncOpenAI | AsyncAzureOpenAI,
+        openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
         chat_model: str,
-        chat_deployment: str | None,  # Not needed for non-Azure OpenAI
+        chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
     ):
         self.searcher = searcher
         self.openai_chat_client = openai_chat_client
@@ -39,8 +39,8 @@ class AdvancedRAGChat(RAGChatBase):
         original_user_query: str,
         past_messages: list[ChatCompletionMessageParam],
         query_response_token_limit: int,
-        seed: int | None = None,
-    ) -> tuple[list[ChatCompletionMessageParam], Any | str | None, list]:
+        seed: Optional[int] = None,
+    ) -> tuple[list[ChatCompletionMessageParam], Union[Any, str, None], list]:
         """Generate an optimized keyword search query based on the chat history and the last question"""
 
         tools = build_search_function()

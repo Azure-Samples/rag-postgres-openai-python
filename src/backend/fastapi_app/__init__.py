@@ -2,7 +2,7 @@ import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import TypedDict
+from typing import TypedDict, Union
 
 import fastapi
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -27,8 +27,8 @@ logger = logging.getLogger("ragapp")
 class State(TypedDict):
     sessionmaker: async_sessionmaker[AsyncSession]
     context: FastAPIAppContext
-    chat_client: AsyncOpenAI | AsyncAzureOpenAI
-    embed_client: AsyncOpenAI | AsyncAzureOpenAI
+    chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI]
+    embed_client: Union[AsyncOpenAI, AsyncAzureOpenAI]
 
 
 @asynccontextmanager

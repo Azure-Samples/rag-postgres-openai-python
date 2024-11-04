@@ -1,6 +1,7 @@
 import json
 import logging
 from collections.abc import AsyncGenerator
+from typing import Union
 
 import fastapi
 from fastapi import HTTPException
@@ -93,7 +94,7 @@ async def search_handler(
     return [ItemPublic.model_validate(item.to_dict()) for item in results]
 
 
-@router.post("/chat", response_model=RetrievalResponse | ErrorResponse)
+@router.post("/chat", response_model=Union[RetrievalResponse, ErrorResponse])
 async def chat_handler(
     context: CommonDeps,
     database_session: DBSession,
@@ -110,7 +111,7 @@ async def chat_handler(
             embed_dimensions=context.openai_embed_dimensions,
             embedding_column=context.embedding_column,
         )
-        rag_flow: SimpleRAGChat | AdvancedRAGChat
+        rag_flow: Union[SimpleRAGChat, AdvancedRAGChat]
         if chat_request.context.overrides.use_advanced_flow:
             rag_flow = AdvancedRAGChat(
                 searcher=searcher,
@@ -154,7 +155,7 @@ async def chat_stream_handler(
         embedding_column=context.embedding_column,
     )
 
-    rag_flow: SimpleRAGChat | AdvancedRAGChat
+    rag_flow: Union[SimpleRAGChat, AdvancedRAGChat]
     if chat_request.context.overrides.use_advanced_flow:
         rag_flow = AdvancedRAGChat(
             searcher=searcher,

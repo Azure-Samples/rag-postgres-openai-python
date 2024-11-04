@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel
@@ -27,8 +27,8 @@ class ChatRequestOverrides(BaseModel):
     temperature: float = 0.3
     retrieval_mode: RetrievalMode = RetrievalMode.HYBRID
     use_advanced_flow: bool = True
-    prompt_template: str | None = None
-    seed: int | None = None
+    prompt_template: Optional[str] = None
+    seed: Optional[int] = None
 
 
 class ChatRequestContext(BaseModel):
@@ -38,7 +38,7 @@ class ChatRequestContext(BaseModel):
 class ChatRequest(BaseModel):
     messages: list[ChatCompletionMessageParam]
     context: ChatRequestContext
-    sessionState: Any | None = None
+    sessionState: Optional[Any] = None
 
 
 class ThoughtStep(BaseModel):
@@ -50,7 +50,7 @@ class ThoughtStep(BaseModel):
 class RAGContext(BaseModel):
     data_points: dict[int, dict[str, Any]]
     thoughts: list[ThoughtStep]
-    followup_questions: list[str] | None = None
+    followup_questions: Optional[list[str]] = None
 
 
 class ErrorResponse(BaseModel):
@@ -60,13 +60,13 @@ class ErrorResponse(BaseModel):
 class RetrievalResponse(BaseModel):
     message: Message
     context: RAGContext
-    sessionState: Any | None = None
+    sessionState: Optional[Any] = None
 
 
 class RetrievalResponseDelta(BaseModel):
-    delta: Message | None = None
-    context: RAGContext | None = None
-    sessionState: Any | None = None
+    delta: Optional[Message] = None
+    context: Optional[RAGContext] = None
+    sessionState: Optional[Any] = None
 
 
 class ItemPublic(BaseModel):
