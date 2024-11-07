@@ -14,5 +14,4 @@ pytest-playwright
 pytest-snapshot
 locust
 psycopg2
-azure-mgmt-cognitiveservices
 dotenv-azd
