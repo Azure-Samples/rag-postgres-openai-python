@@ -38,6 +38,7 @@ Install all the dependencies for the evaluation script by running the following 
 
 ```bash
 pip install -r requirements-dev.txt
+pip install -r evals/requirements.txt
 ```
 
 ## Generate ground truth data
