@@ -146,6 +146,7 @@ Since the local app uses OpenAI models, you should first deploy it for the optim
 1. Run these commands to install the web app as a local package (named `fastapi_app`), set up the local database, and seed it with test data:
 
     ```bash
+    python -m pip install -r src/backend/requirements.txt
     python -m pip install -e src/backend
     python ./src/backend/fastapi_app/setup_postgres_database.py
     python ./src/backend/fastapi_app/setup_postgres_seeddata.py

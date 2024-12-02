@@ -4,6 +4,7 @@ version = "1.0.0"
 description = "Create a RAG application with FastAPI and PostgreSQL"
 dependencies = [
     "fastapi>=0.111.0,<1.0.0",
+    "uvicorn>=0.30.1,<1.0.0",
     "python-dotenv>=1.0.1,<2.0.0",
     "environs>=11.0.0,<12.0.0",
     "azure-identity>=1.16.1,<2.0.0",

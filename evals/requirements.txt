@@ -1,1 +1,2 @@
 git+https://github.com/Azure-Samples/ai-rag-chat-evaluator/@installable
+rich

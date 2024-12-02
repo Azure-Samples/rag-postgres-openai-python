@@ -1,5 +1,4 @@
 -r src/backend/requirements.txt
--r evals/requirements.txt
 ruff
 mypy
 types-requests
