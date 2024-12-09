@@ -65,7 +65,7 @@ environs==11.2.1
     # via fastapi-app (pyproject.toml)
 exceptiongroup==1.2.2
     # via anyio
-fastapi==0.115.5
+fastapi==0.115.6
     # via fastapi-app (pyproject.toml)
 fixedint==0.1.6
     # via azure-monitor-opentelemetry-exporter
