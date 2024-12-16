@@ -180,7 +180,7 @@ opentelemetry-instrumentation-urllib==0.48b0
     # via azure-monitor-opentelemetry
 opentelemetry-instrumentation-urllib3==0.48b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-wsgi==0.48b0
+opentelemetry-instrumentation-wsgi==0.50b0
     # via
     #   opentelemetry-instrumentation-django
     #   opentelemetry-instrumentation-flask
