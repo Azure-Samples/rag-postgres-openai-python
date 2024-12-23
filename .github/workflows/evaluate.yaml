@@ -88,7 +88,7 @@ jobs:
           cache-dependency-glob: "requirements**.txt"
 
       - name: Install azd
-        uses: Azure/setup-azd@v1.0.0
+        uses: Azure/setup-azd@v2.0.0
 
       - name: Login to Azure
         uses: azure/login@v2
