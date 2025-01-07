@@ -73,7 +73,7 @@ jobs:
           if: matrix.os == 'ubuntu-latest'
           run: |
             sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
-            sudo apt-get install postgresql-14-pgvector
+            sudo apt-get install postgresql-16-pgvector
             sudo systemctl start postgresql
             sudo -u postgres psql -c "ALTER USER ${{ env.POSTGRES_USERNAME }} PASSWORD '${{ env.POSTGRES_PASSWORD }}'"
             sudo -u postgres psql -c 'CREATE EXTENSION vector'
