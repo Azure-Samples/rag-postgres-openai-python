@@ -39,23 +39,30 @@ class Item(Base):
         return f"Name: {self.name} Description: {self.description} Type: {self.type}"
 
 
-# Define HNSW index to support vector similarity search
-# Use the vector_ip_ops access method (inner product) since these embeddings are normalized
+"""
+**Define HNSW index to support vector similarity search**
+
+We use the vector_cosine_ops access method (cosine distance)
+ since it works for both normalized and non-normalized vector embeddings
+If you know your embeddings are normalized,
+ you can switch to inner product for potentially better performance.
+The index operator should match the operator used in queries.
+"""
 
 table_name = Item.__tablename__
 
 index_ada002 = Index(
-    "hnsw_index_for_innerproduct_{table_name}_embedding_ada002",
+    "hnsw_index_for_cosine_{table_name}_embedding_ada002",
     Item.embedding_ada002,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},
-    postgresql_ops={"embedding_ada002": "vector_ip_ops"},
+    postgresql_ops={"embedding_ada002": "vector_cosine_ops"},
 )
 
 index_nomic = Index(
-    f"hnsw_index_for_innerproduct_{table_name}_embedding_nomic",
+    f"hnsw_index_for_cosine_{table_name}_embedding_nomic",
     Item.embedding_nomic,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},
-    postgresql_ops={"embedding_nomic": "vector_ip_ops"},
+    postgresql_ops={"embedding_nomic": "vector_cosine_ops"},
 )
