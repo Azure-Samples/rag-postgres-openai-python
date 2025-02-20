@@ -158,7 +158,7 @@ opentelemetry-instrumentation==0.48b0
     #   opentelemetry-instrumentation-wsgi
 opentelemetry-instrumentation-aiohttp-client==0.48b0
     # via fastapi-app (pyproject.toml)
-opentelemetry-instrumentation-asgi==0.48b0
+opentelemetry-instrumentation-asgi==0.51b0
     # via opentelemetry-instrumentation-fastapi
 opentelemetry-instrumentation-dbapi==0.48b0
     # via opentelemetry-instrumentation-psycopg2
