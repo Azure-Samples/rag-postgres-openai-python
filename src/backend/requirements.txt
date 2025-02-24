@@ -121,7 +121,7 @@ openai==1.55.3
     #   openai-messages-token-helper
 openai-messages-token-helper==0.1.10
     # via fastapi-app (pyproject.toml)
-opentelemetry-api==1.27.0
+opentelemetry-api==1.30.0
     # via
     #   azure-core-tracing-opentelemetry
     #   azure-monitor-opentelemetry-exporter
@@ -141,7 +141,7 @@ opentelemetry-api==1.27.0
     #   opentelemetry-instrumentation-wsgi
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
-opentelemetry-instrumentation==0.48b0
+opentelemetry-instrumentation==0.51b0
     # via
     #   opentelemetry-instrumentation-aiohttp-client
     #   opentelemetry-instrumentation-asgi
@@ -156,42 +156,42 @@ opentelemetry-instrumentation==0.48b0
     #   opentelemetry-instrumentation-urllib
     #   opentelemetry-instrumentation-urllib3
     #   opentelemetry-instrumentation-wsgi
-opentelemetry-instrumentation-aiohttp-client==0.48b0
+opentelemetry-instrumentation-aiohttp-client==0.51b0
     # via fastapi-app (pyproject.toml)
-opentelemetry-instrumentation-asgi==0.48b0
+opentelemetry-instrumentation-asgi==0.51b0
     # via opentelemetry-instrumentation-fastapi
-opentelemetry-instrumentation-dbapi==0.48b0
+opentelemetry-instrumentation-dbapi==0.51b0
     # via opentelemetry-instrumentation-psycopg2
-opentelemetry-instrumentation-django==0.48b0
+opentelemetry-instrumentation-django==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-fastapi==0.48b0
+opentelemetry-instrumentation-fastapi==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-flask==0.48b0
+opentelemetry-instrumentation-flask==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-openai==0.33.9
+opentelemetry-instrumentation-openai==0.38.7
     # via fastapi-app (pyproject.toml)
-opentelemetry-instrumentation-psycopg2==0.48b0
+opentelemetry-instrumentation-psycopg2==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-requests==0.48b0
+opentelemetry-instrumentation-requests==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-sqlalchemy==0.48b0
+opentelemetry-instrumentation-sqlalchemy==0.51b0
     # via fastapi-app (pyproject.toml)
-opentelemetry-instrumentation-urllib==0.48b0
+opentelemetry-instrumentation-urllib==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-urllib3==0.48b0
+opentelemetry-instrumentation-urllib3==0.51b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-wsgi==0.48b0
+opentelemetry-instrumentation-wsgi==0.51b0
     # via
     #   opentelemetry-instrumentation-django
     #   opentelemetry-instrumentation-flask
 opentelemetry-resource-detector-azure==0.1.5
     # via azure-monitor-opentelemetry
-opentelemetry-sdk==1.27.0
+opentelemetry-sdk==1.30.0
     # via
     #   azure-monitor-opentelemetry
     #   azure-monitor-opentelemetry-exporter
     #   opentelemetry-resource-detector-azure
-opentelemetry-semantic-conventions==0.48b0
+opentelemetry-semantic-conventions==0.51b0
     # via
     #   opentelemetry-instrumentation-aiohttp-client
     #   opentelemetry-instrumentation-asgi
@@ -208,7 +208,7 @@ opentelemetry-semantic-conventions==0.48b0
     #   opentelemetry-sdk
 opentelemetry-semantic-conventions-ai==0.4.2
     # via opentelemetry-instrumentation-openai
-opentelemetry-util-http==0.48b0
+opentelemetry-util-http==0.51b0
     # via
     #   opentelemetry-instrumentation-aiohttp-client
     #   opentelemetry-instrumentation-asgi
