@@ -76,9 +76,9 @@ async def common_parameters():
     )
 
 
-async def get_azure_credential() -> (
-    Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential]
-):
+async def get_azure_credential() -> Union[
+    azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential
+]:
     azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential]
     try:
         if client_id := os.getenv("APP_IDENTITY_ID"):

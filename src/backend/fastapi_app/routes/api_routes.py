@@ -6,6 +6,7 @@ from typing import Union
 import fastapi
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
+from openai import APIError
 from sqlalchemy import select, text
 
 from fastapi_app.api_models import (
@@ -25,6 +26,9 @@ from fastapi_app.rag_simple import SimpleRAGChat
 router = fastapi.APIRouter()
 
 
+ERROR_FILTER = {"error": "Your message contains content that was flagged by the content filter."}
+
+
 async def format_as_ndjson(r: AsyncGenerator[RetrievalResponseDelta, None]) -> AsyncGenerator[str, None]:
     """
     Format the response as NDJSON
@@ -33,8 +37,11 @@ async def format_as_ndjson(r: AsyncGenerator[RetrievalResponseDelta, None]) -> A
         async for event in r:
             yield event.model_dump_json() + "\n"
     except Exception as error:
-        logging.exception("Exception while generating response stream: %s", error)
-        yield json.dumps({"error": str(error)}, ensure_ascii=False) + "\n"
+        if isinstance(error, APIError) and error.code == "content_filter":
+            yield json.dumps(ERROR_FILTER) + "\n"
+        else:
+            logging.exception("Exception while generating response stream: %s", error)
+            yield json.dumps({"error": str(error)}, ensure_ascii=False) + "\n"
 
 
 @router.get("/items/{id}", response_model=ItemPublic)
@@ -135,7 +142,10 @@ async def chat_handler(
         )
         return response
     except Exception as e:
-        return {"error": str(e)}
+        if isinstance(e, APIError) and e.code == "content_filter":
+            return ERROR_FILTER
+        else:
+            return {"error": str(e)}
 
 
 @router.post("/chat/stream")
@@ -175,9 +185,15 @@ async def chat_stream_handler(
 
     # Intentionally do this before we stream down a response, to avoid using database connections during stream
     # See https://github.com/tiangolo/fastapi/discussions/11321
-    contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
-
-    result = rag_flow.answer_stream(
-        chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
-    )
-    return StreamingResponse(content=format_as_ndjson(result), media_type="application/x-ndjson")
+    try:
+        contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
+        result = rag_flow.answer_stream(
+            chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
+        )
+        return StreamingResponse(content=format_as_ndjson(result), media_type="application/x-ndjson")
+    except Exception as e:
+        if isinstance(e, APIError) and e.code == "content_filter":
+            return StreamingResponse(
+                content=json.dumps(ERROR_FILTER) + "\n",
+                media_type="application/x-ndjson",
+            )

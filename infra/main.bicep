@@ -142,6 +142,8 @@ param embedDeploymentCapacity int // Set in main.parameters.json
 @description('Dimensions of the embedding model')
 param embedDimensions int // Set in main.parameters.json
 
+@description('Use AI project')
+param useAiProject bool = false
 
 param webAppExists bool = false
 
@@ -406,6 +408,18 @@ module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
   }
 }
 
+module ai 'core/ai/ai-environment.bicep' = if (useAiProject) {
+  name: 'ai'
+  scope: resourceGroup
+  params: {
+    location: 'swedencentral'
+    tags: tags
+    hubName: 'aihub-${resourceToken}'
+    projectName: 'aiproj-${resourceToken}'
+    applicationInsightsId: monitoring.outputs.applicationInsightsId
+  }
+}
+
 // USER ROLES
 module openAIRoleUser 'core/security/role.bicep' = {
   scope: openAIResourceGroup
@@ -430,6 +444,8 @@ module openAIRoleBackend 'core/security/role.bicep' = {
 
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
+output AZURE_RESOURCE_GROUP string = resourceGroup.name
+
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName
 
 output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.environmentName
@@ -467,6 +483,8 @@ output AZURE_OPENAI_EVAL_DEPLOYMENT_VERSION string = deployAzureOpenAI ? evalDep
 output AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY string = deployAzureOpenAI ? evalDeploymentCapacity : ''
 output AZURE_OPENAI_EVAL_DEPLOYMENT_SKU string = deployAzureOpenAI ? evalDeploymentSku : ''
 output AZURE_OPENAI_EVAL_MODEL string = deployAzureOpenAI ? evalModelName : ''
+
+output AZURE_AI_PROJECT string = useAiProject ? ai.outputs.projectName : ''
 
 output POSTGRES_HOST string = postgresServer.outputs.POSTGRES_DOMAIN_NAME
 output POSTGRES_USERNAME string = postgresEntraAdministratorName
