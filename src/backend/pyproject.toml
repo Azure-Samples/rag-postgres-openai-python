@@ -16,9 +16,9 @@ dependencies = [
     "tiktoken>=0.7.0,<0.8.0",
     "openai-messages-token-helper>=0.1.8,<0.2.0",
     "azure-monitor-opentelemetry>=1.6.0,<2.0.0",
-    "opentelemetry-instrumentation-sqlalchemy==0.48b0",
-    "opentelemetry-instrumentation-aiohttp-client==0.48b0",
-    "opentelemetry-instrumentation-openai==0.33.9",
+    "opentelemetry-instrumentation-sqlalchemy",
+    "opentelemetry-instrumentation-aiohttp-client",
+    "opentelemetry-instrumentation-openai",
 ]
 
 [build-system]
