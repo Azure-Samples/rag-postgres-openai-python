@@ -88,6 +88,9 @@
       },
       "openAIComKey": {
         "value": "${OPENAICOM_KEY}"
+      },
+      "useAiProject": {
+        "value": "${USE_AI_PROJECT=false}"
       }
     }
 }

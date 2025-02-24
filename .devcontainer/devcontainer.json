@@ -16,9 +16,7 @@
             "version": "18",
             "nodeGypDependencies": false
         },
-        "ghcr.io/azure/azure-dev/azd:latest": {
-			"version": "1.11.0"
-		},
+        "ghcr.io/azure/azure-dev/azd:latest": {},
 		"ghcr.io/prulloac/devcontainer-features/ollama:1": {},
 		// az CLI is helpful for being able to login correctly with DefaultAzureCredential:
 		"ghcr.io/devcontainers/features/azure-cli": {}

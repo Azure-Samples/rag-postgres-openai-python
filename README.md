@@ -85,8 +85,9 @@ A related option is VS Code Dev Containers, which will open the project in your 
 4. Install required Python packages and backend application:
 
     ```shell
-    pip install -r requirements-dev.txt
-    pip install -e src/backend
+    pip install uv
+    uv pip install -r requirements-dev.txt
+    uv pip install -e src/backend
     ```
 
 5. Continue with the [deployment steps](#deployment)
@@ -208,7 +209,8 @@ Further documentation is available in the `docs/` folder:
 * [Using Entra auth with PostgreSQL tools](docs/using_entra_auth.md)
 * [Monitoring with Azure Monitor](docs/monitoring.md)
 * [Load testing](docs/loadtesting.md)
-* [Evaluation](docs/evaluation.md)
+* [Quality evaluation](docs/evaluation.md)
+* [Safety evaluation](docs/safety_evaluation.md)
 
 Please post in the issue tracker with any questions or issues.
 
