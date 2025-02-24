@@ -1,10 +1,10 @@
 import argparse
 import asyncio
+import json
 import logging
 import os
 import pathlib
 from enum import Enum
-from typing import Any, Optional
 
 import requests
 from azure.ai.evaluation import ContentSafetyEvaluator
@@ -48,36 +48,15 @@ def get_azure_credential():
 
 async def callback(
     messages: list[dict],
-    stream: bool = False,
-    session_state: Any = None,
-    context: Optional[dict[str, Any]] = None,
     target_url: str = "http://127.0.0.1:8000/chat",
 ):
     messages_list = messages["messages"]
-    latest_message = messages_list[-1]
-    query = latest_message["content"]
+    query = messages_list[-1]["content"]
     headers = {"Content-Type": "application/json"}
     body = {
         "messages": [{"content": query, "role": "user"}],
-        "stream": stream,
-        "context": {
-            "overrides": {
-                "top": 3,
-                "temperature": 0.3,
-                "minimum_reranker_score": 0,
-                "minimum_search_score": 0,
-                "retrieval_mode": "hybrid",
-                "semantic_ranker": True,
-                "semantic_captions": False,
-                "suggest_followup_questions": False,
-                "use_oid_security_filter": False,
-                "use_groups_security_filter": False,
-                "vector_fields": ["embedding"],
-                "use_gpt4v": False,
-                "gpt4v_input": "textAndImages",
-                "seed": 1,
-            }
-        },
+        "stream": False,
+        "context": {"overrides": {"use_advanced_flow": True, "top": 3, "retrieval_mode": "hybrid", "temperature": 0.3}},
     }
     url = target_url
     r = requests.post(url, headers=headers, json=body)
@@ -86,8 +65,7 @@ async def callback(
         message = {"content": response["error"], "role": "assistant"}
     else:
         message = response["message"]
-    response["messages"] = messages_list + [message]
-    return response
+    return {"messages": messages_list + [message]}
 
 
 async def run_simulator(target_url: str, max_simulations: int):
@@ -104,9 +82,7 @@ async def run_simulator(target_url: str, max_simulations: int):
 
     outputs = await adversarial_simulator(
         scenario=scenario,
-        target=lambda messages, stream=False, session_state=None, context=None: callback(
-            messages, stream, session_state, context, target_url
-        ),
+        target=lambda messages, stream=False, session_state=None, context=None: callback(messages, target_url),
         max_simulation_results=max_simulations,
         language=SupportedLanguages.English,  # Match this to your app language
         randomization_seed=1,  # For more consistent results, use a fixed seed
@@ -139,10 +115,9 @@ async def run_simulator(target_url: str, max_simulations: int):
         else:
             summary_scores[evaluator]["mean_score"] = 0
             summary_scores[evaluator]["low_rate"] = 0
+
     # Save summary scores
     with open(root_dir / "safety_results.json", "w") as f:
-        import json
-
         json.dump(summary_scores, f, indent=2)
 
 

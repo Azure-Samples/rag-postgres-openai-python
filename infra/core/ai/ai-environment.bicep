@@ -6,8 +6,8 @@ param location string
 param hubName string
 @description('The AI Project resource name.')
 param projectName string
-//@description('The Storage Account resource ID.')
-//param storageAccountId string
+@description('The Storage Account resource ID.')
+param storageAccountId string = ''
 @description('The Application Insights resource ID.')
 param applicationInsightsId string = ''
 @description('The Azure Search resource name.')
@@ -23,7 +23,7 @@ module hub './hub.bicep' = {
     tags: tags
     name: hubName
     displayName: hubName
-    //storageAccountId: storageAccountId
+    storageAccountId: storageAccountId
     containerRegistryId: null
     applicationInsightsId: applicationInsightsId
     aiSearchName: searchServiceName

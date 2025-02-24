@@ -2,8 +2,8 @@
 param name string
 @description('The display name of the AI Foundry Hub Resource')
 param displayName string = name
-//@description('The storage account ID to use for the AI Foundry Hub Resource')
-//param storageAccountId string
+@description('The storage account ID to use for the AI Foundry Hub Resource')
+param storageAccountId string = ''
 
 @description('The application insights ID to use for the AI Foundry Hub Resource')
 param applicationInsightsId string = ''
@@ -13,7 +13,7 @@ param containerRegistryId string = ''
 @description('The Azure Cognitive Search service name to use for the AI Foundry Hub Resource')
 param aiSearchName string = ''
 @description('The Azure Cognitive Search service connection name to use for the AI Foundry Hub Resource')
-param aiSearchConnectionName string
+param aiSearchConnectionName string = ''
 
 
 @description('The SKU name to use for the AI Foundry Hub Resource')
@@ -42,7 +42,7 @@ resource hub 'Microsoft.MachineLearningServices/workspaces@2024-07-01-preview' =
   }
   properties: {
     friendlyName: displayName
-    //storageAccount: storageAccountId
+    storageAccount: !empty(storageAccountId) ? storageAccountId : null
     applicationInsights: !empty(applicationInsightsId) ? applicationInsightsId : null
     containerRegistry: !empty(containerRegistryId) ? containerRegistryId : null
     hbiWorkspace: false
