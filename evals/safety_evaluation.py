@@ -7,7 +7,7 @@ import pathlib
 from enum import Enum
 
 import requests
-from azure.ai.evaluation import ContentSafetyEvaluator
+from azure.ai.evaluation import AzureAIProject, ContentSafetyEvaluator
 from azure.ai.evaluation.simulator import (
     AdversarialScenario,
     AdversarialSimulator,
@@ -47,7 +47,7 @@ def get_azure_credential():
 
 
 async def callback(
-    messages: list[dict],
+    messages: dict,
     target_url: str = "http://127.0.0.1:8000/chat",
 ):
     messages_list = messages["messages"]
@@ -70,10 +70,10 @@ async def callback(
 
 async def run_simulator(target_url: str, max_simulations: int):
     credential = get_azure_credential()
-    azure_ai_project = {
-        "subscription_id": os.getenv("AZURE_SUBSCRIPTION_ID"),
-        "resource_group_name": os.getenv("AZURE_RESOURCE_GROUP"),
-        "project_name": os.getenv("AZURE_AI_PROJECT"),
+    azure_ai_project: AzureAIProject = {
+        "subscription_id": os.environ["AZURE_SUBSCRIPTION_ID"],
+        "resource_group_name": os.environ["AZURE_RESOURCE_GROUP"],
+        "project_name": os.environ["AZURE_AI_PROJECT"],
     }
 
     # Simulate single-turn question-and-answering against the app
@@ -91,7 +91,9 @@ async def run_simulator(target_url: str, max_simulations: int):
     # Run safety evaluation on the outputs and save the scores
     # Do not save the outputs, as they may contain disturbing content
     evaluators = ["hate_unfairness", "sexual", "violence", "self_harm"]
-    summary_scores = {evaluator: {"low_count": 0, "score_total": 0} for evaluator in evaluators}
+    summary_scores = {
+        evaluator: {"low_count": 0, "score_total": 0.0, "mean_score": 0.0, "low_rate": 0.0} for evaluator in evaluators
+    }
     for output in track(outputs, description="Evaluating simulated responses..."):
         query = output["messages"][0]["content"]
         answer = output["messages"][1]["content"]
@@ -103,7 +105,9 @@ async def run_simulator(target_url: str, max_simulations: int):
                 summary_scores[evaluator]["low_count"] += 1
             else:
                 logger.info(f"Failing score from:\nQ: {query}\nA: {answer}\n{evaluator} score: {eval_score}")
-            summary_scores[evaluator]["score_total"] += eval_score[f"{evaluator}_score"]
+            numeric_severity_score = eval_score[f"{evaluator}_score"]
+            if isinstance(numeric_severity_score, float):
+                summary_scores[evaluator]["score_total"] += numeric_severity_score
 
     # Compute the overall statistics
     for evaluator in evaluators:
@@ -112,9 +116,6 @@ async def run_simulator(target_url: str, max_simulations: int):
                 summary_scores[evaluator]["score_total"] / summary_scores[evaluator]["low_count"]
             )
             summary_scores[evaluator]["low_rate"] = summary_scores[evaluator]["low_count"] / len(outputs)
-        else:
-            summary_scores[evaluator]["mean_score"] = 0
-            summary_scores[evaluator]["low_rate"] = 0
 
     # Save summary scores
     with open(root_dir / "safety_results.json", "w") as f:
