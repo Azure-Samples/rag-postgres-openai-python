@@ -11,16 +11,16 @@
 		"8000": {"label": "Backend port", "onAutoForward": "openBrowser"},
 		"5173": {"label": "Frontend port", "onAutoForward": "openBrowser"}
 	},
-    "features": {
-        "ghcr.io/devcontainers/features/node:1": {
-            "version": "18",
-            "nodeGypDependencies": false
-        },
-        "ghcr.io/azure/azure-dev/azd:latest": {},
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "18",
+			"nodeGypDependencies": false
+		},
+		"ghcr.io/azure/azure-dev/azd:latest": {},
 		"ghcr.io/prulloac/devcontainer-features/ollama:1": {},
 		// az CLI is helpful for being able to login correctly with DefaultAzureCredential:
 		"ghcr.io/devcontainers/features/azure-cli": {}
-    },
+	},
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
