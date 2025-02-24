@@ -85,9 +85,8 @@ A related option is VS Code Dev Containers, which will open the project in your 
 4. Install required Python packages and backend application:
 
     ```shell
-    pip install uv
-    uv pip install -r requirements-dev.txt
-    uv pip install -e src/backend
+    pip install -r requirements-dev.txt
+    pip install -e src/backend
     ```
 
 5. Continue with the [deployment steps](#deployment)

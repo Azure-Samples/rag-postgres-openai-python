@@ -25,25 +25,31 @@ In order to use the adversarial simulator and safety evaluators, you need an Azu
 
 ## Setup the evaluation environment
 
-1. Install all the dependencies for the safety evaluation script by running the following command:
+1. Create a new Python virtual environment in `.evalenv` by running the following command:
+
+    ```bash
+    python -m venv .evalenv
+    ```
+
+2. Activate the virtual environment by running the following command:
+
+    MacOS/Linux:
+
+    ```bash
+    source .evalenv/bin/activate
+    ```
+
+    Windows:
+
+    ```bash
+    .evalenv\Scripts\activate
+    ```
+
+1. Install the dependencies for the safety evaluation script:
 
   ```bash
-  uv pip install -r requirements-dev.txt
+  pip install uv
   uv pip install -r evals/requirements.txt
-  ```
-
-2. Activate the virtual environment:
-
-  macOS and Linux:
-
-  ```bash
-  source .venv/bin/activate
-  ```
-
-  Windows:
-
-  ```bash
-  .venv\Scripts\activate
   ```
 
 ## Simulate and evaluate adversarial users
@@ -54,7 +60,7 @@ Run the following command to simulate adversarial queries and evaluate the safet
 python evals/safety_evaluation.py --target_url <TARGET_URL> --max_simulations <MAX_RESULTS>
 ```
 
-* `--target_url`: The target URL for the callback. Default is `http://127.0.0.1:8000/chat`.
+* `--target_url`: The target URL for the callback. Default is `http://127.0.0.1:8000/chat`, so make sure that the RAG app is running locally. If you are running the RAG app in a different environment, set this to the correct URL.
 * `--max_simulations`: The maximum number of simulated user queries. Default is `200`. The higher the number, the longer the evaluation will take. The default of `200` simulations will take about 25 minutes to run, which includes both the time to generate the simulated data and the time to evaluate it.
 
 ## Review the safety evaluation results
