@@ -295,7 +295,7 @@ typing-extensions==4.12.2
     #   sqlalchemy
     #   starlette
     #   uvicorn
-urllib3==2.2.3
+urllib3==2.3.0
     # via requests
 uvicorn==0.32.1
     # via fastapi-app (pyproject.toml)
