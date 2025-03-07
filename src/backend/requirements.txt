@@ -119,7 +119,7 @@ openai==1.55.3
     # via
     #   fastapi-app (pyproject.toml)
     #   openai-messages-token-helper
-openai-messages-token-helper==0.1.10
+openai-messages-token-helper==0.1.11
     # via fastapi-app (pyproject.toml)
 opentelemetry-api==1.30.0
     # via
