@@ -52,7 +52,7 @@ The index operator should match the operator used in queries.
 table_name = Item.__tablename__
 
 index_ada002 = Index(
-    "hnsw_index_for_cosine_{table_name}_embedding_ada002",
+    f"hnsw_index_for_cosine_{table_name}_embedding_ada002",
     Item.embedding_ada002,
     postgresql_using="hnsw",
     postgresql_with={"m": 16, "ef_construction": 64},

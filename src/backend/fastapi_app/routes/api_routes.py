@@ -145,6 +145,7 @@ async def chat_handler(
         if isinstance(e, APIError) and e.code == "content_filter":
             return ERROR_FILTER
         else:
+            logging.exception("Exception while generating response: %s", e)
             return {"error": str(e)}
 
 
