@@ -42,10 +42,10 @@ async def common_parameters():
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_EMBED_HOST == "azure":
-        openai_embed_deployment = os.getenv("AZURE_OPENAI_EMBED_DEPLOYMENT") or "text-embedding-ada-002"
-        openai_embed_model = os.getenv("AZURE_OPENAI_EMBED_MODEL") or "text-embedding-ada-002"
+        openai_embed_deployment = os.getenv("AZURE_OPENAI_EMBED_DEPLOYMENT") or "text-embedding-3-large"
+        openai_embed_model = os.getenv("AZURE_OPENAI_EMBED_MODEL") or "text-embedding-3-large"
         openai_embed_dimensions = int(os.getenv("AZURE_OPENAI_EMBED_DIMENSIONS") or 1536)
-        embedding_column = os.getenv("AZURE_OPENAI_EMBEDDING_COLUMN") or "embedding_ada002"
+        embedding_column = os.getenv("AZURE_OPENAI_EMBEDDING_COLUMN") or "embedding_3l"
     elif OPENAI_EMBED_HOST == "ollama":
         openai_embed_deployment = None
         openai_embed_model = os.getenv("OLLAMA_EMBED_MODEL") or "nomic-embed-text"
@@ -53,9 +53,9 @@ async def common_parameters():
         embedding_column = os.getenv("OLLAMA_EMBEDDING_COLUMN") or "embedding_nomic"
     else:
         openai_embed_deployment = None
-        openai_embed_model = os.getenv("OPENAICOM_EMBED_MODEL") or "text-embedding-ada-002"
-        openai_embed_dimensions = int(os.getenv("OPENAICOM_EMBED_DIMENSIONS", 1536))
-        embedding_column = os.getenv("OPENAICOM_EMBEDDING_COLUMN") or "embedding_ada002"
+        openai_embed_model = os.getenv("OPENAICOM_EMBED_MODEL") or "text-embedding-3-large"
+        openai_embed_dimensions = int(os.getenv("OPENAICOM_EMBED_DIMENSIONS", 1024))
+        embedding_column = os.getenv("OPENAICOM_EMBEDDING_COLUMN") or "embedding_3l"
     if OPENAI_CHAT_HOST == "azure":
         openai_chat_deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT") or "gpt-4o-mini"
         openai_chat_model = os.getenv("AZURE_OPENAI_CHAT_MODEL") or "gpt-4o-mini"
