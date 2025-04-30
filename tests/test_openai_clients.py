@@ -9,7 +9,7 @@ async def test_create_openai_embed_client(mock_azure_credential, mock_openai_emb
     openai_embed_client = await create_openai_embed_client(mock_azure_credential)
     assert openai_embed_client.embeddings.create is not None
     embeddings = await openai_embed_client.embeddings.create(
-        model="text-embedding-3-large", input="test", dimensions=1536
+        model="text-embedding-3-large", input="test", dimensions=1024
     )
     assert embeddings.data[0].embedding == test_data.embeddings
 

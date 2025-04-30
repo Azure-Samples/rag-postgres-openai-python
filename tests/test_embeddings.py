@@ -11,8 +11,8 @@ async def test_compute_text_embedding(mock_azure_credential, mock_openai_embeddi
     result = await compute_text_embedding(
         q="test",
         openai_client=openai_embed_client,
-        embed_model="text-embedding-3-large",
-        embed_deployment="text-embedding-3-large",
+        embed_model="text-embedding-ada-002",
+        embed_deployment="text-embedding-ada-002",
     )
     assert result == test_data.embeddings
 
@@ -25,6 +25,6 @@ async def test_compute_text_embedding_dimensions(mock_azure_credential, mock_ope
         openai_client=openai_embed_client,
         embed_model="text-embedding-3-small",
         embed_deployment="text-embedding-3-small",
-        embedding_dimensions=1536,
+        embedding_dimensions=1024,
     )
     assert result == test_data.embeddings

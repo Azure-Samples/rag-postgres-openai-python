@@ -303,7 +303,7 @@ var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   }
   {
     name: 'OPENAICOM_EMBED_MODEL_DIMENSIONS'
-    value: openAIEmbedHost == 'openaicom' ? '1536' : ''
+    value: openAIEmbedHost == 'openaicom' ? '1024' : ''
   }
   {
     name: 'OPENAICOM_EMBED_MODEL'
