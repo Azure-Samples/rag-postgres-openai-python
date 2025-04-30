@@ -45,7 +45,7 @@ async def test_similar_handler(test_client):
             "id": 71,
             "name": "Explorer Frost Boots",
             "price": 149.99,
-            "distance": 0.11,
+            "distance": 0.3,
             "type": "Footwear",
             "brand": "Daybird",
             "description": "The Explorer Frost Boots by Daybird are the perfect companion for "
