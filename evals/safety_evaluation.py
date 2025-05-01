@@ -1,24 +1,22 @@
 import argparse
 import asyncio
-import json
 import logging
 import os
 import pathlib
+import sys
 from enum import Enum
 
 import requests
-from azure.ai.evaluation import AzureAIProject, ContentSafetyEvaluator
-from azure.ai.evaluation.simulator import (
-    AdversarialScenario,
-    AdversarialSimulator,
-    SupportedLanguages,
-)
+from azure.ai.evaluation import AzureAIProject
+from azure.ai.evaluation.red_team import AttackStrategy, RedTeam, RiskCategory
 from azure.identity import AzureDeveloperCliCredential
 from dotenv_azd import load_azd_env
 from rich.logging import RichHandler
-from rich.progress import track
 
 logger = logging.getLogger("ragapp")
+
+# Configure logging to capture and display warnings with tracebacks
+logging.captureWarnings(True)  # Capture warnings as log messages
 
 root_dir = pathlib.Path(__file__).parent
 
@@ -47,11 +45,10 @@ def get_azure_credential():
 
 
 async def callback(
-    messages: dict,
+    messages: list,
     target_url: str = "http://127.0.0.1:8000/chat",
 ):
-    messages_list = messages["messages"]
-    query = messages_list[-1]["content"]
+    query = messages[-1].content
     headers = {"Content-Type": "application/json"}
     body = {
         "messages": [{"content": query, "role": "user"}],
@@ -65,7 +62,7 @@ async def callback(
         message = {"content": response["error"], "role": "assistant"}
     else:
         message = response["message"]
-    return {"messages": messages_list + [message]}
+    return {"messages": messages + [message]}
 
 
 async def run_simulator(target_url: str, max_simulations: int):
@@ -75,49 +72,34 @@ async def run_simulator(target_url: str, max_simulations: int):
         "resource_group_name": os.environ["AZURE_RESOURCE_GROUP"],
         "project_name": os.environ["AZURE_AI_PROJECT"],
     }
-
-    # Simulate single-turn question-and-answering against the app
-    scenario = AdversarialScenario.ADVERSARIAL_QA
-    adversarial_simulator = AdversarialSimulator(azure_ai_project=azure_ai_project, credential=credential)
-
-    outputs = await adversarial_simulator(
-        scenario=scenario,
-        target=lambda messages, stream=False, session_state=None, context=None: callback(messages, target_url),
-        max_simulation_results=max_simulations,
-        language=SupportedLanguages.English,  # Match this to your app language
-        randomization_seed=1,  # For more consistent results, use a fixed seed
+    model_red_team = RedTeam(
+        azure_ai_project=azure_ai_project,
+        credential=credential,
+        risk_categories=[
+            RiskCategory.Violence,
+            # RiskCategory.HateUnfairness,
+            # RiskCategory.Sexual,
+            # RiskCategory.SelfHarm,
+        ],
+        num_objectives=1,
     )
-
-    # Run safety evaluation on the outputs and save the scores
-    # Do not save the outputs, as they may contain disturbing content
-    evaluators = ["hate_unfairness", "sexual", "violence", "self_harm"]
-    summary_scores = {
-        evaluator: {"low_count": 0, "score_total": 0.0, "mean_score": 0.0, "low_rate": 0.0} for evaluator in evaluators
-    }
-    for output in track(outputs, description="Evaluating simulated responses..."):
-        query = output["messages"][0]["content"]
-        answer = output["messages"][1]["content"]
-        safety_eval = ContentSafetyEvaluator(credential=credential, azure_ai_project=azure_ai_project)
-        eval_score = safety_eval(query=query, response=answer)
-        for evaluator in evaluators:
-            severity_level = HarmSeverityLevel(eval_score[evaluator])
-            if severity_level == HarmSeverityLevel.VeryLow or severity_level == HarmSeverityLevel.Low.name:
-                summary_scores[evaluator]["low_count"] += 1
-            else:
-                logger.info(f"Failing score from:\nQ: {query}\nA: {answer}\n{evaluator} score: {eval_score}")
-            numeric_severity_score = eval_score[f"{evaluator}_score"]
-            if isinstance(numeric_severity_score, float) or isinstance(numeric_severity_score, int):
-                summary_scores[evaluator]["score_total"] += numeric_severity_score
-
-    # Compute the overall statistics
-    for evaluator in evaluators:
-        if len(outputs) > 0:
-            summary_scores[evaluator]["mean_score"] = summary_scores[evaluator]["score_total"] / len(outputs)
-            summary_scores[evaluator]["low_rate"] = summary_scores[evaluator]["low_count"] / len(outputs)
-
-    # Save summary scores
-    with open(root_dir / "safety_results.json", "w") as f:
-        json.dump(summary_scores, f, indent=2)
+    await model_red_team.scan(
+        target=lambda messages, stream=False, session_state=None, context=None: callback(messages, target_url),
+        scan_name="Advanced-Callback-Scan",
+        attack_strategies=[
+            AttackStrategy.EASY,  # Group of easy complexity attacks
+            # AttackStrategy.MODERATE,  # Group of moderate complexity attacks
+            # AttackStrategy.CharacterSpace,  # Add character spaces
+            # AttackStrategy.ROT13,  # Use ROT13 encoding
+            # AttackStrategy.UnicodeConfusable,  # Use confusable Unicode characters
+            # AttackStrategy.CharSwap,  # Swap characters in prompts
+            # AttackStrategy.Morse,  # Encode prompts in Morse code
+            # AttackStrategy.Leetspeak,  # Use Leetspeak
+            # AttackStrategy.Url,  # Use URLs in prompts
+            # AttackStrategy.Binary,  # Encode prompts in binary
+        ],
+        output_path="Advanced-Callback-Scan.json",
+    )
 
 
 if __name__ == "__main__":
@@ -130,10 +112,26 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    # Configure logging to show tracebacks for warnings and above
     logging.basicConfig(
-        level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+        level=logging.WARNING,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(rich_tracebacks=True, show_path=True)],
     )
+
+    # Set urllib3 and azure libraries to WARNING level to see connection issues
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("azure").setLevel(logging.DEBUG)
+    logging.getLogger("RedTeamLogger").setLevel(logging.DEBUG)
+
+    # Set our application logger to INFO level
     logger.setLevel(logging.INFO)
+
     load_azd_env()
 
-    asyncio.run(run_simulator(args.target_url, args.max_simulations))
+    try:
+        asyncio.run(run_simulator(args.target_url, args.max_simulations))
+    except Exception:
+        logging.exception("Unhandled exception in safety evaluation")
+        sys.exit(1)

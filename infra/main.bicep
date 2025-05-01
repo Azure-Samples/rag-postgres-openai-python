@@ -408,6 +408,24 @@ module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
   }
 }
 
+module storage 'br/public:avm/res/storage/storage-account:0.9.1' = if (useAiProject) {
+  name: 'storage'
+  scope: resourceGroup
+  params: {
+    name: '${take(replace(prefix, '-', ''), 17)}storage'
+    location: location
+    tags: tags
+    kind: 'StorageV2'
+    skuName: 'Standard_LRS'
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
+    allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
+  }
+}
+
 module ai 'core/ai/ai-environment.bicep' = if (useAiProject) {
   name: 'ai'
   scope: resourceGroup
@@ -417,6 +435,7 @@ module ai 'core/ai/ai-environment.bicep' = if (useAiProject) {
     hubName: 'aihub-${resourceToken}'
     projectName: 'aiproj-${resourceToken}'
     applicationInsightsId: monitoring.outputs.applicationInsightsId
+    storageAccountId: storage.outputs.resourceId
   }
 }
 
@@ -439,6 +458,17 @@ module openAIRoleBackend 'core/security/role.bicep' = {
     principalId: web.outputs.SERVICE_WEB_IDENTITY_PRINCIPAL_ID
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'ServicePrincipal'
+  }
+}
+
+// Application Insights Reader role for web app
+module appInsightsReaderRole 'core/security/role.bicep' = {
+  scope: resourceGroup
+  name: 'appinsights-reader-role'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '43d0d8ad-25c7-4714-9337-8ba259a9fe05' // Application Insights Component Reader
+    principalType: 'User'
   }
 }
 
