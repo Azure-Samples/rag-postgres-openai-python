@@ -117,7 +117,7 @@ if __name__ == "__main__":
         level=logging.WARNING,
         format="%(message)s",
         datefmt="[%X]",
-        handlers=[RichHandler(rich_tracebacks=True, show_path=True)],
+        handlers=[RichHandler(rich_tracebacks=False, show_path=True)],
     )
 
     # Set urllib3 and azure libraries to WARNING level to see connection issues

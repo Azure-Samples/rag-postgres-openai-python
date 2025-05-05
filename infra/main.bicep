@@ -423,6 +423,52 @@ module storage 'br/public:avm/res/storage/storage-account:0.9.1' = if (useAiProj
     }
     allowBlobPublicAccess: false
     allowSharedKeyAccess: false
+    roleAssignments: [
+      {
+        principalId: principalId
+        principalType: 'User'
+        roleDefinitionIdOrName: 'Storage Blob Data Contributor'
+      }
+    ]
+    blobServices: {
+      containers: [
+        {
+          name: 'default'
+          publicAccess: 'None'
+        }
+      ]
+      cors: {
+        corsRules: [
+          {
+          allowedOrigins: [
+            'https://mlworkspace.azure.ai'
+            'https://ml.azure.com'
+            'https://*.ml.azure.com'
+            'https://ai.azure.com'
+            'https://*.ai.azure.com'
+            'https://mlworkspacecanary.azure.ai'
+            'https://mlworkspace.azureml-test.net'
+          ]
+          allowedMethods: [
+            'GET'
+            'HEAD'
+            'POST'
+            'PUT'
+            'DELETE'
+            'OPTIONS'
+            'PATCH'
+          ]
+          maxAgeInSeconds: 1800
+          exposedHeaders: [
+            '*'
+          ]
+          allowedHeaders: [
+            '*'
+          ]
+        }
+      ]
+    }
+  }
   }
 }
 
