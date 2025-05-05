@@ -77,6 +77,9 @@ class ItemPublic(BaseModel):
     description: str
     price: float
 
+    def to_str_for_rag(self):
+        return f"Name:{self.name} Description:{self.description} Price:{self.price} Brand:{self.brand} Type:{self.type}"
+
 
 class ItemWithDistance(ItemPublic):
     distance: float

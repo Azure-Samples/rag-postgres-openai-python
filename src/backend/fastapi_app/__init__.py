@@ -34,7 +34,13 @@ class State(TypedDict):
 @asynccontextmanager
 async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[State]:
     context = await common_parameters()
-    azure_credential = await get_azure_credential()
+    azure_credential = None
+    if (
+        os.getenv("OPENAI_CHAT_HOST") == "azure"
+        or os.getenv("OPENAI_EMBED_HOST") == "azure"
+        or os.getenv("POSTGRES_HOST").endswith(".database.azure.com")
+    ):
+        azure_credential = await get_azure_credential()
     engine = await create_postgres_engine_from_env(azure_credential)
     sessionmaker = await create_async_sessionmaker(engine)
     chat_client = await create_openai_chat_client(azure_credential)

@@ -136,8 +136,8 @@ async def chat_handler(
 
         chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
 
-        results, thoughts = await rag_flow.prepare_context(chat_params)
-        response = await rag_flow.answer(chat_params=chat_params, results=results, earlier_thoughts=thoughts)
+        items, thoughts = await rag_flow.prepare_context(chat_params)
+        response = await rag_flow.answer(chat_params=chat_params, items=items, earlier_thoughts=thoughts)
         return response
     except Exception as e:
         if isinstance(e, APIError) and e.code == "content_filter":

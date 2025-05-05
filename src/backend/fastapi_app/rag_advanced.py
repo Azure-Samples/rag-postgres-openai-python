@@ -12,6 +12,7 @@ from pydantic_ai.settings import ModelSettings
 
 from fastapi_app.api_models import (
     AIChatRoles,
+    ItemPublic,
     Message,
     RAGContext,
     RetrievalResponse,
@@ -50,6 +51,14 @@ class BrandFilter(TypedDict):
     """The brand name to compare against (e.g., 'AirStrider')"""
 
 
+class SearchResults(TypedDict):
+    items: list[ItemPublic]
+    """List of items that match the search query and filters"""
+
+    filters: list[Union[PriceFilter, BrandFilter]]
+    """List of filters applied to the search results"""
+
+
 class AdvancedRAGChat(RAGChatBase):
     def __init__(
         self,
@@ -71,7 +80,7 @@ class AdvancedRAGChat(RAGChatBase):
         search_query: str,
         price_filter: Optional[PriceFilter] = None,
         brand_filter: Optional[BrandFilter] = None,
-    ) -> list[str]:
+    ) -> SearchResults:
         """
         Search PostgreSQL database for relevant products based on user query
 
@@ -83,7 +92,6 @@ class AdvancedRAGChat(RAGChatBase):
         Returns:
             List of formatted items that match the search query and filters
         """
-        print(search_query, price_filter, brand_filter)
         # Only send non-None filters
         filters = []
         if price_filter:
@@ -97,9 +105,9 @@ class AdvancedRAGChat(RAGChatBase):
             enable_text_search=ctx.deps.enable_text_search,
             filters=filters,
         )
-        return [f"[{(item.id)}]:{item.to_str_for_rag()}\n\n" for item in results]
+        return SearchResults(items=[ItemPublic.model_validate(item.to_dict()) for item in results], filters=filters)
 
-    async def prepare_context(self, chat_params: ChatParams) -> tuple[str, list[Item], list[ThoughtStep]]:
+    async def prepare_context(self, chat_params: ChatParams) -> tuple[list[ItemPublic], list[ThoughtStep]]:
         model = OpenAIModel(
             os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"], provider=OpenAIProvider(openai_client=self.openai_chat_client)
         )
@@ -108,7 +116,7 @@ class AdvancedRAGChat(RAGChatBase):
             model_settings=ModelSettings(temperature=0.0, max_tokens=500, seed=chat_params.seed),
             system_prompt=self.query_prompt_template,
             tools=[self.search_database],
-            output_type=list[str],
+            output_type=SearchResults,
         )
         # TODO: Provide few-shot examples
         results = await agent.run(
@@ -116,9 +124,7 @@ class AdvancedRAGChat(RAGChatBase):
             # message_history=chat_params.past_messages, # TODO
             deps=chat_params,
         )
-        if not isinstance(results, list):
-            raise ValueError("Search results should be a list of strings")
-
+        items = results.output.items
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
@@ -144,12 +150,12 @@ class AdvancedRAGChat(RAGChatBase):
                 description="",  # TODO
             ),
         ]
-        return results, thoughts
+        return items, thoughts
 
     async def answer(
         self,
         chat_params: ChatParams,
-        results: list[str],
+        items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
         agent = Agent(
@@ -163,15 +169,16 @@ class AdvancedRAGChat(RAGChatBase):
             ),
         )
 
+        item_references = [item.to_str_for_rag() for item in items]
         response = await agent.run(
-            user_prompt=chat_params.original_user_query + "Sources:\n" + "\n".join(results),
+            user_prompt=chat_params.original_user_query + "Sources:\n" + "\n".join(item_references),
             message_history=chat_params.past_messages,
         )
 
         return RetrievalResponse(
             message=Message(content=str(response.output), role=AIChatRoles.ASSISTANT),
             context=RAGContext(
-                data_points={item.id: item.to_dict() for item in results},
+                data_points={},  # TODO
                 thoughts=earlier_thoughts
                 + [
                     ThoughtStep(
