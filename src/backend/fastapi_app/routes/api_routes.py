@@ -68,7 +68,7 @@ async def similar_handler(
                 f"SELECT *, {context.embedding_column} <=> :embedding as DISTANCE FROM {Item.__tablename__} "
                 "WHERE id <> :item_id ORDER BY distance LIMIT :n"
             ),
-            {"embedding": item.embedding_3l, "n": n, "item_id": id},
+            {"embedding": getattr(item, context.embedding_column), "n": n, "item_id": id},
         )
     ).fetchall()
 

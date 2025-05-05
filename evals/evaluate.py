@@ -66,6 +66,10 @@ def get_openai_config() -> dict:
             # azure-ai-evaluate will call DefaultAzureCredential behind the scenes,
             # so we must be logged in to Azure CLI with the correct tenant
         openai_config["model"] = os.environ["AZURE_OPENAI_EVAL_MODEL"]
+    elif os.environ.get("OPENAI_CHAT_HOST") == "ollama":
+        raise NotImplementedError("Ollama is not supported. Switch to Azure or OpenAI.com")
+    elif os.environ.get("OPENAI_CHAT_HOST") == "github":
+        raise NotImplementedError("GitHub Models is not supported. Switch to Azure or OpenAI.com")
     else:
         logger.info("Using OpenAI Service with API Key from OPENAICOM_KEY")
         openai_config = {"api_key": os.environ["OPENAICOM_KEY"], "model": "gpt-4"}
