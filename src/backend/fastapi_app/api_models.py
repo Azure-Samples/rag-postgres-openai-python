@@ -41,34 +41,6 @@ class ChatRequest(BaseModel):
     sessionState: Optional[Any] = None
 
 
-class ThoughtStep(BaseModel):
-    title: str
-    description: Any
-    props: dict = {}
-
-
-class RAGContext(BaseModel):
-    data_points: dict[int, dict[str, Any]]
-    thoughts: list[ThoughtStep]
-    followup_questions: Optional[list[str]] = None
-
-
-class ErrorResponse(BaseModel):
-    error: str
-
-
-class RetrievalResponse(BaseModel):
-    message: Message
-    context: RAGContext
-    sessionState: Optional[Any] = None
-
-
-class RetrievalResponseDelta(BaseModel):
-    delta: Optional[Message] = None
-    context: Optional[RAGContext] = None
-    sessionState: Optional[Any] = None
-
-
 class ItemPublic(BaseModel):
     id: int
     type: str
@@ -87,6 +59,34 @@ class ItemWithDistance(ItemPublic):
     def __init__(self, **data):
         super().__init__(**data)
         self.distance = round(self.distance, 2)
+
+
+class ThoughtStep(BaseModel):
+    title: str
+    description: Any
+    props: dict = {}
+
+
+class RAGContext(BaseModel):
+    data_points: dict[int, ItemPublic]
+    thoughts: list[ThoughtStep]
+    followup_questions: Optional[list[str]] = None
+
+
+class ErrorResponse(BaseModel):
+    error: str
+
+
+class RetrievalResponse(BaseModel):
+    message: Message
+    context: RAGContext
+    sessionState: Optional[Any] = None
+
+
+class RetrievalResponseDelta(BaseModel):
+    delta: Optional[Message] = None
+    context: Optional[RAGContext] = None
+    sessionState: Optional[Any] = None
 
 
 class ChatParams(ChatRequestOverrides):

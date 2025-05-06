@@ -14,7 +14,7 @@ async def create_openai_chat_client(
     openai_chat_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_CHAT_HOST == "azure":
-        api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-03-01-preview"
+        api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-10-21"
         azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
         azure_deployment = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
         if api_key := os.getenv("AZURE_OPENAI_KEY"):

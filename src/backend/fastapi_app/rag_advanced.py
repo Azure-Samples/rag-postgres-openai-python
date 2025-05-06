@@ -52,6 +52,9 @@ class BrandFilter(TypedDict):
 
 
 class SearchResults(TypedDict):
+    query: str
+    """The original search query"""
+
     items: list[ItemPublic]
     """List of items that match the search query and filters"""
 
@@ -105,7 +108,9 @@ class AdvancedRAGChat(RAGChatBase):
             enable_text_search=ctx.deps.enable_text_search,
             filters=filters,
         )
-        return SearchResults(items=[ItemPublic.model_validate(item.to_dict()) for item in results], filters=filters)
+        return SearchResults(
+            query=search_query, items=[ItemPublic.model_validate(item.to_dict()) for item in results], filters=filters
+        )
 
     async def prepare_context(self, chat_params: ChatParams) -> tuple[list[ItemPublic], list[ThoughtStep]]:
         model = OpenAIModel(
@@ -119,35 +124,36 @@ class AdvancedRAGChat(RAGChatBase):
             output_type=SearchResults,
         )
         # TODO: Provide few-shot examples
+        user_query = f"Find search results for user query: {chat_params.original_user_query}"
         results = await agent.run(
-            f"Find search results for user query: {chat_params.original_user_query}",
-            # message_history=chat_params.past_messages, # TODO
+            user_query,
+            message_history=chat_params.past_messages,
             deps=chat_params,
         )
-        items = results.output.items
+        items = results.output["items"]
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
-                description=chat_params.past_messages,  # TODO: update this
+                description=results.all_messages(),
                 props=(
                     {"model": self.chat_model, "deployment": self.chat_deployment}
                     if self.chat_deployment
-                    else {"model": self.chat_model}
+                    else {"model": self.chat_model}  # TODO
                 ),
             ),
             ThoughtStep(
                 title="Search using generated search arguments",
-                description=chat_params.original_user_query,  # TODO:
+                description=results.output["query"],
                 props={
                     "top": chat_params.top,
                     "vector_search": chat_params.enable_vector_search,
                     "text_search": chat_params.enable_text_search,
-                    "filters": [],  # TODO
+                    "filters": results.output["filters"],
                 },
             ),
             ThoughtStep(
                 title="Search results",
-                description="",  # TODO
+                description=items,
             ),
         ]
         return items, thoughts
@@ -178,12 +184,12 @@ class AdvancedRAGChat(RAGChatBase):
         return RetrievalResponse(
             message=Message(content=str(response.output), role=AIChatRoles.ASSISTANT),
             context=RAGContext(
-                data_points={},  # TODO
+                data_points={item.id: item for item in items},
                 thoughts=earlier_thoughts
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description="",  # TODO: update
+                        description=response.all_messages(),
                         props=(
                             {"model": self.chat_model, "deployment": self.chat_deployment}
                             if self.chat_deployment
