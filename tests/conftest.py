@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from unittest import mock
@@ -253,6 +254,8 @@ def mock_openai_chatcompletion(monkeypatch_session):
         last_question = messages[-1]["content"]
         last_role = messages[-1]["role"]
         if last_role == "tool":
+            items = json.loads(last_question)["items"]
+            arguments = {"query": "capital of France", "items": items, "filters": []}
             return ChatCompletion(
                 object="chat.completion",
                 choices=[
@@ -265,7 +268,7 @@ def mock_openai_chatcompletion(monkeypatch_session):
                                     type="function",
                                     function=Function(
                                         name="final_result",
-                                        arguments='{"query":"capital of France", "items":[], "filters":[]}',
+                                        arguments=json.dumps(arguments),
                                     ),
                                 )
                             ],

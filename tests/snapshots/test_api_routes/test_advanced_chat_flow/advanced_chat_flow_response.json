@@ -4,7 +4,16 @@
         "role": "assistant"
     },
     "context": {
-        "data_points": {},
+        "data_points": {
+            "1": {
+                "id": 1,
+                "type": "Footwear",
+                "brand": "Daybird",
+                "name": "Wanderer Black Hiking Boots",
+                "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all your outdoor adventures. These boots are made with a waterproof leather upper and a durable rubber sole for superior traction. With their cushioned insole and padded collar, these boots will keep you comfortable all day long.",
+                "price": 109.99
+            }
+        },
         "thoughts": [
             {
                 "title": "Prompt to generate search arguments",
@@ -87,7 +96,7 @@
                         "parts": [
                             {
                                 "content": "Find search results for user query: What is the capital of France?",
-                                "timestamp": "2025-05-07T22:31:16.169127Z",
+                                "timestamp": "2025-05-07T22:53:02.948859Z",
                                 "part_kind": "user-prompt"
                             }
                         ],
@@ -126,7 +135,7 @@
                                     "filters": []
                                 },
                                 "tool_call_id": "call_abc123",
-                                "timestamp": "2025-05-07T22:31:16.187780Z",
+                                "timestamp": "2025-05-07T22:53:02.963649Z",
                                 "part_kind": "tool-return"
                             }
                         ],
@@ -137,7 +146,7 @@
                         "parts": [
                             {
                                 "tool_name": "final_result",
-                                "args": "{\"query\":\"capital of France\", \"items\":[], \"filters\":[]}",
+                                "args": "{\"query\": \"capital of France\", \"items\": [{\"id\": 1, \"type\": \"Footwear\", \"brand\": \"Daybird\", \"name\": \"Wanderer Black Hiking Boots\", \"description\": \"Daybird's Wanderer Hiking Boots in sleek black are perfect for all your outdoor adventures. These boots are made with a waterproof leather upper and a durable rubber sole for superior traction. With their cushioned insole and padded collar, these boots will keep you comfortable all day long.\", \"price\": 109.99}], \"filters\": []}",
                                 "tool_call_id": "call_abc123final",
                                 "part_kind": "tool-call"
                             }
@@ -152,7 +161,7 @@
                                 "tool_name": "final_result",
                                 "content": "Final result processed.",
                                 "tool_call_id": "call_abc123final",
-                                "timestamp": "2025-05-07T22:31:16.188322Z",
+                                "timestamp": "2025-05-07T22:53:02.964200Z",
                                 "part_kind": "tool-return"
                             }
                         ],
@@ -177,7 +186,16 @@
             },
             {
                 "title": "Search results",
-                "description": [],
+                "description": [
+                    {
+                        "id": 1,
+                        "type": "Footwear",
+                        "brand": "Daybird",
+                        "name": "Wanderer Black Hiking Boots",
+                        "description": "Daybird's Wanderer Hiking Boots in sleek black are perfect for all your outdoor adventures. These boots are made with a waterproof leather upper and a durable rubber sole for superior traction. With their cushioned insole and padded collar, these boots will keep you comfortable all day long.",
+                        "price": 109.99
+                    }
+                ],
                 "props": {}
             },
             {
@@ -187,13 +205,13 @@
                         "parts": [
                             {
                                 "content": "Assistant helps customers with questions about products.\nRespond as if you are a salesperson helping a customer in a store. Do NOT respond with tables.\nAnswer ONLY with the product details listed in the products.\nIf there isn't enough information below, say you don't know.\nDo not generate answers that don't use the sources below.\nEach product has an ID in brackets followed by colon and the product details.\nAlways include the product ID for each product you use in the response.\nUse square brackets to reference the source, for example [52].\nDon't combine citations, list each product separately, for example [27][51].",
-                                "timestamp": "2025-05-07T22:31:16.188611Z",
+                                "timestamp": "2025-05-07T22:53:02.964504Z",
                                 "dynamic_ref": null,
                                 "part_kind": "system-prompt"
                             },
                             {
-                                "content": "What is the capital of France?Sources:\n",
-                                "timestamp": "2025-05-07T22:31:16.188613Z",
+                                "content": "What is the capital of France?Sources:\n[1]:Name:Wanderer Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for all your outdoor adventures. These boots are made with a waterproof leather upper and a durable rubber sole for superior traction. With their cushioned insole and padded collar, these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird Type:Footwear",
+                                "timestamp": "2025-05-07T22:53:02.964505Z",
                                 "part_kind": "user-prompt"
                             }
                         ],
