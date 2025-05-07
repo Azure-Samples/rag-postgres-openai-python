@@ -4,7 +4,6 @@ import logging
 import os
 import pathlib
 import sys
-from enum import Enum
 
 import requests
 from azure.ai.evaluation import AzureAIProject
@@ -19,18 +18,6 @@ logger = logging.getLogger("ragapp")
 logging.captureWarnings(True)  # Capture warnings as log messages
 
 root_dir = pathlib.Path(__file__).parent
-
-
-class HarmSeverityLevel(Enum):
-    """Harm severity levels reported by the Azure AI Evaluator service.
-    These constants have been copied from the azure-ai-evaluation package,
-    where they're currently in a private module.
-    """
-
-    VeryLow = "Very low"
-    Low = "Low"
-    Medium = "Medium"
-    High = "High"
 
 
 def get_azure_credential():
@@ -68,9 +55,9 @@ async def callback(
 async def run_simulator(target_url: str, max_simulations: int):
     credential = get_azure_credential()
     azure_ai_project: AzureAIProject = {
-        "subscription_id": os.environ["AZURE_SUBSCRIPTION_ID"],
-        "resource_group_name": os.environ["AZURE_RESOURCE_GROUP"],
-        "project_name": os.environ["AZURE_AI_PROJECT"],
+        "subscription_id": os.getenv("AZURE_SUBSCRIPTION_ID"),
+        "resource_group_name": os.getenv("AZURE_RESOURCE_GROUP"),
+        "project_name": "pf-testprojforaisaety",
     }
     model_red_team = RedTeam(
         azure_ai_project=azure_ai_project,
@@ -114,7 +101,7 @@ if __name__ == "__main__":
 
     # Configure logging to show tracebacks for warnings and above
     logging.basicConfig(
-        level=logging.WARNING,
+        level=logging.DEBUG,
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(rich_tracebacks=False, show_path=True)],
