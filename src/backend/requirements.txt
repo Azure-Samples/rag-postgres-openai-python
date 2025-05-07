@@ -61,7 +61,7 @@ deprecated==1.2.15
     #   opentelemetry-semantic-conventions
 distro==1.9.0
     # via openai
-environs==11.2.1
+environs==14.1.1
     # via fastapi-app (pyproject.toml)
 exceptiongroup==1.2.2
     # via anyio
