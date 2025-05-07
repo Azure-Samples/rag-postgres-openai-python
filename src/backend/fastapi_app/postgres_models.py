@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Index, VARCHAR
+from sqlalchemy import VARCHAR, Index
 from sqlalchemy.dialects import postgresql
-
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -43,10 +42,11 @@ class Item(Base):
         return model_dict
 
     def to_str_for_rag(self):
-        return f"Name:{self.name} Description:{self.description} Location:{self.location} Cuisine:{self.cuisine} Rating:{self.rating} Price Level:{self.price_level} Review Count:{self.review_count} Hours:{self.hours} Tags:{self.tags} Menu Summary:{self.menu_summary} Top Reviews:{self.top_reviews} Vibe:{self.vibe}"
-    
+        return f"Name:{self.name} Description:{self.description} Location:{self.location} Cuisine:{self.cuisine} Rating:{self.rating} Price Level:{self.price_level} Review Count:{self.review_count} Hours:{self.hours} Tags:{self.tags} Menu Summary:{self.menu_summary} Top Reviews:{self.top_reviews} Vibe:{self.vibe}"  # noqa: E501
+
     def to_str_for_embedding(self):
-        return f"Name: {self.name} Description: {self.description} Cuisine: {self.cuisine} Tags: {self.tags} Menu Summary: {self.menu_summary} Top Reviews: {self.top_reviews} Vibe: {self.vibe}"
+        return f"Name: {self.name} Description: {self.description} Cuisine: {self.cuisine} Tags: {self.tags} Menu Summary: {self.menu_summary} Top Reviews: {self.top_reviews} Vibe: {self.vibe}"  # noqa: E501
+
 
 """
 **Define HNSW index to support vector similarity search**

@@ -22,11 +22,11 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                         },
                         "price_level_filter": {
                             "type": "object",
-                            "description": "Filter search results to a certain price level (from 1 $ to 4 $$$$, with 4 being most costly)",
+                            "description": "Filter search results to a certain price level (from 1 $ to 4 $$$$, with 4 being most costly)",  # noqa: E501
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
-                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa
+                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa: E501
                                 },
                                 "value": {
                                     "type": "number",
@@ -36,11 +36,11 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                         },
                         "rating_filter": {
                             "type": "object",
-                            "description": "Filter search results based on ratings of restaurant (from 1 to 5 stars, with 5 the best)",
+                            "description": "Filter search results based on ratings of restaurant (from 1 to 5 stars, with 5 the best)",  # noqa: E501
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
-                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",
+                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa: E501
                                 },
                                 "value": {
                                     "type": "string",
@@ -69,7 +69,11 @@ def extract_search_arguments(original_user_query: str, chat_completion: ChatComp
                 arg = json.loads(function.arguments)
                 # Even though its required, search_query is not always specified
                 search_query = arg.get("search_query", original_user_query)
-                if "price_level_filter" in arg and arg["price_level_filter"] and isinstance(arg["price_level_filter"], dict):
+                if (
+                    "price_level_filter" in arg
+                    and arg["price_level_filter"]
+                    and isinstance(arg["price_level_filter"], dict)
+                ):
                     price_level_filter = arg["price_level_filter"]
                     filters.append(
                         {
