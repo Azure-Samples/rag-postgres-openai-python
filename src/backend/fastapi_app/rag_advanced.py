@@ -6,6 +6,7 @@ from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletionChunk, ChatCompletionMessageParam
 from openai_messages_token_helper import get_token_limit
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.messages import ModelMessagesTypeAdapter
 from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.settings import ModelSettings
@@ -119,15 +120,15 @@ class AdvancedRAGChat(RAGChatBase):
         agent = Agent(
             model,
             model_settings=ModelSettings(temperature=0.0, max_tokens=500, seed=chat_params.seed),
-            system_prompt=self.query_prompt_template,
+            instructions=self.query_prompt_template,
             tools=[self.search_database],
             output_type=SearchResults,
         )
-        # TODO: Provide few-shot examples
+        few_shots = ModelMessagesTypeAdapter.validate_json(self.query_fewshots)
         user_query = f"Find search results for user query: {chat_params.original_user_query}"
         results = await agent.run(
             user_query,
-            message_history=chat_params.past_messages,
+            message_history=few_shots + chat_params.past_messages,
             deps=chat_params,
         )
         items = results.output["items"]
@@ -175,9 +176,9 @@ class AdvancedRAGChat(RAGChatBase):
             ),
         )
 
-        item_references = [item.to_str_for_rag() for item in items]
+        sources_content = [f"[{(item.id)}]:{item.to_str_for_rag()}\n\n" for item in items]
         response = await agent.run(
-            user_prompt=chat_params.original_user_query + "Sources:\n" + "\n".join(item_references),
+            user_prompt=chat_params.original_user_query + "Sources:\n" + "\n".join(sources_content),
             message_history=chat_params.past_messages,
         )
 

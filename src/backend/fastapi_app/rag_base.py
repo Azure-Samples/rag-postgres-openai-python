@@ -1,4 +1,3 @@
-import json
 import pathlib
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
@@ -18,7 +17,7 @@ from fastapi_app.postgres_models import Item
 class RAGChatBase(ABC):
     current_dir = pathlib.Path(__file__).parent
     query_prompt_template = open(current_dir / "prompts/query.txt").read()
-    query_fewshots = json.loads(open(current_dir / "prompts/query_fewshots.json").read())
+    query_fewshots = open(current_dir / "prompts/query_fewshots.json").read()
     answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
 
     def get_params(self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides) -> ChatParams:
