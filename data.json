@@ -1,0 +1,1002 @@
+[
+    {
+        "id": 1,
+        "name": "Apteka",
+        "location": "Bloomfield",
+        "cuisine": "Eastern European (Vegan)",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 71,
+        "hours": "Wed-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 5pm-9pm; Mon-Tue closed",
+        "tags": [
+            "vegan",
+            "trendy",
+            "BYOB",
+            "casual"
+        ],
+        "description": "A vegan Eastern European restaurant known for its creative plant-based takes on Central and Eastern European comfort dishes, served in a relaxed, communal atmosphere&#8203;:contentReference[oaicite:0]{index=0}. Apteka’s playful approach brings hearty, flavorful fare with a sense of humor, drawing crowds for its unique twist on comfort food.",
+        "menu_summary": "Features handmade pierogi, a buckwheat burger, stuffed cabbage, smoked beet Reuben, and seasonal Eastern European specials—all made from scratch and entirely vegan.",
+        "top_reviews": "Customers praise the innovative plant-based cuisine and cozy, communal vibe, often noting the bold, satisfying flavors despite the vegan menu.",
+        "vibe": "quirky and communal"
+    },
+    {
+        "id": 2,
+        "name": "Alta Via Ristorante",
+        "location": "Fox Chapel",
+        "cuisine": "Italian",
+        "price_level": 3,
+        "rating": 4.6,
+        "review_count": 220,
+        "hours": "Mon-Thu 4pm-9pm; Fri 4pm-10pm; Sat 10am-10pm; Sun 10am-9pm",
+        "tags": [
+            "modern",
+            "upscale",
+            "Italian",
+            "wine"
+        ],
+        "description": "Inspired by the Italian Alps and California wine country, this modern Italian eatery offers fresh seafood, vegetable-forward dishes, and house-made pasta in a stylish setting&#8203;:contentReference[oaicite:1]{index=1}. Alta Via Ristorante delivers upscale yet approachable dining, from indulgent handmade pastas to hearty wood-fired entrees, all complemented by an extensive wine selection.",
+        "menu_summary": "Known for dishes like bucatini with rich sauces, Long Island duck gnocchi, wood-fired pizzas, and seasonal specialties, plus an in-house gelato program and weekend brunch options.",
+        "top_reviews": "Diners laud the high-quality ingredients and balanced flavors, often highlighting the excellent pasta and wine pairings, as well as the chic but inviting atmosphere.",
+        "vibe": "sleek and modern"
+    },
+    {
+        "id": 3,
+        "name": "Alta Via Pizzeria",
+        "location": "East Liberty (Bakery Square)",
+        "cuisine": "Italian (Pizzeria)",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 150,
+        "hours": "Daily 11am-9pm",
+        "tags": [
+            "casual",
+            "pizzeria",
+            "Italian",
+            "family-friendly"
+        ],
+        "description": "A casual offshoot of Alta Via, AVP specializes in rustic, hearth-baked pizzas and Italian comfort food in a family-friendly setting. Known for its pull-apart garlic mascarpone bread and creative wood-fired pies topped with gourmet ingredients&#8203;:contentReference[oaicite:2]{index=2}, Alta Via Pizzeria delivers big Italian flavors in a relaxed atmosphere.",
+        "menu_summary": "Highlights include Neapolitan-style pizzas with toppings like pepperoni and taleggio cream, fresh salads, hearty sandwiches, and house-made gelato for dessert.",
+        "top_reviews": "Reviewers love the chewy, flavorful crust and quality toppings of the pizzas, and appreciate the laid-back vibe and value compared to fine dining options.",
+        "vibe": "warm and casual"
+    },
+    {
+        "id": 4,
+        "name": "Cioppino",
+        "location": "Strip District",
+        "cuisine": "Steakhouse & Seafood",
+        "price_level": 3,
+        "rating": 4.4,
+        "review_count": 180,
+        "hours": "Tue-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 10am-2pm, 5pm-9pm; Mon closed",
+        "tags": [
+            "upscale",
+            "steaks",
+            "seafood",
+            "cocktails"
+        ],
+        "description": "An upscale steakhouse and seafood restaurant known for its elegant atmosphere and a menu playfully described as having \"a potato problem\" by its chef&#8203;:contentReference[oaicite:3]{index=3}. Cioppino offers premium cuts of beef and fresh seafood with creative sides (especially potato dishes), plus a sophisticated bar and lounge for cocktails and cigars.",
+        "menu_summary": "Signature offerings include dry-aged steaks, lamb rack with rosemary potatoes, Chilean sea bass, and an array of potato-forward sides. They also serve a popular Saturday brunch featuring items like a deluxe lox board.",
+        "top_reviews": "Patrons frequently praise the perfectly cooked steaks and indulgent sides, mentioning the attentive service and classy, lounge-like ambiance as highlights of the dining experience.",
+        "vibe": "clubby and elegant"
+    },
+    {
+        "id": 5,
+        "name": "Coast & Main",
+        "location": "Monroeville",
+        "cuisine": "Seafood & Chophouse",
+        "price_level": 3,
+        "rating": 4.5,
+        "review_count": 210,
+        "hours": "Mon-Thu 11am-9pm; Fri-Sat 11am-10pm; Sun 11am-8pm",
+        "tags": [
+            "seafood",
+            "steak",
+            "upscale",
+            "modern"
+        ],
+        "description": "A gourmet seafood and chop house bringing a surf-and-turf dining experience to Monroeville Mall. Opened in 2018, Coast & Main offers an upscale fusion of land and sea – even the kid’s menu features a 4-ounce filet mignon&#8203;:contentReference[oaicite:4]{index=4}. With a chef from the Pacific Northwest, the restaurant flies in fresh seafood daily and pairs it with premium steaks in a contemporary setting.",
+        "menu_summary": "Popular menu items include the bone-in ribeye, Chilean sea bass, lobster tail, and creative dishes like potato-and-parmesan crusted Pacific cod. The menu spans from crab cake sliders at the bar to elegant surf-and-turf plates.",
+        "top_reviews": "Guests appreciate the high-quality seafood and steaks, commenting on the surprising find of such fine dining in a mall location, along with the attentive service and polished atmosphere.",
+        "vibe": "contemporary and polished"
+    },
+    {
+        "id": 6,
+        "name": "Dish Osteria and Bar",
+        "location": "South Side",
+        "cuisine": "Italian (Sicilian)",
+        "price_level": 3,
+        "rating": 4.7,
+        "review_count": 110,
+        "hours": "Tue-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun-Mon closed",
+        "tags": [
+            "romantic",
+            "Italian",
+            "cozy",
+            "wine"
+        ],
+        "description": "A cozy, romantic osteria tucked away on the South Side, serving Sicilian-inspired Italian cuisine with an emphasis on fresh seafood and housemade pastas. Dish Osteria’s candle-lit, rustic interior and attentive service have made it a beloved date-night spot for over two decades.",
+        "menu_summary": "The menu features dishes like squid ink pasta with calamari, veal saltimbocca, daily antipasti specials, and classic Sicilian desserts. The bar offers an extensive Italian wine list and craft cocktails to complement the meals.",
+        "top_reviews": "Reviewers often rave about the authentic flavors and intimate atmosphere, highlighting the superb seafood dishes, robust wine selection, and the feeling of discovering a hidden gem in the city.",
+        "vibe": "intimate and rustic"
+    },
+    {
+        "id": 7,
+        "name": "Eleven",
+        "location": "Strip District",
+        "cuisine": "New American",
+        "price_level": 4,
+        "rating": 4.7,
+        "review_count": 520,
+        "hours": "Mon-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 10am-2pm, 5pm-9pm",
+        "tags": [
+            "fine dining",
+            "New American",
+            "seasonal",
+            "upscale"
+        ],
+        "description": "A chic, contemporary American restaurant set in a renovated warehouse, Eleven offers a seasonal, chef-driven menu and polished service. Part of the city's renowned Big Burrito group, it balances fine dining sophistication with a trendy, urban ambiance overlooking the Allegheny River.",
+        "menu_summary": "Diners can expect artfully plated dishes that blend classic and modern techniques—think seared scallops with truffle risotto, braised short ribs, seasonal farm-fresh salads, and an indulgent Sunday brunch. The extensive wine list and craft cocktails round out the experience.",
+        "top_reviews": "Customers frequently mention the exceptional tasting menus and knowledgeable staff, praising Eleven’s consistently excellent food quality and the elegant yet comfortable atmosphere for special occasions.",
+        "vibe": "refined and modern"
+    },
+    {
+        "id": 8,
+        "name": "Fig & Ash",
+        "location": "North Side (Deutschtown)",
+        "cuisine": "New American",
+        "price_level": 3,
+        "rating": 4.8,
+        "review_count": 250,
+        "hours": "Wed-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 10am-3pm; Mon-Tue closed",
+        "tags": [
+            "farm-to-table",
+            "wood-fired",
+            "craft cocktails",
+            "cozy"
+        ],
+        "description": "A neighborhood bistro in Deutschtown focusing on farm-to-table cuisine cooked over a wood-fired hearth. Fig & Ash serves modern American dishes in a cozy, brick-walled space, offering a warm atmosphere that complements its rustic, seasonal menu.",
+        "menu_summary": "The ever-changing menu might include wood-grilled meats, hearth-roasted vegetables, creative small plates, and homemade bread, along with craft cocktails and weekend brunch specials like hearty hashes and benedicts.",
+        "top_reviews": "Guests often comment on the exceptional flavors from the open-fire cooking and the friendly, unpretentious service, noting that the restaurant feels upscale yet welcoming for a casual night out or brunch.",
+        "vibe": "rustic and welcoming"
+    },
+    {
+        "id": 9,
+        "name": "Fish Nor Fowl",
+        "location": "Garfield",
+        "cuisine": "Eclectic New American",
+        "price_level": 3,
+        "rating": 4.5,
+        "review_count": 130,
+        "hours": "Wed-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 5pm-9pm; Mon-Tue closed",
+        "tags": [
+            "creative",
+            "tasting menu",
+            "intimate",
+            "trendy"
+        ],
+        "description": "A stylish eatery offering an eclectic take on New American cuisine, Fish Nor Fowl features inventive dishes that blend flavors and techniques from various cuisines. The atmosphere is intimate and hip, with dim lighting and modern decor that set the stage for adventurous dining.",
+        "menu_summary": "The menu is concise and creative—diners might find items like dry-aged duck, handmade agnolotti, or crudo with seasonal garnishes. A chef’s tasting menu is often available, showcasing the kitchen’s innovation. Craft cocktails and a curated wine list complement the food.",
+        "top_reviews": "Diners often describe the experience as unique and memorable, praising the inventive menu and chic ambiance. Many highlight the tasting menu as a journey of flavors, paired with attentive service.",
+        "vibe": "intimate and hip"
+    },
+    {
+        "id": 10,
+        "name": "Hemlock House",
+        "location": "Regent Square",
+        "cuisine": "Gastropub",
+        "price_level": 2,
+        "rating": 4.6,
+        "review_count": 90,
+        "hours": "Mon-Thu 11am-12am; Fri-Sat 11am-2am; Sun 11am-12am",
+        "tags": [
+            "gastropub",
+            "craft beer",
+            "fusion",
+            "casual"
+        ],
+        "description": "A new gastropub in the Regent Square area (Swissvale), opened in 2023, that serves up modern pub fare with creative flavor twists&#8203;:contentReference[oaicite:5]{index=5}. Hemlock House offers a contemporary take on comfort food in a laid-back tavern setting, featuring a rotating selection of craft beers and inventive dishes that elevate classic bar cuisine.",
+        "menu_summary": "The menu ranges from gourmet burgers and globally-inspired wings to unique offerings like kimchi-topped hot dogs and flavorful vegetarian options. Weekend brunch brings twists on staples like stuffed French toast alongside brunch cocktails.",
+        "top_reviews": "Visitors love the innovative spin on traditional pub dishes, noting that the flavors are both unexpected and delicious. The friendly neighborhood vibe, extensive beer list, and late-night kitchen hours make it a popular hangout.",
+        "vibe": "modern and laid-back"
+    },
+    {
+        "id": 11,
+        "name": "LeMont",
+        "location": "Mount Washington",
+        "cuisine": "Fine Dining (Continental)",
+        "price_level": 4,
+        "rating": 4.4,
+        "review_count": 370,
+        "hours": "Tue-Thu 5pm-9pm; Fri-Sat 5pm-10pm; Sun 4pm-8pm; Mon closed",
+        "tags": [
+            "fine dining",
+            "romantic",
+            "scenic view",
+            "classic"
+        ],
+        "description": "A Pittsburgh landmark for fine dining, LeMont is perched atop Mount Washington, offering sweeping panoramic views of the city skyline. This elegant, old-school restaurant features white-tablecloth service, live music, and a Continental-American menu, making it a go-to spot for special occasions and romantic dinners.",
+        "menu_summary": "The menu includes upscale classics like Chateaubriand for two, lobster bisque, filet mignon, and veal Normandy, as well as an award-winning Sunday brunch buffet. Decadent desserts and a deep wine list complete the experience.",
+        "top_reviews": "Guests often describe the experience as timeless and luxurious, praising the stunning view and attentive service. Many celebrate anniversaries or birthdays here, noting the nostalgic charm and consistently well-prepared steak and seafood dishes.",
+        "vibe": "opulent and panoramic"
+    },
+    {
+        "id": 12,
+        "name": "Long Story Short",
+        "location": "Lawrenceville",
+        "cuisine": "Sandwiches & Bar",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 85,
+        "hours": "Tue-Thu 4pm-10pm; Fri-Sat 12pm-12am; Sun 12pm-8pm; Mon closed",
+        "tags": [
+            "casual",
+            "sandwiches",
+            "retro",
+            "arcade"
+        ],
+        "description": "A laid-back sandwich joint and bar with a fun retro vibe, Long Story Short was created by the team behind a local brewery. The space features a \"retro rumpus room\" in the back and an arcade on the mezzanine level plastered with classic movie posters&#8203;:contentReference[oaicite:6]{index=6}, making it as much an experience as a place to eat.",
+        "menu_summary": "The menu focuses on comfort food: hearty sandwiches (like smash burgers and fried chicken sandwiches), creative hot dogs, and shareable snacks. There’s a full bar with local beers and inventive cocktails to enjoy between arcade games.",
+        "top_reviews": "Customers love the playful atmosphere and delicious comfort eats, often commenting on the nostalgia of the decor and the perfectly cooked smash burgers. It's praised as a great casual hangout for food, drinks, and some arcade fun.",
+        "vibe": "playful and nostalgic"
+    },
+    {
+        "id": 13,
+        "name": "Moonlit Burgers",
+        "location": "Dormont",
+        "cuisine": "Burgers",
+        "price_level": 1,
+        "rating": 4.7,
+        "review_count": 560,
+        "hours": "Tue-Thu 11am-9pm; Fri-Sat 11am-10pm; Sun 11am-8pm; Mon closed",
+        "tags": [
+            "burgers",
+            "casual",
+            "smash burgers",
+            "retro"
+        ],
+        "description": "A popular burger spot born from a pop-up concept, Moonlit Burgers is known for its classic smash burgers served with a Pittsburgh twist. The Dormont location exudes a throwback diner feel, complete with neon signage and a steady crowd craving indulgent comfort food.",
+        "menu_summary": "Its signature smash burgers feature thin, crispy-edged beef patties layered with American cheese, griddled onions, and special sauce on a soft bun. Sides include fresh-cut fries (offerings like poutine fries), milkshakes, and rotating special burgers that push creative boundaries.",
+        "top_reviews": "Customers rave about the juicy, flavorful smash burgers, often calling them the best in town. The fast, friendly service and nostalgic vibe keep locals and visitors coming back whenever they’re craving an all-American burger experience.",
+        "vibe": "energetic and nostalgic"
+    },
+    {
+        "id": 14,
+        "name": "Nanban",
+        "location": "Lawrenceville",
+        "cuisine": "Asian Fusion (Japanese/Korean)",
+        "price_level": 2,
+        "rating": 4.6,
+        "review_count": 210,
+        "hours": "Tue-Thu 11am-9pm; Fri-Sat 11am-10pm; Sun 11am-8pm; Mon closed",
+        "tags": [
+            "Asian fusion",
+            "spicy",
+            "BYOB",
+            "counter-service"
+        ],
+        "description": "A BYOB eatery specializing in “five-alarm” Asian soul food, Nanban brings the heat with a fusion of Japanese and Korean street eats&#8203;:contentReference[oaicite:7]{index=7}. Born from the merger of two popular concepts (a ramen shop and a fried chicken joint), this counter-service spot in Lawrenceville serves boldly flavored comfort food in a casual setting.",
+        "menu_summary": "The menu features spicy ramen bowls (like the infamous Inferno Ramen), Korean-style fried chicken sandwiches (the Hot Chicken Sando packs serious heat), steamed bao buns, and creative small plates. Cooling sides and rotating specials help balance out the fiery offerings.",
+        "top_reviews": "Spice-loving customers can’t get enough of Nanban’s intense flavors, frequently mentioning the addictive heat of the hot chicken and ramen. They also appreciate the fun, no-frills atmosphere and the fact that it’s BYOB, which keeps the experience affordable.",
+        "vibe": "funky and fiery"
+    },
+    {
+        "id": 15,
+        "name": "Oak Hill Post",
+        "location": "Brookline",
+        "cuisine": "Breakfast & Brunch Cafe",
+        "price_level": 1,
+        "rating": 4.8,
+        "review_count": 140,
+        "hours": "Wed-Mon 7:30am-2pm; Tue closed",
+        "tags": [
+            "breakfast",
+            "brunch",
+            "cozy",
+            "neighborhood"
+        ],
+        "description": "A charming daytime cafe in Brookline, Oak Hill Post offers a welcoming community vibe—like a foodie version of the bar in “Cheers,” where everybody knows your name&#8203;:contentReference[oaicite:8]{index=8}. This breakfast and brunch hot spot serves comfort food favorites with creative twists, in a bright and friendly setting.",
+        "menu_summary": "The menu revolves around biscuit-based dishes and hearty breakfast fare: from a loaded breakfast burrito with sausage gravy and biscuit bites, to fried chicken on a biscuit, and their famous Crème Brûlée French Toast. House-made pastries and rotating specials keep regulars coming back daily.",
+        "top_reviews": "Regulars rave about the warm hospitality and consistently delicious food. Many note that it feels like a neighborhood living room, with standout favorites like the fluffy biscuits and unique French toast earning high praise.",
+        "vibe": "homey and cheerful"
+    },
+    {
+        "id": 16,
+        "name": "Pizza Lupo",
+        "location": "Lawrenceville",
+        "cuisine": "Pizza",
+        "price_level": 1,
+        "rating": 4.7,
+        "review_count": 180,
+        "hours": "Tue-Thu 4pm-9pm; Fri-Sat 4pm-10pm; Sun-Mon closed",
+        "tags": [
+            "pizza",
+            "takeout",
+            "artisanal",
+            "family-run"
+        ],
+        "description": "A small artisan pizzeria run by two firefighter brothers who are heating up Lawrenceville with their pies&#8203;:contentReference[oaicite:9]{index=9}. Pizza Lupo (Italian for “wolf”) specializes in naturally leavened, sourdough crust pizzas baked to perfection. With limited seating and a takeout-focused setup, this family-run spot has earned a loyal following for its creative, high-quality pizzas.",
+        "menu_summary": "The menu features a rotating selection of wood-fired pizzas available in multiple sizes (including a thick, square Grandma style) and Italian sandwiches and pastas. Standouts include the Tropic Thunder pizza (jalapeño, bacon, and a spicy-sweet kick of pineapple) and a rich vodka sauce pie, as well as addictive garlic-mascarpone pull-apart bread.",
+        "top_reviews": "Fans love the chewy sourdough crust and inventive topping combinations, often remarking that Pizza Lupo delivers gourmet pizza flavors without pretension. Many note it's their go-to for takeout on pizza night, with friendly service from the Wolff family making the experience even better.",
+        "vibe": "funky and family-friendly"
+    },
+    {
+        "id": 17,
+        "name": "Pusadee’s Garden",
+        "location": "Lawrenceville",
+        "cuisine": "Thai",
+        "price_level": 3,
+        "rating": 4.7,
+        "review_count": 320,
+        "hours": "Tue-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 5pm-9pm; Mon closed",
+        "tags": [
+            "Thai",
+            "outdoor seating",
+            "romantic",
+            "trendy"
+        ],
+        "description": "An acclaimed Thai restaurant known for its lush courtyard dining space that transports guests out of the city. Tucked in Upper Lawrenceville, Pusadee’s Garden offers artfully presented Thai cuisine in a beautiful, modern setting—the outdoor garden is a tranquil oasis that complements the refined dishes&#8203;:contentReference[oaicite:10]{index=10}. (Chef Busaba Tongdee was even a 2023 James Beard Award nominee for her work here&#8203;:contentReference[oaicite:11]{index=11}.)",
+        "menu_summary": "The menu features authentic Thai flavors with a contemporary twist: aromatic curries, fresh herbaceous salads, grilled meats, and seasonal specials incorporating local produce (foraged mushrooms, ramps, etc.). Signature dishes like jungle curry and Pad Kee Mao are spicy favorites, balanced by creative cocktails and teas.",
+        "top_reviews": "Diners consistently praise the serene ambiance and exquisite flavors at Pusadee’s. Many highlight the garden seating as a highlight of their visit, along with the thoughtfully spiced dishes that offer a true taste of Thailand elevated to fine-dining standards.",
+        "vibe": "serene and upscale"
+    },
+    {
+        "id": 18,
+        "name": "Scratch & Co.",
+        "location": "Troy Hill",
+        "cuisine": "Gastropub & Cafe",
+        "price_level": 2,
+        "rating": 4.6,
+        "review_count": 150,
+        "hours": "Wed-Thu 5pm-10pm; Fri 5pm-11pm; Sat 10am-2pm, 5pm-11pm; Sun 10am-2pm, 5pm-9pm; Mon-Tue closed",
+        "tags": [
+            "neighborhood",
+            "farm-to-table",
+            "community",
+            "craft beer"
+        ],
+        "description": "A community-driven gastropub and cafe in Troy Hill, Scratch & Co. is beloved for its locally sourced, made-from-scratch meals and its commitment to the neighborhood. During the pandemic, owner Don Mahaney even adopted a pay-what-you-can model and market to support locals&#8203;:contentReference[oaicite:12]{index=12}. Now returned to traditional service, Scratch & Co. continues to serve elevated comfort food in a cozy, convivial setting.",
+        "menu_summary": "The menu features creative comfort dishes like the famed Meatballloaf sandwich (a sturdy meatball sub on house focaccia), seasonal salads, hearty brunch plates, and rotating dinner specials that highlight local produce. The bar offers craft beers and cocktails, and fun events like \"Mystic Mondays\" with tarot readings add to the charm.",
+        "top_reviews": "Reviewers highlight the welcoming, community atmosphere and consistently delicious food. Many appreciate the restaurant’s mission and note that the quality—from the house-baked bread to the inventive entrees—shines through in every dish. Brunch in particular has a devoted following.",
+        "vibe": "friendly and eclectic"
+    },
+    {
+        "id": 19,
+        "name": "Soju",
+        "location": "Garfield",
+        "cuisine": "Korean Fusion",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 190,
+        "hours": "Tue-Thu 5pm-10pm; Fri-Sat 5pm-12am; Sun 5pm-9pm; Mon closed",
+        "tags": [
+            "Korean",
+            "bar",
+            "artsy",
+            "intimate"
+        ],
+        "description": "A small Korean-American restaurant and bar in Garfield that feels like a neighborhood living room. For six years and counting, Soju has drawn in locals with its intimate, art-adorned space and a menu that encourages sharing and conversation&#8203;:contentReference[oaicite:13]{index=13}. The walls feature local artwork, and the ever-welcoming atmosphere makes it easy to chat with fellow diners over creative cocktails.",
+        "menu_summary": "The menu includes Korean-inspired comfort food such as Bi Bim Bap bowls, tteokbokki (stir-fried rice cakes), and Korean BBQ plates with kalbi and bulgogi. Bar favorites like the massive Soju Punch cocktail bowl&#8203;:contentReference[oaicite:14]{index=14} and nori-seasoned fries showcase the restaurant’s playful take on food and drink.",
+        "top_reviews": "Patrons love Soju’s blend of delicious food and community vibe. Many mention making new friends at the bar or bonding over the shareable punch bowl. The consensus is that the dishes— from spicy fried chicken sandwiches to savory rice bowls—are flavorful and authentic, served with a personal touch in a cozy setting.",
+        "vibe": "laid-back and artistic"
+    },
+    {
+        "id": 20,
+        "name": "Spork",
+        "location": "Garfield",
+        "cuisine": "Contemporary American",
+        "price_level": 3,
+        "rating": 4.6,
+        "review_count": 220,
+        "hours": "Wed-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun-Tue closed",
+        "tags": [
+            "innovative",
+            "tasting menu",
+            "garden-to-table",
+            "intimate"
+        ],
+        "description": "An inventive, intimate restaurant known for its ever-evolving menu and culinary creativity. Spork operates a small urban garden next door, often picking fresh herbs and edible flowers (like dill and nasturtiums) the same day to use in dishes&#8203;:contentReference[oaicite:15]{index=15}. The result is a high-end dining experience where seasonal ingredients shine, in a cozy space with only a handful of tables.",
+        "menu_summary": "Spork offers a multi-course tasting menu format as well as à la carte options that blend modern American cuisine with global influences. Dishes can range from house-cured charcuterie to delicate handmade pastas and unexpected flavor pairings. Their cocktail program is equally thoughtful, with rotating specialty drinks that often support charitable causes.",
+        "top_reviews": "Diners frequently leave impressed by Spork’s attention to detail and the element of surprise in the menu. Many highlight the garden-fresh ingredients and the knowledgeable staff who guide them through each course, making the experience feel personalized and special.",
+        "vibe": "innovative and intimate"
+    },
+    {
+        "id": 21,
+        "name": "The Vandal",
+        "location": "Lawrenceville",
+        "cuisine": "New American Cafe",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 240,
+        "hours": "Wed-Sun 10am-3pm, 5pm-9pm; Mon-Tue closed",
+        "tags": [
+            "brunch",
+            "seasonal",
+            "minimalist",
+            "natural wine"
+        ],
+        "description": "A chic yet unpretentious bistro in Lawrenceville, The Vandal is a small restaurant with minimalist decor but bold, seasonal flavors&#8203;:contentReference[oaicite:16]{index=16}. It’s a popular brunch spot by day and an intimate dinner destination by night, showcasing a constantly changing menu that highlights local ingredients and a thoughtfully curated natural wine program.",
+        "menu_summary": "The menu is concise and market-driven: think inventive vegetable-forward small plates, hearty grain bowls, fresh oysters on Wednesdays, and dishes that draw inspiration from global cuisines while remaining comfortingly familiar. Their weekend brunch is famed for dishes like shakshuka and ricotta pancakes.",
+        "top_reviews": "Customers often describe The Vandal as a neighborhood gem, praising the fresh, creative dishes and the relaxed atmosphere. Many specifically recommend the brunch and the unique wine selections, noting that the restaurant manages to feel trendy yet welcoming.",
+        "vibe": "minimalist and hip"
+    },
+    {
+        "id": 22,
+        "name": "Wise County Biscuits & Cafe",
+        "location": "North Side",
+        "cuisine": "Breakfast & Brunch",
+        "price_level": 1,
+        "rating": 4.9,
+        "review_count": 100,
+        "hours": "Wed-Mon 7:30am-2pm; Tue closed",
+        "tags": [
+            "breakfast",
+            "biscuits",
+            "Southern",
+            "cozy"
+        ],
+        "description": "A cheerful North Side cafe dedicated to Southern-style biscuit cooking, Wise County Biscuits was born from owner James Wolfe’s Appalachian roots. His grandmother from Wise County, VA taught him the art of buttermilk biscuits, and now those flaky, hearty biscuits form the cornerstone of this menu&#8203;:contentReference[oaicite:17]{index=17}. The atmosphere is bright and country-chic, making patrons feel right at home.",
+        "menu_summary": "The menu showcases a variety of biscuit sandwiches and platters—like the popular build-your-own biscuit with fried egg and choice of toppings, or \"Sallie’s Snack\" with pimento cheese, egg, and Chow Chow relish. Rounding out the offerings are classic sides (home fries, grits), daily baked goods, and locally roasted coffee.",
+        "top_reviews": "Reviewers can’t get enough of the tender, buttery biscuits, often saying they are the best in Pittsburgh. The cafe’s down-home hospitality and reasonable prices also earn high marks, with many noting it’s the perfect spot for a comforting breakfast or lunch that tastes like home cooking.",
+        "vibe": "bright and homey"
+    },
+    {
+        "id": 23,
+        "name": "The Woods House Historic Pub",
+        "location": "Hazelwood",
+        "cuisine": "Scottish Pub",
+        "price_level": 2,
+        "rating": 4.7,
+        "review_count": 130,
+        "hours": "Tue-Thu 4pm-10pm; Fri-Sat 12pm-11pm; Sun 12pm-8pm; Mon closed",
+        "tags": [
+            "historic",
+            "pub",
+            "Scottish",
+            "cozy"
+        ],
+        "description": "A unique tavern set in a 1792 stone house (one of the oldest structures in Pittsburgh), The Woods House Historic Pub allows guests to dine in a piece of history&#8203;:contentReference[oaicite:18]{index=18}. This Scottish-style pub overlooks the new Hazelwood Green development and embraces its heritage with hearty UK-inspired fare and a cozy, old-world atmosphere complete with fireplaces and period decor.",
+        "menu_summary": "The menu pays homage to traditional Scottish and British dishes: think Scotch eggs with mustard aioli, fish and chips, savory pies, and black pudding with mash and gravy&#8203;:contentReference[oaicite:19]{index=19}. Modern touches include Guinness-braised pot roast mac and cheese and a curated list of Scotch whiskies and beers to enjoy across its two tavern floors.",
+        "top_reviews": "Visitors love the combination of history and comfort food at Woods House. Many mention that dining by the fireplace with a pint and a plate of shepherd's pie feels like stepping back in time. The authentic Scotch recipes and the pub’s fascinating backstory make for a memorable, hearty dining experience.",
+        "vibe": "historic and cozy"
+    },
+    {
+        "id": 24,
+        "name": "Primanti Bros. (Strip District)",
+        "location": "Strip District",
+        "cuisine": "Sandwiches",
+        "price_level": 1,
+        "rating": 4.5,
+        "review_count": 1200,
+        "hours": "Mon-Thu 10am-12am; Fri-Sat 10am-3am; Sun 10am-12am",
+        "tags": [
+            "sandwiches",
+            "iconic",
+            "late-night",
+            "casual"
+        ],
+        "description": "A Pittsburgh institution famous for its \"Almost Famous\" sandwiches piled high with tangy coleslaw and french fries. Since 1933, Primanti Bros. has been serving its classic sandwich loaded with grilled meat, provolone, vinegar-based coleslaw, sliced tomatoes, and, of course, french fries&#8203;:contentReference[oaicite:20]{index=20}. The original Strip District location, once a trucker’s lunch spot, now stays open late into the night to feed hungry locals and tourists alike&#8203;:contentReference[oaicite:21]{index=21}.",
+        "menu_summary": "The signature menu item is the Primanti sandwich available with various fillings (pastrami, capicola, turkey, etc.), all topped with slaw and fries between thick Italian bread. Other menu staples include wings, pizza, and beer, but it's the overstuffed sandwiches—best enjoyed with an Iron City beer—that define the Primanti experience.",
+        "top_reviews": "Visitors often call Primanti’s a must-visit for an authentic Pittsburgh experience. They love the no-frills, bustling atmosphere and hearty portions. Many reviews highlight the unique combination of fries and slaw in the sandwich as oddly satisfying, and late-night crowds appreciate the extended hours and quick service.",
+        "vibe": "boisterous and no-frills"
+    },
+    {
+        "id": 25,
+        "name": "Pamela’s Diner",
+        "location": "Strip District",
+        "cuisine": "Diner (Breakfast)",
+        "price_level": 1,
+        "rating": 4.5,
+        "review_count": 328,
+        "hours": "Daily 8am-2pm",
+        "tags": [
+            "diner",
+            "pancakes",
+            "retro",
+            "historic"
+        ],
+        "description": "A retro Pittsburgh diner famous for its crêpe-style pancakes and hearty breakfast plates. Pamela’s Diner has been a local staple for decades, with Formica countertops, vintage decor, and a loyal following — even President Obama proclaimed their pancakes the best he’d had in years, praising their buttery, crispy edges&#8203;:contentReference[oaicite:22]{index=22}.",
+        "menu_summary": "Their signature dish is the plate-sized crepe pancakes, served with toppings like strawberries and whipped cream. Other favorites include omelets overflowing with fillings, lyonnaise potatoes, and classic diner fare like bacon, eggs, and hash browns—all served in generous portions.",
+        "top_reviews": "Customers adore the nostalgic atmosphere and consistently delicious food. Pamela’s hotcakes, in particular, receive endless acclaim for their unique texture and flavor. Expect a wait on weekends, but most agree that the friendly service and memorable breakfast make it well worth it.",
+        "vibe": "bustling and nostalgic"
+    },
+    {
+        "id": 26,
+        "name": "Tessaro’s",
+        "location": "Bloomfield",
+        "cuisine": "Burgers & Barbecue",
+        "price_level": 2,
+        "rating": 4.6,
+        "review_count": 600,
+        "hours": "Mon-Thu 11am-11pm; Fri-Sat 11am-12am; Sun closed",
+        "tags": [
+            "burgers",
+            "grill",
+            "casual",
+            "neighborhood"
+        ],
+        "description": "A beloved neighborhood grill in Bloomfield, Tessaro’s is renowned for its no-nonsense, juicy burgers cooked over a hardwood charcoal grill. This classic Pittsburgh tavern has a cozy, old-school atmosphere (wood-paneled walls, neon beer signs) and has frequently been cited as serving the best burgers in the city.",
+        "menu_summary": "The star of the menu is the half-pound burger—hand-ground in-house daily and flame-grilled to perfection—served on a fresh bun with simple toppings. Tessaro’s also offers hearty grilled steaks, chicken, and traditional sides like coleslaw, chili, and baked beans, all imbued with smoky flavor from the open grill.",
+        "top_reviews": "Regulars and newcomers alike rave about the rich, char-grilled taste of Tessaro’s burgers. Many reviews highlight the consistency over the years and the friendly, laid-back service. It’s the kind of place where time stands still, and you can simply enjoy a great burger and a cold beer among friends.",
+        "vibe": "classic and cozy"
+    },
+    {
+        "id": 27,
+        "name": "DiAnoia’s Eatery",
+        "location": "Strip District",
+        "cuisine": "Italian",
+        "price_level": 2,
+        "rating": 4.7,
+        "review_count": 1000,
+        "hours": "Tue-Thu 11am-9pm; Fri 11am-10pm; Sat 10am-10pm; Sun 10am-3pm; Mon closed",
+        "tags": [
+            "Italian",
+            "bakery",
+            "cocktails",
+            "trendy"
+        ],
+        "description": "A vibrant all-day Italian cafe, bakery, and restaurant in the Strip District, DiAnoia’s Eatery transitions from a coffee-and-pastry spot in the morning to a bustling trattoria at night. With its white subway tiles and cozy bistro tables, the ambiance is equal parts modern and welcoming, perfect for enjoying homemade Italian comfort food.",
+        "menu_summary": "By day, guests pop in for espresso, cannoli, and fresh-baked Italian pastries. By night, the menu shines with house-made pastas (like ricotta gnocchi and cacio e pepe), wood-fired Roman-style pizzas, and shareable antipasti. A full bar serves creative cocktails (the negroni list is a highlight) and Italian wines to pair with dinner.",
+        "top_reviews": "Diners frequently mention DiAnoia’s as their favorite Italian spot in Pittsburgh, praising the exceptionally fresh pasta and warm hospitality. The restaurant’s hybrid cafe/restaurant concept also gets love—many appreciate grabbing a pastry in the morning then returning for a hearty, authentic Italian dinner in the same inviting space.",
+        "vibe": "charming and lively"
+    },
+    {
+        "id": 28,
+        "name": "Little Tokyo Bistro",
+        "location": "South Side",
+        "cuisine": "Japanese & Sushi",
+        "price_level": 2,
+        "rating": 4.3,
+        "review_count": 100,
+        "hours": "Mon, Wed-Fri 11:30am-2:30pm, 4:30pm-9pm; Sat 4:30pm-10pm; Sun 4:30pm-9pm; Tue closed",
+        "tags": [
+            "sushi",
+            "Japanese",
+            "intimate",
+            "casual"
+        ],
+        "description": "A cozy sushi bar and Japanese bistro located on East Carson Street in the South Side. Little Tokyo Bistro offers a broad menu of Japanese favorites, from creative sushi rolls and sashimi to kitchen entrees like teriyaki and tempura, all served in a relaxed, intimate setting.",
+        "menu_summary": "Popular choices include the chef’s special sushi rolls (with fresh salmon, tuna, and eel featuring prominently), bento box combinations for lunch, and appetizers like gyoza and seaweed salad. They also serve classic staples such as udon noodle soup and hibachi-style fried rice, providing something for every taste.",
+        "top_reviews": "Patrons appreciate the freshness of the sushi and the friendly, unhurried atmosphere. It’s often described as a hidden gem for quality Japanese food outside of the downtown core, with many regulars returning for the generous portions and authentic flavors.",
+        "vibe": "unpretentious and cozy"
+    },
+    {
+        "id": 29,
+        "name": "El Campesino",
+        "location": "North Hills",
+        "cuisine": "Mexican",
+        "price_level": 2,
+        "rating": 4.4,
+        "review_count": 500,
+        "hours": "Sun-Thu 11am-9pm; Fri-Sat 11am-10pm",
+        "tags": [
+            "Mexican",
+            "family-friendly",
+            "casual",
+            "margaritas"
+        ],
+        "description": "A long-running local Mexican restaurant chain, El Campesino serves up all the classic Tex-Mex favorites in a colorful and family-friendly atmosphere. The North Hills location (on McKnight Road) is known for its fast, friendly service and consistently tasty fare, making it a go-to spot for casual lunches and dinners.",
+        "menu_summary": "The extensive menu features everything from sizzling fajitas and loaded burritos to cheesy enchiladas and combo platters. Crowd favorites include the homemade chips and salsa (with a kick of cilantro), the velvety queso dip, and jumbo margaritas in a variety of flavors—often enjoyed during the restaurant’s popular happy hour.",
+        "top_reviews": "Customers appreciate El Campesino for its generous portions, affordable prices, and authentic flavors. It’s frequently praised as a reliable choice for a fun night out with family or friends, where the ambiance is lively and the plates arrive hot and satisfying.",
+        "vibe": "festive and relaxed"
+    },
+    {
+        "id": 30,
+        "name": "Aladdin’s Eatery",
+        "location": "Squirrel Hill",
+        "cuisine": "Middle Eastern",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 280,
+        "hours": "Daily 11am-9pm",
+        "tags": [
+            "Middle Eastern",
+            "healthy",
+            "casual",
+            "vegetarian-friendly"
+        ],
+        "description": "A popular regional chain offering a large menu of Lebanese and Middle Eastern dishes in a casual cafe setting. The Squirrel Hill location of Aladdin’s Eatery is bright and inviting, appealing to both health-conscious diners and those craving authentic Middle Eastern flavors, with many vegetarian and vegan options available.",
+        "menu_summary": "The menu spans fresh hummus and pita, stuffed grape leaves, and crisp falafel to heartier platters like shish kebabs and shawarma rolled pitas. Signature salads (topped with house-made dressings), lentil soups, fresh juices, and smoothies round out the offerings, and there’s a dessert case of baklava and other sweets for a sweet finish.",
+        "top_reviews": "Regulars commend the consistently fresh ingredients and flavorful preparations, noting that everything from the tangy garlic sauce to the tabouli tastes homemade. The quick service and reasonable prices make it a favorite for both takeout and relaxed dine-in meals.",
+        "vibe": "bright and casual"
+    },
+    {
+        "id": 31,
+        "name": "Pierogies Plus",
+        "location": "McKees Rocks",
+        "cuisine": "Polish",
+        "price_level": 1,
+        "rating": 4.8,
+        "review_count": 420,
+        "hours": "Mon-Fri 11am-6pm; Sat 11am-4pm; Sun closed",
+        "tags": [
+            "Polish",
+            "takeout",
+            "homemade",
+            "casual"
+        ],
+        "description": "A humble storefront in McKees Rocks turning out Pittsburgh’s most beloved pierogies, Pierogies Plus is a destination for homemade Polish comfort food. Operated in a repurposed old gas station, this no-frills spot features Eastern European ladies hand-pinching pierogi in the back, ensuring each dumpling is as authentic as it gets.",
+        "menu_summary": "The menu focuses on traditional pierogi (potato & cheese, sauerkraut, cottage cheese, etc.) available by the dozen—pan-fried with butter and onions if you wish. They also offer haluski (buttery cabbage and noodles), stuffed cabbage rolls, kielbasa, and homemade soups. Most customers get their food to-go, though a few small tables accommodate those who can’t wait to dig in.",
+        "top_reviews": "Pierogi fans across the city sing the praises of Pierogies Plus. Reviews consistently mention the nostalgia factor and superb quality of the pierogi, often comparing them to what their Babcia or grandmother made. It’s widely regarded as the place to go for an authentic taste of Pittsburgh’s Eastern European heritage.",
+        "vibe": "unassuming and homey"
+    },
+    {
+        "id": 32,
+        "name": "Fiori’s Pizzaria",
+        "location": "Brookline",
+        "cuisine": "Pizza",
+        "price_level": 1,
+        "rating": 4.7,
+        "review_count": 780,
+        "hours": "Tue-Thu 11am-11pm; Fri-Sat 11am-12am; Sun 4pm-10pm; Mon closed",
+        "tags": [
+            "pizza",
+            "old-school",
+            "BYOB",
+            "casual"
+        ],
+        "description": "A legendary name in Pittsburgh pizza, Fiori’s Pizzaria is an old-school, cash-only pizzeria in Brookline that has been slinging pies since 1979. Unpretentious and eternally popular, Fiori’s is known for its traditional approach: hand-tossed dough, slightly sweet tomato sauce, lots of melty cheese, and a generosity with toppings. The dining area is simple and often packed with families and longtime regulars (BYOB is welcomed).",
+        "menu_summary": "The menu is straightforward: pizzas available in medium or large with a wide array of toppings, plus hoagies, wedgies (a Pittsburgh-style folded sandwich), and strombolis. The “Fiori Special” loaded pizza is a fan favorite, and many enjoy finishing their meal with a scoop of spumoni ice cream, an Italian-American classic dessert offered here.",
+        "top_reviews": "Loyal patrons claim Fiori’s as their favorite pizza in the city, citing the uniquely delicious sauce and perfect crust. It’s common to see rave reviews about the friendly neighborhood vibe and the consistency that’s been maintained over decades. Many also note that lines can be long during peak times, but the pizza is absolutely worth the wait.",
+        "vibe": "no-frills and nostalgic"
+    },
+    {
+        "id": 33,
+        "name": "Condado Tacos",
+        "location": "Downtown",
+        "cuisine": "Mexican (Tacos)",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 1000,
+        "hours": "Mon-Thu 11am-11pm; Fri-Sat 11am-12am; Sun 11am-10pm",
+        "tags": [
+            "tacos",
+            "customizable",
+            "trendy",
+            "bar"
+        ],
+        "description": "A lively build-your-own taco spot, Condado Tacos has quickly become a favorite for its affordable, customizable tacos and upbeat atmosphere. The Downtown Pittsburgh location features vibrant murals, a full bar, and a checklist-style menu that lets diners craft their perfect taco from a huge selection of shells, proteins, sauces, and toppings.",
+        "menu_summary": "Options range from creative house tacos (like the Korean BBQ-inspired \"Lucy’s Fire\" or the vegetarian \"Dutch Dragon\") to DIY selections where you pick everything from the tortilla (flour, corn, or even a hard+soft \"Double Decker\") to the filling (brisket, tequila-lime chicken, jackfruit, etc.) and add-ons. Chips with queso or guacamole make great starters, and the margarita list—featuring flavors like blood orange and prickly pear—adds to the fun.",
+        "top_reviews": "Customers love the energetic vibe and endless flavor combinations at Condado. Many point out that it's great for groups with different dietary preferences, since everyone can get exactly what they want. The creative tacos and strong drinks, combined with reasonable prices, make Condado a go-to for a casual night out.",
+        "vibe": "funky and energetic"
+    },
+    {
+        "id": 34,
+        "name": "Nicky’s Thai Kitchen",
+        "location": "North Side",
+        "cuisine": "Thai",
+        "price_level": 2,
+        "rating": 4.6,
+        "review_count": 580,
+        "hours": "Tue-Thu 11am-2:30pm, 5pm-9pm; Fri 11am-2:30pm, 5pm-10pm; Sat 12pm-10pm; Sun 12pm-9pm; Mon closed",
+        "tags": [
+            "Thai",
+            "BYOB",
+            "traditional",
+            "cozy"
+        ],
+        "description": "A cornerstone of Pittsburgh’s Thai dining scene, Nicky’s Thai Kitchen serves authentic Thai cuisine in a charming, traditionally decorated space. The North Side location, set in a converted townhouse with a lush little garden patio, is especially popular for its BYOB policy and intimate atmosphere filled with Thai artwork and warm lighting.",
+        "menu_summary": "The extensive menu covers all the classics: aromatic curries (green, red, massaman), noodle dishes like Pad Thai and Pad See Ew, tangy papaya salad, and flavorful stir-fries. House specials include dishes like crispy duck curry and mango tilapia. Spice levels can be customized, and each dish arrives beautifully presented with carved vegetable garnishes.",
+        "top_reviews": "Fans of Nicky’s praise the restaurant for its consistency and authenticity, often noting that the flavors rival those found in Thailand. The friendly staff and ability to BYOB (bring your own beer or wine) enhance the experience, making Nicky’s a perennial favorite for everything from date nights to family celebrations.",
+        "vibe": "warm and intimate"
+    },
+    {
+        "id": 35,
+        "name": "Big Shot Bob’s House of Wings",
+        "location": "Avalon",
+        "cuisine": "Wings & American",
+        "price_level": 1,
+        "rating": 4.4,
+        "review_count": 340,
+        "hours": "Mon-Thu 11am-10pm; Fri-Sat 11am-11pm; Sun 12pm-8pm",
+        "tags": [
+            "wings",
+            "casual",
+            "takeout",
+            "sports bar"
+        ],
+        "description": "A local wing joint that has achieved cult status, Big Shot Bob’s House of Wings (often just “Big Shot Bob’s”) is famed for its staggering variety of wing flavors—well over 100 saucing options with colorful names. The original Avalon shop is a small, no-frills space mainly geared toward takeout and delivery, but it has a few tables and a constant stream of devoted customers.",
+        "menu_summary": "Wings are the star, available bone-in or boneless, tossed in flavors ranging from the sweet \"Louisiana Lickers\" to the fiery \"Suicide\" and quirky combos like \"Hoagie\" (which mimics the taste of a deli sandwich) or \"PB&J\" (peanut butter and jelly). In addition to wings, the menu offers sandwiches, hoagies, and fried appetizers, but wings are by far the main attraction.",
+        "top_reviews": "Wing enthusiasts praise Big Shot Bob’s for its creativity and consistency—the wings are crispy and meaty, and with so many flavors, there’s always something new to try. While many order to-go, those who dine in enjoy the casual, sports-bar vibe (the walls are often plastered with local sports memorabilia) and the friendly, fast service.",
+        "vibe": "unpretentious and lively"
+    },
+    {
+        "id": 36,
+        "name": "The Church Brew Works",
+        "location": "Lawrenceville",
+        "cuisine": "Brewpub",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 1400,
+        "hours": "Wed-Thu 4pm-10pm; Fri-Sat 11:30am-11pm; Sun 11:30am-9pm; Mon-Tue closed",
+        "tags": [
+            "brewery",
+            "historic",
+            "American",
+            "unique"
+        ],
+        "description": "Located in a stunningly repurposed 1902 Roman Catholic church, The Church Brew Works offers a one-of-a-kind dining experience. The sanctuary has been converted into a brewery and restaurant, with the altar now housing steel brewing tanks and the nave filled with long tables (crafted from the original pews) for communal dining under stained-glass windows. The ambiance alone makes it a must-visit in Pittsburgh.",
+        "menu_summary": "The brewpub serves a mix of comfort foods and Pittsburgh favorites with a twist, such as pierogi pizza, Pittsburgh salad (topped with fries), and hearty entrees like barbecue baby back ribs and pasta. They brew a lineup of award-winning beers on-site—like the popular Pipe Organ Pale Ale and Pious Monk Dunkel—which pair perfectly with the menu. Save room for the spent-grain cheesecake, a dessert incorporating malt from the brewing process.",
+        "top_reviews": "Visitors often express awe at the beautiful church setting and enjoy the solid lineup of house beers. The food receives high marks for complementing the brews, and many appreciate the nods to local culture in the menu. Overall, guests describe Church Brew Works as a memorable blend of history, architecture, and craft brewing—a place where you can savor a beer while soaking in Pittsburgh heritage.",
+        "vibe": "unique and grand"
+    },
+    {
+        "id": 37,
+        "name": "Monterey Bay Fish Grotto",
+        "location": "Mount Washington",
+        "cuisine": "Seafood",
+        "price_level": 4,
+        "rating": 4.6,
+        "review_count": 780,
+        "hours": "Mon-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 4pm-9pm",
+        "tags": [
+            "seafood",
+            "view",
+            "romantic",
+            "fine dining"
+        ],
+        "description": "Perched atop Mount Washington, Monterey Bay Fish Grotto pairs some of the best views of Pittsburgh with top-notch seafood cuisine. Floor-to-ceiling windows showcase the city skyline and rivers below, providing a breathtaking backdrop for an elegant dinner. Known for its high-quality fresh seafood flown in daily, this restaurant is a favorite for celebrations and date nights.",
+        "menu_summary": "The menu features a wide array of seafood prepared to highlight its natural flavors: from raw bar selections and sushi appetizers to signature entrées like macadamia-crusted swordfish, lobster tail, and Chilean sea bass. Guests can customize fish with a variety of sauces and preparations. An extensive wine list and craft cocktails complement the ocean fare, and indulgent desserts (like the famous coconut cream pie) cap off the meal.",
+        "top_reviews": "Guests consistently praise the combination of stunning views and exceptional seafood. Service is described as attentive and professional, contributing to a refined dining experience. It’s often noted as an ideal spot to impress out-of-towners or to celebrate a special occasion while enjoying panoramic views of the city lights.",
+        "vibe": "sophisticated and scenic"
+    },
+    {
+        "id": 38,
+        "name": "Altius",
+        "location": "Mount Washington",
+        "cuisine": "Contemporary American",
+        "price_level": 4,
+        "rating": 4.7,
+        "review_count": 480,
+        "hours": "Tue-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 11am-2pm, 5pm-9pm; Mon closed",
+        "tags": [
+            "fine dining",
+            "view",
+            "farm-to-table",
+            "modern"
+        ],
+        "description": "A relatively new addition to Mount Washington’s dining scene, Altius has quickly earned acclaim for its modern American cuisine and upscale atmosphere. Its hilltop location offers panoramic views similar to its predecessor (the space was formerly a different restaurant), but Altius distinguishes itself with a sleek, contemporary interior and a farm-to-table philosophy that infuses each dish with seasonal, local ingredients.",
+        "menu_summary": "The menu is inventive and changes with the seasons. Guests might find entrees like pan-seared scallops with truffle cauliflower puree, Wagyu hanger steak with chimichurri, or Amish chicken with heirloom vegetables. Meticulous appetizers and an award-winning wine program enhance the experience, and desserts are both beautiful and indulgent. On Sundays, Altius also serves a refined brunch with unique takes on classic morning fare.",
+        "top_reviews": "Reviewers frequently mention that Altius delivers on both food and view—often a rare combination. Service is polished yet warm, and the attention to detail in flavor and presentation consistently impresses. It’s commonly recommended as one of Pittsburgh’s top fine-dining destinations, especially to mark a special occasion with style.",
+        "vibe": "elegant and breathtaking"
+    },
+    {
+        "id": 39,
+        "name": "Morcilla",
+        "location": "Lawrenceville",
+        "cuisine": "Spanish Tapas",
+        "price_level": 3,
+        "rating": 4.8,
+        "review_count": 460,
+        "hours": "Wed-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 5pm-9pm; Mon-Tue closed",
+        "tags": [
+            "Spanish",
+            "tapas",
+            "charcuterie",
+            "stylish"
+        ],
+        "description": "A stylish Spanish tapas restaurant in Lawrenceville, Morcilla offers an authentic taste of Spain via an array of small plates and house-made charcuterie. Opened by renowned local chef Justin Severino, Morcilla quickly gained national attention for its high-caliber cuisine and lively, communal atmosphere reminiscent of a Barcelona tapas bar (albeit with Pittsburgh flair).",
+        "menu_summary": "Guests typically share multiple tapas such as jamón Ibérico and manchego cheese boards, patatas bravas with spicy brava sauce, grilled octopus, and Morcilla’s namesake blood sausage. Larger raciones include dishes like paella of the day or whole grilled fish meant for sharing. The beverage program highlights Spanish wines, sherries, and creative gin & tonic variations, paying homage to Spanish drinking culture.",
+        "top_reviews": "Reviewers describe meals at Morcilla as transportive, noting that the quality of ingredients and execution makes for some of the best Spanish food outside Spain. The convivial setup—barrels for tables, a bustling open kitchen—and knowledgeable servers guiding the experience all contribute to an evening that is both fun and culinarily exceptional.",
+        "vibe": "vibrant and convivial"
+    },
+    {
+        "id": 40,
+        "name": "Casbah",
+        "location": "Shadyside",
+        "cuisine": "Mediterranean",
+        "price_level": 3,
+        "rating": 4.6,
+        "review_count": 540,
+        "hours": "Mon-Thu 5pm-10pm; Fri 5pm-11pm; Sat 10:30am-2pm, 5pm-11pm; Sun 10:30am-2pm, 5pm-9pm",
+        "tags": [
+            "Mediterranean",
+            "wine bar",
+            "romantic",
+            "patio"
+        ],
+        "description": "A longstanding fixture in Pittsburgh’s dining scene, Casbah is an upscale Mediterranean restaurant tucked along a side street between Shadyside and East Liberty. Its welcoming stone patio with lush greenery and twinkling lights is a major draw in warm weather, while the interior exudes rustic elegance. Part of the Big Burrito Restaurant Group, Casbah is known for consistently excellent food and service over the years.",
+        "menu_summary": "The menu spans the Mediterranean region, featuring dishes like Moroccan-spiced lamb shank, house-made pastas (such as goat cheese agnolotti), fresh seafood preparations, and flavorful mezze appetizers like hummus, olives, and grilled octopus. The kitchen emphasizes seasonal ingredients and creativity. Casbah’s wine list is extensive and carefully curated, making wine pairings a highlight of the experience. Weekend brunch offers specialties like shakshuka and brioche French toast with a Mediterranean twist.",
+        "top_reviews": "Patrons frequently laud Casbah for its romantic ambiance and refined yet approachable cuisine. Many have favorite dishes they return for, and newcomers often remark on the knowledgeable waitstaff who can guide them through the wine selections. Whether for a special occasion dinner or a leisurely brunch, Casbah remains a top choice for a taste of the Mediterranean in Pittsburgh.",
+        "vibe": "romantic and refined"
+    },
+    {
+        "id": 41,
+        "name": "Bar Marco",
+        "location": "Strip District",
+        "cuisine": "Italian & Wine Bar",
+        "price_level": 2,
+        "rating": 4.7,
+        "review_count": 680,
+        "hours": "Wed-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun 10am-2pm; Mon-Tue closed",
+        "tags": [
+            "small plates",
+            "wine",
+            "trendy",
+            "no-tipping"
+        ],
+        "description": "Housed in a historic firehouse in the Strip District, Bar Marco is a trendy restaurant and wine bar known for its inventive small plates and progressive approach to hospitality (it famously operates a no-tipping policy, instead paying staff a salary with benefits). The brick interior and candle-lit tables create an intimate vibe that’s equally suited for a romantic date or catching up with friends over wine.",
+        "menu_summary": "The menu, which changes frequently, draws inspiration from Italian cuisine and beyond: think handmade pasta dishes like squid ink linguine, seasonal risotto, bruschetta topped with inventive spreads, and shareable plates featuring local produce and cheeses. Their award-winning cocktail program and thoughtfully curated wine list (with many natural wines) make drink pairings part of the experience. On Sundays, Bar Marco offers a popular brunch with dishes like polenta pancakes and baked eggs.",
+        "top_reviews": "Reviews often highlight Bar Marco’s exceptional hospitality and the quality of its dishes despite a relatively small menu. Diners love discovering new wines recommended by the knowledgeable staff and often mention the standout pasta creations. Many consider it a must-visit in Pittsburgh’s dining scene for its combination of culinary creativity and warm, unpretentious service.",
+        "vibe": "intimate and chic"
+    },
+    {
+        "id": 42,
+        "name": "Poulet Bleu",
+        "location": "Lawrenceville",
+        "cuisine": "French Bistro",
+        "price_level": 3,
+        "rating": 4.8,
+        "review_count": 580,
+        "hours": "Tue-Thu 5pm-10pm; Fri 5pm-11pm; Sat 10am-2pm, 5pm-11pm; Sun 10am-2pm, 5pm-9pm; Mon closed",
+        "tags": [
+            "French",
+            "bistro",
+            "romantic",
+            "chic"
+        ],
+        "description": "Poulet Bleu is a classic French bistro reimagined through a modern Pittsburgh lens. Located in Lawrenceville, this charming restaurant is decorated with blue-and-white tiles, brass fixtures, and antique mirrors that give it a distinct Parisian flair. From the moment it opened, it has been one of the toughest reservations to snag in town, thanks to its romantic ambiance and impeccable traditional French cooking.",
+        "menu_summary": "The menu reads like a Francophile’s dream: French onion soup bubbling with gruyère, escargot in garlic butter, steak frites, trout amandine, and of course, rotisserie chicken (the restaurant’s namesake “blue chicken”). For dessert, the chocolate soufflé and crème brûlée are standouts. The wine list leans heavily French as well, with Champagne flowing on many a special night out.",
+        "top_reviews": "Diners often gush that stepping into Poulet Bleu feels like a trip to Paris. The food consistently earns high marks for authenticity and flavor, and the service is polished yet approachable. Many celebrate anniversaries or birthdays here, citing the intimate setting and nostalgic dishes as a perfect combination for a memorable evening.",
+        "vibe": "romantic and vintage"
+    },
+    {
+        "id": 43,
+        "name": "Gaucho Parrilla Argentina",
+        "location": "Downtown",
+        "cuisine": "Argentine Grill",
+        "price_level": 2,
+        "rating": 4.7,
+        "review_count": 1450,
+        "hours": "Tue-Thu 11am-9pm; Fri-Sat 11am-10pm; Sun 11am-8pm; Mon closed",
+        "tags": [
+            "Argentinian",
+            "wood-fired",
+            "steak",
+            "casual"
+        ],
+        "description": "A carnivore’s paradise, Gaucho Parrilla Argentina started as a modest BYOB spot in the Strip District and grew into a full-scale Downtown restaurant serving rustic Argentine-style wood-fired cuisine. The ambiance at Gaucho is warm and bustling, with the scent of charcoal-grilled meats perfuming the air and an open kitchen that lets you watch the asadores (grill cooks) at work.",
+        "menu_summary": "The menu centers on grilled meats and sandwiches: juicy ribeyes, skirt steaks, and sausages (choripán sandwiches) are cooked over open flames and served with homemade chimichurri. There are also grilled vegetables, provoleta (griddled provolone cheese), fresh salads, and hearty sides like empanadas and roasted potatoes. Many diners start with the shareable parrilla platter to sample a bit of everything. Don’t miss the dulce de leche-filled churro donuts for dessert.",
+        "top_reviews": "Gaucho has earned a devoted following; fans often mention it’s the place that converted them into steak lovers. Portions are generous, and the flavors—smoky, garlicky, deeply savory—feel both exotic and comfortingly familiar. Despite moving to a larger space, Gaucho retains a casual, communal feel, routinely drawing lines of eager patrons willing to wait for one of Pittsburgh’s most satisfying meals.",
+        "vibe": "rustic and energetic"
+    },
+    {
+        "id": 44,
+        "name": "Grand Concourse",
+        "location": "Station Square",
+        "cuisine": "Seafood & American",
+        "price_level": 3,
+        "rating": 4.4,
+        "review_count": 1400,
+        "hours": "Mon-Sat 11am-9pm; Sun 10am-2pm, 4pm-9pm",
+        "tags": [
+            "historic",
+            "seafood",
+            "brunch",
+            "elegant"
+        ],
+        "description": "Housed in the lavishly restored waiting room of the 1901 Pittsburgh & Lake Erie Railroad Station, the Grand Concourse offers an ambiance unlike any other in the city. Its grandeur – think marble columns, a vaulted ceiling with stained glass, and opulent chandeliers – makes dining here feel like stepping back into the Gilded Age. It’s known both for its top-tier Sunday brunch and for classic surf-and-turf dinners served with a side of nostalgia.",
+        "menu_summary": "The menu emphasizes seafood and steakhouse classics. For dinner, offerings include Alaskan king crab legs, lobster bisque, crab cakes, and prime rib, as well as pasta and chicken dishes. The Sunday buffet brunch is legendary, featuring carving stations, made-to-order omelets, fresh shrimp and oysters, carved meats, breakfast pastries, and much more, all laid out beneath the grandeur of the station’s architecture.",
+        "top_reviews": "Guests often remark that the setting alone is worth the visit. The food receives praise for being reliably good, if traditional. The brunch in particular is a Pittsburgh rite of passage for many, who laud the vast selection of quality dishes. Overall, the Grand Concourse remains a favorite for those seeking a blend of history, elegance, and hearty American fare.",
+        "vibe": "grand and classic"
+    },
+    {
+        "id": 45,
+        "name": "Chengdu Gourmet",
+        "location": "Squirrel Hill",
+        "cuisine": "Chinese (Sichuan)",
+        "price_level": 2,
+        "rating": 4.7,
+        "review_count": 820,
+        "hours": "Tue-Sun 11:30am-9:30pm; Mon closed",
+        "tags": [
+            "Chinese",
+            "Sichuan",
+            "authentic",
+            "spicy"
+        ],
+        "description": "An unassuming Squirrel Hill eatery that has gained national recognition for its authentic Sichuan cuisine, Chengdu Gourmet is helmed by Chef Wei Zhu—a multiple James Beard Award nominee known for his masterful command of spice&#8203;:contentReference[oaicite:23]{index=23}. The restaurant offers two menus: one with Americanized Chinese favorites, and another “Traditional” menu that showcases the bold, fiery dishes of Sichuan province. It’s the latter that has put Chengdu Gourmet on the map for adventurous eaters.",
+        "menu_summary": "Signature Sichuan offerings include mapo tofu that numbs and tingles with Sichuan peppercorn, spicy dry-pot dishes loaded with chili, Dan Dan noodles with pork and preserved vegetables, and Chongqing spicy chicken (la zi ji) buried under a heap of dried red chilies. There's also an array of delicate dishes like Chengdu cold noodles, cumin-rubbed lamb, and even exotic options like frog legs or rabbit for the truly intrepid. Mild dishes and familiar items (General Tso’s, lo mein) are available too, ensuring everyone can find something.",
+        "top_reviews": "Reviewers frequently call Chengdu Gourmet the most authentic Chinese food in Pittsburgh, comparing it favorably to meals in Chengdu. The spice levels can be intense (by design), and fans love it that way. Service is friendly and the atmosphere simple—people come for the food above all. Many recommend going with a group to order family-style and experience as many different dishes as possible from the extensive menu.",
+        "vibe": "simple and spicy"
+    },
+    {
+        "id": 46,
+        "name": "Everyday Noodles",
+        "location": "Squirrel Hill",
+        "cuisine": "Chinese (Noodle House)",
+        "price_level": 1,
+        "rating": 4.6,
+        "review_count": 1150,
+        "hours": "Tue-Sun 11am-9pm; Mon closed",
+        "tags": [
+            "noodles",
+            "handmade",
+            "casual",
+            "bustling"
+        ],
+        "description": "A vibrant noodle house in Squirrel Hill where diners can watch chefs hand-pulling strands of dough behind a glass kitchen wall, Everyday Noodles delivers an interactive and delicious dining experience. Specializing in the comfort foods of Shanghai and Taiwan, this casual eatery is almost always busy with patrons slurping noodles or carefully nibbling soup dumplings right out of the steamer baskets.",
+        "menu_summary": "The menu’s highlights are the Xiao Long Bao (soup dumplings) filled with hot broth and pork, and various hand-pulled noodle soups that can be customized with toppings like beef brisket, braised pork, or vegetables. Also popular are the slippery wontons in chili oil, scallion pancakes, and sesame noodles. Each bowl of noodles is made to order, giving the dishes a fresh, springy texture that’s hard to beat.",
+        "top_reviews": "Customers often mention the fun of watching their noodles being made in real time, and they rave about the rich flavors of the broth and the perfect chew of the noodles. The soup dumplings are commonly dubbed the best in the city. While the restaurant doesn’t take reservations and can have a wait at peak times, most agree that the quick turnover and amazing food make it worth it.",
+        "vibe": "busy and comforting"
+    },
+    {
+        "id": 47,
+        "name": "Taj Mahal",
+        "location": "Oakland",
+        "cuisine": "Indian",
+        "price_level": 2,
+        "rating": 4.3,
+        "review_count": 400,
+        "hours": "Tue-Sun 11am-2:30pm, 5pm-10pm; Mon closed",
+        "tags": [
+            "Indian",
+            "buffet",
+            "traditional",
+            "family-run"
+        ],
+        "description": "An established Indian restaurant in Oakland, Taj Mahal has been delighting Pittsburgh residents with authentic North Indian cuisine for decades. Its inviting, traditional décor and aromatic dishes make for a classic dining experience. It’s often lauded for its daily lunch buffet, which offers a chance to sample a wide variety of dishes for a great value.",
+        "menu_summary": "The extensive menu covers everything from tandoori specialties (like chicken tikka and seekh kababs) to rich curries (butter chicken, lamb rogan josh, paneer tikka masala) and biryani rice dishes. A full assortment of vegetarian entrees (such as chana masala, palak paneer, dal makhani) and fresh-baked breads (naan, paratha) ensure there’s something for every palate. For dessert, classics like gulab jamun and mango lassi provide a sweet finish.",
+        "top_reviews": "Regulars praise Taj Mahal for its consistency and the warmth of its family ownership. Many highlight the lunch buffet as one of the best Indian buffets in town, perfect for both newcomers to Indian cuisine and longtime fans. The dinner service is noted for generous portions and the kitchen’s ability to customize spice levels to each guest’s liking.",
+        "vibe": "comfortable and aromatic"
+    },
+    {
+        "id": 48,
+        "name": "Kaya",
+        "location": "Strip District",
+        "cuisine": "Caribbean & Latin Fusion",
+        "price_level": 2,
+        "rating": 4.5,
+        "review_count": 720,
+        "hours": "Tue-Thu 11:30am-9pm; Fri 11:30am-10pm; Sat 11am-10pm; Sun 11am-8pm; Mon closed",
+        "tags": [
+            "Caribbean",
+            "fusion",
+            "tropical",
+            "lively"
+        ],
+        "description": "Kaya is a tropical oasis in the Strip District, offering a colorful menu influenced by the flavors of the Caribbean and Latin America. Bright murals, eclectic artwork, and a festive ambiance make it feel like a mini-vacation as soon as you walk in. Part of the Big Burrito group, Kaya has been a mainstay for its creative cocktails and island-inspired cuisine that changes seasonally.",
+        "menu_summary": "Dishes draw from Jamaican, Cuban, Brazilian, and Mexican traditions, among others. The menu features items like jerk chicken wings, Cuban-style pork mojo, conch fritters, tacos with plantain or fish, and hearty rice bowls topped with beans and fresh salsas. Vegetarian options like black bean cakes and plantain empanadas are favorites too. The drink list is famous for its mojitos, caipirinhas, and seasonal fruit margaritas, plus a strong offering of craft beers.",
+        "top_reviews": "Patrons love Kaya’s vibrant mix of flavors and often mention the annual themed events like its popular KayaFest celebration of island food and music. Many recommend the restaurant for its energetic happy hour and as a great spot to dine with friends. The combination of spicy, sweet, and tangy dishes (and those amazing cocktails) consistently earns Kaya high marks as a fun dining adventure.",
+        "vibe": "vibrant and tropical"
+    },
+    {
+        "id": 49,
+        "name": "Bae Bae’s Kitchen",
+        "location": "Downtown",
+        "cuisine": "Korean Fusion",
+        "price_level": 1,
+        "rating": 4.8,
+        "review_count": 530,
+        "hours": "Mon-Fri 11am-8pm; Sat 12pm-8pm; Sun closed",
+        "tags": [
+            "Korean",
+            "fast-casual",
+            "healthy",
+            "trendy"
+        ],
+        "description": "A bright and trendy fast-casual spot in Downtown, Bae Bae’s Kitchen specializes in Korean-inspired bowls and bites made with wholesome, locally sourced ingredients. With its minimalist decor, potted plants, and communal tables, the atmosphere is as fresh and modern as the food. The restaurant prioritizes sustainability and health without sacrificing flavor, making it a popular lunch and early dinner destination for downtown workers and visitors alike.",
+        "menu_summary": "The menu is simple: choose a base (rice, noodles, salad greens), add a protein like Korean BBQ beef (bulgogi), glazed chicken, or tofu, and then top with an array of banchan-style sides such as kimchi, pickled vegetables, japchae sweet potato noodles, and sesame broccoli. Signature combinations are available for those who want a curated bowl experience. They also offer items like pork mandu (dumplings) and occasional specials, plus refreshing drinks like barley tea and matcha lemonade.",
+        "top_reviews": "Reviewers frequently praise the balance Bae Bae’s strikes between healthy and delicious. The flavors are clean, vibrant, and comforting, and portions are generous for the price point. Many note it’s a perfect introduction to Korean flavors for newcomers, while still satisfying those craving authentic tastes. Quick service and a hip vibe have solidified Bae Bae’s Kitchen as a downtown favorite.",
+        "vibe": "modern and refreshing"
+    },
+    {
+        "id": 50,
+        "name": "Alla Famiglia",
+        "location": "Allentown",
+        "cuisine": "Italian (Fine Dining)",
+        "price_level": 4,
+        "rating": 4.8,
+        "review_count": 310,
+        "hours": "Tue-Thu 5pm-10pm; Fri-Sat 5pm-11pm; Sun-Mon closed",
+        "tags": [
+            "Italian",
+            "fine dining",
+            "traditional",
+            "family-style"
+        ],
+        "description": "Tucked in the Allentown neighborhood, Alla Famiglia is an upscale Italian restaurant that has earned a reputation for uncompromising quality and old-world charm. From the outside it’s unassuming, but inside you’ll find an intimate, white-tablecloth dining room where waiters in tuxedo aprons deliver polished service. Known for its multi-course, family-style approach and top-notch ingredients (like house-cured meats and imported cheeses), Alla Famiglia provides a dining experience reminiscent of a classic Italian-American supper club.",
+        "menu_summary": "Dinners here are lavish. Meals often begin with complimentary antipasti bites and warm bread with garlic butter. Menu highlights include the spicy \"Shot-and-a-Beer\" spaghetti (finished table-side with an ignited shot of bourbon), a show-stopping veal chop parmesan, and daily chef’s specials featuring prime cuts of beef or fresh seafood prepared with Italian flair. Homemade ricotta cheesecake or tiramisu usually ends the feast on a sweet note. The wine list is extensive, focusing on premium Italian reds to match the richness of the food.",
+        "top_reviews": "Diners consistently describe Alla Famiglia as a special occasion destination, praising the attentive, old-school service and the indulgent portions of soulful Italian cuisine. Many note that prices are commensurate with the quality and experience—this is a splurge that true Italian food lovers will remember. With its combination of hearty, authentic dishes and sophisticated ambiance, Alla Famiglia stands out as a pinnacle of Italian dining in Pittsburgh.",
+        "vibe": "luxurious and old-school"
+    }
+]

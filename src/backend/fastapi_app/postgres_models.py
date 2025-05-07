@@ -13,11 +13,19 @@ class Base(DeclarativeBase):
 class Item(Base):
     __tablename__ = "items"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    type: Mapped[str] = mapped_column()
-    brand: Mapped[str] = mapped_column()
     name: Mapped[str] = mapped_column()
+    location: Mapped[str] = mapped_column()
+    cuisine: Mapped[str] = mapped_column()
+    rating: Mapped[int] = mapped_column()
+    price_level: Mapped[int] = mapped_column()
+    review_count: Mapped[int] = mapped_column()
+    hours: Mapped[str] = mapped_column()
+    tags: Mapped[str] = mapped_column()  # JSON array
     description: Mapped[str] = mapped_column()
-    price: Mapped[float] = mapped_column()
+    menu_summary: Mapped[str] = mapped_column()
+    top_reviews: Mapped[str] = mapped_column()
+    vibe: Mapped[str] = mapped_column()
+
     # Embeddings for different models:
     embedding_3l: Mapped[Vector] = mapped_column(Vector(1024), nullable=True)  # text-embedding-3-large
     embedding_nomic: Mapped[Vector] = mapped_column(Vector(768), nullable=True)  # nomic-embed-text
@@ -33,11 +41,10 @@ class Item(Base):
         return model_dict
 
     def to_str_for_rag(self):
-        return f"Name:{self.name} Description:{self.description} Price:{self.price} Brand:{self.brand} Type:{self.type}"
-
+        return f"Name:{self.name} Description:{self.description} Location:{self.location} Cuisine:{self.cuisine} Rating:{self.rating} Price Level:{self.price_level} Review Count:{self.review_count} Hours:{self.hours} Tags:{self.tags} Menu Summary:{self.menu_summary} Top Reviews:{self.top_reviews} Vibe:{self.vibe}"
+    
     def to_str_for_embedding(self):
-        return f"Name: {self.name} Description: {self.description} Type: {self.type}"
-
+        return f"Name: {self.name} Description: {self.description} Cuisine: {self.cuisine} Tags: {self.tags} Menu Summary: {self.menu_summary} Top Reviews: {self.top_reviews} Vibe: {self.vibe}"
 
 """
 **Define HNSW index to support vector similarity search**

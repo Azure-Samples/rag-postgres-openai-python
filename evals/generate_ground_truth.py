@@ -12,7 +12,7 @@ from openai.types.chat import ChatCompletionToolParam
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from fastapi_app.postgres_models import Item
+from fastapi_app.postgres_models import Restaurant
 
 logger = logging.getLogger("ragapp")
 
