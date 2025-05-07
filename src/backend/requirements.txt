@@ -50,7 +50,7 @@ charset-normalizer==3.4.0
     # via requests
 click==8.1.7
     # via uvicorn
-cryptography==44.0.1
+cryptography==44.0.3
     # via
     #   azure-identity
     #   msal
