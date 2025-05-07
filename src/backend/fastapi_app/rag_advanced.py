@@ -120,7 +120,7 @@ class AdvancedRAGChat(RAGChatBase):
         agent = Agent(
             model,
             model_settings=ModelSettings(temperature=0.0, max_tokens=500, seed=chat_params.seed),
-            instructions=self.query_prompt_template,
+            system_prompt=self.query_prompt_template,
             tools=[self.search_database],
             output_type=SearchResults,
         )
