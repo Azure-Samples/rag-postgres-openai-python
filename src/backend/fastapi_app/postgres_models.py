@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Index
+from sqlalchemy import Index, VARCHAR
+from sqlalchemy.dialects import postgresql
+
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -20,7 +22,7 @@ class Item(Base):
     price_level: Mapped[int] = mapped_column()
     review_count: Mapped[int] = mapped_column()
     hours: Mapped[str] = mapped_column()
-    tags: Mapped[str] = mapped_column()  # JSON array
+    tags: Mapped[list[str]] = mapped_column(postgresql.ARRAY(VARCHAR))  # Array of strings
     description: Mapped[str] = mapped_column()
     menu_summary: Mapped[str] = mapped_column()
     top_reviews: Mapped[str] = mapped_column()

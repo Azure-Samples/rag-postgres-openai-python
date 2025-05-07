@@ -85,7 +85,7 @@ class ItemPublic(BaseModel):
     vibe: str
 
 
-class ItemPublicWithDistance(RestaurantPublic):
+class ItemWithDistance(ItemPublic):
     distance: float
 
     def __init__(self, **data):
