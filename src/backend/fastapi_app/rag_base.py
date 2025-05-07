@@ -7,6 +7,7 @@ from openai.types.chat import ChatCompletionMessageParam
 from fastapi_app.api_models import (
     ChatParams,
     ChatRequestOverrides,
+    ItemPublic,
     RetrievalResponse,
     RetrievalResponseDelta,
     ThoughtStep,
@@ -15,12 +16,12 @@ from fastapi_app.postgres_models import Item
 
 
 class RAGChatBase(ABC):
-    current_dir = pathlib.Path(__file__).parent
-    query_prompt_template = open(current_dir / "prompts/query.txt").read()
-    query_fewshots = open(current_dir / "prompts/query_fewshots.json").read()
-    answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
+    prompts_dir = pathlib.Path(__file__).parent / "prompts/"
+    answer_prompt_template = open(prompts_dir / "answer.txt").read()
 
-    def get_params(self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides) -> ChatParams:
+    def get_chat_params(
+        self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides
+    ) -> ChatParams:
         response_token_limit = 1024
         prompt_template = overrides.prompt_template or self.answer_prompt_template
 
@@ -51,6 +52,10 @@ class RAGChatBase(ABC):
         self, chat_params: ChatParams
     ) -> tuple[list[ChatCompletionMessageParam], list[Item], list[ThoughtStep]]:
         raise NotImplementedError
+
+    def prepare_rag_request(self, user_query, items: list[ItemPublic]) -> str:
+        sources_str = "\n".join([f"[{item.id}]:{item.to_str_for_rag()}" for item in items])
+        return f"{user_query}Sources:\n{sources_str}"
 
     @abstractmethod
     async def answer(

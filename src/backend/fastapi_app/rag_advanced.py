@@ -1,10 +1,8 @@
-import os
 from collections.abc import AsyncGenerator
 from typing import Optional, TypedDict, Union
 
-from openai import AsyncAzureOpenAI, AsyncOpenAI, AsyncStream
-from openai.types.chat import ChatCompletionChunk, ChatCompletionMessageParam
-from openai_messages_token_helper import get_token_limit
+from openai import AsyncAzureOpenAI, AsyncOpenAI
+from openai.types.chat import ChatCompletionMessageParam
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.messages import ModelMessagesTypeAdapter
 from pydantic_ai.models.openai import OpenAIModel
@@ -13,6 +11,7 @@ from pydantic_ai.settings import ModelSettings
 
 from fastapi_app.api_models import (
     AIChatRoles,
+    ChatRequestOverrides,
     ItemPublic,
     Message,
     RAGContext,
@@ -20,14 +19,8 @@ from fastapi_app.api_models import (
     RetrievalResponseDelta,
     ThoughtStep,
 )
-from fastapi_app.postgres_models import Item
 from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.rag_base import ChatParams, RAGChatBase
-
-# Experiment #1: Annotated did not work!
-# Experiment #2: Function-level docstring, Inline docstrings next to attributes
-#  Function -level docstring leads to XML like this: <summary>Search ...
-# Experiment #3: Move the docstrings below the attributes in triple-quoted strings - SUCCESS!!!
 
 
 class PriceFilter(TypedDict):
@@ -64,19 +57,44 @@ class SearchResults(TypedDict):
 
 
 class AdvancedRAGChat(RAGChatBase):
+    query_prompt_template = open(RAGChatBase.prompts_dir / "query.txt").read()
+    query_fewshots = open(RAGChatBase.prompts_dir / "query_fewshots.json").read()
+
     def __init__(
         self,
         *,
+        messages: list[ChatCompletionMessageParam],
+        overrides: ChatRequestOverrides,
         searcher: PostgresSearcher,
         openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
         chat_model: str,
         chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
     ):
         self.searcher = searcher
-        self.openai_chat_client = openai_chat_client
-        self.chat_model = chat_model
-        self.chat_deployment = chat_deployment
-        self.chat_token_limit = get_token_limit(chat_model, default_to_minimum=True)
+        self.chat_params = self.get_chat_params(messages, overrides)
+        self.model_for_thoughts = (
+            {"model": chat_model, "deployment": chat_deployment} if chat_deployment else {"model": chat_model}
+        )
+        pydantic_chat_model = OpenAIModel(
+            chat_model if chat_deployment is None else chat_deployment,
+            provider=OpenAIProvider(openai_client=openai_chat_client),
+        )
+        self.search_agent = Agent(
+            pydantic_chat_model,
+            model_settings=ModelSettings(temperature=0.0, max_tokens=500, seed=self.chat_params.seed),
+            system_prompt=self.query_prompt_template,
+            tools=[self.search_database],
+            output_type=SearchResults,
+        )
+        self.answer_agent = Agent(
+            pydantic_chat_model,
+            system_prompt=self.answer_prompt_template,
+            model_settings=ModelSettings(
+                temperature=self.chat_params.temperature,
+                max_tokens=self.chat_params.response_token_limit,
+                seed=self.chat_params.seed,
+            ),
+        )
 
     async def search_database(
         self,
@@ -113,42 +131,28 @@ class AdvancedRAGChat(RAGChatBase):
             query=search_query, items=[ItemPublic.model_validate(item.to_dict()) for item in results], filters=filters
         )
 
-    async def prepare_context(self, chat_params: ChatParams) -> tuple[list[ItemPublic], list[ThoughtStep]]:
-        model = OpenAIModel(
-            os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"], provider=OpenAIProvider(openai_client=self.openai_chat_client)
-        )
-        agent = Agent(
-            model,
-            model_settings=ModelSettings(temperature=0.0, max_tokens=500, seed=chat_params.seed),
-            system_prompt=self.query_prompt_template,
-            tools=[self.search_database],
-            output_type=SearchResults,
-        )
+    async def prepare_context(self) -> tuple[list[ItemPublic], list[ThoughtStep]]:
         few_shots = ModelMessagesTypeAdapter.validate_json(self.query_fewshots)
-        user_query = f"Find search results for user query: {chat_params.original_user_query}"
-        results = await agent.run(
+        user_query = f"Find search results for user query: {self.chat_params.original_user_query}"
+        results = await self.search_agent.run(
             user_query,
-            message_history=few_shots + chat_params.past_messages,
-            deps=chat_params,
+            message_history=few_shots + self.chat_params.past_messages,
+            deps=self.chat_params,
         )
         items = results.output["items"]
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
                 description=results.all_messages(),
-                props=(
-                    {"model": self.chat_model, "deployment": self.chat_deployment}
-                    if self.chat_deployment
-                    else {"model": self.chat_model}  # TODO
-                ),
+                props=self.model_for_thoughts,
             ),
             ThoughtStep(
                 title="Search using generated search arguments",
                 description=results.output["query"],
                 props={
-                    "top": chat_params.top,
-                    "vector_search": chat_params.enable_vector_search,
-                    "text_search": chat_params.enable_text_search,
+                    "top": self.chat_params.top,
+                    "vector_search": self.chat_params.enable_vector_search,
+                    "text_search": self.chat_params.enable_text_search,
                     "filters": results.output["filters"],
                 },
             ),
@@ -161,25 +165,12 @@ class AdvancedRAGChat(RAGChatBase):
 
     async def answer(
         self,
-        chat_params: ChatParams,
         items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
-        agent = Agent(
-            OpenAIModel(
-                os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"],
-                provider=OpenAIProvider(openai_client=self.openai_chat_client),
-            ),
-            system_prompt=self.answer_prompt_template,
-            model_settings=ModelSettings(
-                temperature=chat_params.temperature, max_tokens=chat_params.response_token_limit, seed=chat_params.seed
-            ),
-        )
-
-        sources_content = [f"[{(item.id)}]:{item.to_str_for_rag()}\n\n" for item in items]
-        response = await agent.run(
-            user_prompt=chat_params.original_user_query + "Sources:\n" + "\n".join(sources_content),
-            message_history=chat_params.past_messages,
+        response = await self.answer_agent.run(
+            user_prompt=self.prepare_rag_request(self.chat_params.original_user_query, items),
+            message_history=self.chat_params.past_messages,
         )
 
         return RetrievalResponse(
@@ -191,11 +182,7 @@ class AdvancedRAGChat(RAGChatBase):
                     ThoughtStep(
                         title="Prompt to generate answer",
                         description=response.all_messages(),
-                        props=(
-                            {"model": self.chat_model, "deployment": self.chat_deployment}
-                            if self.chat_deployment
-                            else {"model": self.chat_model}
-                        ),
+                        props=self.model_for_thoughts,
                     ),
                 ],
             ),
@@ -203,45 +190,27 @@ class AdvancedRAGChat(RAGChatBase):
 
     async def answer_stream(
         self,
-        chat_params: ChatParams,
-        contextual_messages: list[ChatCompletionMessageParam],
-        results: list[Item],
+        items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
-        chat_completion_async_stream: AsyncStream[
-            ChatCompletionChunk
-        ] = await self.openai_chat_client.chat.completions.create(
-            # Azure OpenAI takes the deployment name as the model name
-            model=self.chat_deployment if self.chat_deployment else self.chat_model,
-            messages=contextual_messages,
-            temperature=chat_params.temperature,
-            max_tokens=chat_params.response_token_limit,
-            n=1,
-            stream=True,
-        )
-
-        yield RetrievalResponseDelta(
-            context=RAGContext(
-                data_points={item.id: item.to_dict() for item in results},
-                thoughts=earlier_thoughts
-                + [
-                    ThoughtStep(
-                        title="Prompt to generate answer",
-                        description=contextual_messages,
-                        props=(
-                            {"model": self.chat_model, "deployment": self.chat_deployment}
-                            if self.chat_deployment
-                            else {"model": self.chat_model}
+        async with self.answer_agent.run_stream(
+            self.prepare_rag_request(self.chat_params.original_user_query, items),
+            message_history=self.chat_params.past_messages,
+        ) as agent_stream_runner:
+            yield RetrievalResponseDelta(
+                context=RAGContext(
+                    data_points={item.id: item for item in items},
+                    thoughts=earlier_thoughts
+                    + [
+                        ThoughtStep(
+                            title="Prompt to generate answer",
+                            description=agent_stream_runner.all_messages(),
+                            props=self.model_for_thoughts,
                         ),
-                    ),
-                ],
-            ),
-        )
+                    ],
+                ),
+            )
 
-        async for response_chunk in chat_completion_async_stream:
-            # first response has empty choices and last response has empty content
-            if response_chunk.choices and response_chunk.choices[0].delta.content:
-                yield RetrievalResponseDelta(
-                    delta=Message(content=str(response_chunk.choices[0].delta.content), role=AIChatRoles.ASSISTANT)
-                )
-        return
+            async for message in agent_stream_runner.stream_text(delta=True, debounce_by=None):
+                yield RetrievalResponseDelta(delta=Message(content=str(message), role=AIChatRoles.ASSISTANT))
+            return
