@@ -50,6 +50,15 @@ async def create_openai_chat_client(
             base_url=os.getenv("OLLAMA_ENDPOINT"),
             api_key="nokeyneeded",
         )
+    elif OPENAI_CHAT_HOST == "github":
+        logger.info("Setting up OpenAI client for chat completions using GitHub Models")
+        github_base_url = os.getenv("GITHUB_BASE_URL", "https://models.inference.ai.azure.com")
+        github_model = os.getenv("GITHUB_MODEL", "gpt-4o")
+        logger.info(f"Using GitHub Models with base URL: {github_base_url}, model: {github_model}")
+        openai_chat_client = openai.AsyncOpenAI(
+            base_url=github_base_url,
+            api_key=os.getenv("GITHUB_TOKEN"),
+        )
     else:
         logger.info("Setting up OpenAI client for chat completions using OpenAI.com API key")
         openai_chat_client = openai.AsyncOpenAI(api_key=os.getenv("OPENAICOM_KEY"))
@@ -98,6 +107,15 @@ async def create_openai_embed_client(
         openai_embed_client = openai.AsyncOpenAI(
             base_url=os.getenv("OLLAMA_ENDPOINT"),
             api_key="nokeyneeded",
+        )
+    elif OPENAI_EMBED_HOST == "github":
+        logger.info("Setting up OpenAI client for embeddings using GitHub Models")
+        github_base_url = os.getenv("GITHUB_BASE_URL", "https://models.inference.ai.azure.com")
+        github_embed_model = os.getenv("GITHUB_EMBED_MODEL", "text-embedding-3-small")
+        logger.info(f"Using GitHub Models with base URL: {github_base_url}, embedding model: {github_embed_model}")
+        openai_embed_client = openai.AsyncOpenAI(
+            base_url=github_base_url,
+            api_key=os.getenv("GITHUB_TOKEN"),
         )
     else:
         logger.info("Setting up OpenAI client for embeddings using OpenAI.com API key")

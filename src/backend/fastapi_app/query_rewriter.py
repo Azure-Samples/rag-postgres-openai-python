@@ -69,7 +69,7 @@ def extract_search_arguments(original_user_query: str, chat_completion: ChatComp
                 arg = json.loads(function.arguments)
                 # Even though its required, search_query is not always specified
                 search_query = arg.get("search_query", original_user_query)
-                if "price_filter" in arg and arg["price_filter"]:
+                if "price_filter" in arg and arg["price_filter"] and isinstance(arg["price_filter"], dict):
                     price_filter = arg["price_filter"]
                     filters.append(
                         {
@@ -78,7 +78,7 @@ def extract_search_arguments(original_user_query: str, chat_completion: ChatComp
                             "value": price_filter["value"],
                         }
                     )
-                if "brand_filter" in arg and arg["brand_filter"]:
+                if "brand_filter" in arg and arg["brand_filter"] and isinstance(arg["brand_filter"], dict):
                     brand_filter = arg["brand_filter"]
                     filters.append(
                         {

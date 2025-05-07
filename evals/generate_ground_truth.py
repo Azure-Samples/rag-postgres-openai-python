@@ -101,7 +101,9 @@ def get_openai_client() -> tuple[Union[AzureOpenAI, OpenAI], str]:
             )
         model = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
     elif OPENAI_CHAT_HOST == "ollama":
-        raise NotImplementedError("Ollama OpenAI Service is not supported. Switch to Azure or OpenAI.com")
+        raise NotImplementedError("Ollama is not supported. Switch to Azure or OpenAI.com")
+    elif OPENAI_CHAT_HOST == "github":
+        raise NotImplementedError("GitHub Models is not supported. Switch to Azure or OpenAI.com")
     else:
         logger.info("Using OpenAI Service with API Key from OPENAICOM_KEY")
         openai_client = OpenAI(api_key=os.environ["OPENAICOM_KEY"])

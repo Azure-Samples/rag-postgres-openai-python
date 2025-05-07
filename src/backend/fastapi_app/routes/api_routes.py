@@ -68,7 +68,7 @@ async def similar_handler(
                 f"SELECT *, {context.embedding_column} <=> :embedding as DISTANCE FROM {Item.__tablename__} "
                 "WHERE id <> :item_id ORDER BY distance LIMIT :n"
             ),
-            {"embedding": item.embedding_ada002, "n": n, "item_id": id},
+            {"embedding": getattr(item, context.embedding_column), "n": n, "item_id": id},
         )
     ).fetchall()
 
@@ -145,6 +145,7 @@ async def chat_handler(
         if isinstance(e, APIError) and e.code == "content_filter":
             return ERROR_FILTER
         else:
+            logging.exception("Exception while generating response: %s", e)
             return {"error": str(e)}
 
 

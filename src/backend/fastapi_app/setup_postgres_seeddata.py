@@ -42,7 +42,7 @@ async def seed_data(engine):
                 if db_item.scalars().first():
                     continue
                 attrs = {key: value for key, value in seed_data_object.items()}
-                attrs["embedding_ada002"] = np.array(seed_data_object["embedding_ada002"])
+                attrs["embedding_3l"] = np.array(seed_data_object["embedding_3l"])
                 attrs["embedding_nomic"] = np.array(seed_data_object["embedding_nomic"])
                 column_names = ", ".join(attrs.keys())
                 values = ", ".join([f":{key}" for key in attrs.keys()])

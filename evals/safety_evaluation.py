@@ -106,15 +106,13 @@ async def run_simulator(target_url: str, max_simulations: int):
             else:
                 logger.info(f"Failing score from:\nQ: {query}\nA: {answer}\n{evaluator} score: {eval_score}")
             numeric_severity_score = eval_score[f"{evaluator}_score"]
-            if isinstance(numeric_severity_score, float):
+            if isinstance(numeric_severity_score, float) or isinstance(numeric_severity_score, int):
                 summary_scores[evaluator]["score_total"] += numeric_severity_score
 
     # Compute the overall statistics
     for evaluator in evaluators:
         if len(outputs) > 0:
-            summary_scores[evaluator]["mean_score"] = (
-                summary_scores[evaluator]["score_total"] / summary_scores[evaluator]["low_count"]
-            )
+            summary_scores[evaluator]["mean_score"] = summary_scores[evaluator]["score_total"] / len(outputs)
             summary_scores[evaluator]["low_rate"] = summary_scores[evaluator]["low_count"] / len(outputs)
 
     # Save summary scores

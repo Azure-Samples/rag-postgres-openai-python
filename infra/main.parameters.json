@@ -69,22 +69,22 @@
         "value": "${OPENAI_EMBED_HOST=azure}"
       },
       "embedModelName":{
-        "value": "${AZURE_OPENAI_EMBED_MODEL=text-embedding-ada-002}"
+        "value": "${AZURE_OPENAI_EMBED_MODEL=text-embedding-3-large}"
       },
       "embedDeploymentName": {
-        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT=text-embedding-ada-002}"
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT=text-embedding-3-large}"
       },
       "embedDeploymentVersion":{
-        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION=2}"
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION=1}"
       },
       "embedDeploymentSku": {
-        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_SKU=Standard}"
+        "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_SKU=GlobalStandard}"
       },
       "embedDeploymentCapacity":{
         "value": "${AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY=30}"
       },
       "embedDimensions": {
-        "value": "${AZURE_OPENAI_EMBED_DIMENSIONS=1536}"
+        "value": "${AZURE_OPENAI_EMBED_DIMENSIONS=1024}"
       },
       "openAIComKey": {
         "value": "${OPENAICOM_KEY}"

@@ -64,9 +64,10 @@ def mock_session_env(monkeypatch_session):
         monkeypatch_session.setenv("AZURE_OPENAI_VERSION", "2024-03-01-preview")
         monkeypatch_session.setenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4o-mini")
         monkeypatch_session.setenv("AZURE_OPENAI_CHAT_MODEL", "gpt-4o-mini")
-        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DEPLOYMENT", "text-embedding-ada-002")
-        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL", "text-embedding-ada-002")
-        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DIMENSIONS", "1536")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DEPLOYMENT", "text-embedding-3-large")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_MODEL", "text-embedding-3-large")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBED_DIMENSIONS", "1024")
+        monkeypatch_session.setenv("AZURE_OPENAI_EMBEDDING_COLUMN", "embedding_3l")
         monkeypatch_session.setenv("AZURE_OPENAI_KEY", "fakekey")
 
         yield
@@ -93,9 +94,9 @@ def mock_session_env_openai(monkeypatch_session):
         monkeypatch_session.setenv("OPENAI_EMBED_HOST", "openai")
         monkeypatch_session.setenv("OPENAICOM_KEY", "fakekey")
         monkeypatch_session.setenv("OPENAICOM_CHAT_MODEL", "gpt-3.5-turbo")
-        monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL", "text-embedding-ada-002")
-        monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL_DIMENSIONS", "1536")
-        monkeypatch_session.setenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_ada002")
+        monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL", "text-embedding-3-large")
+        monkeypatch_session.setenv("OPENAICOM_EMBED_DIMENSIONS", "1024")
+        monkeypatch_session.setenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_3l")
 
         yield
 
@@ -157,7 +158,7 @@ def mock_openai_embedding(monkeypatch_session):
                     object="embedding",
                 )
             ],
-            model="text-embedding-ada-002",
+            model="text-embedding-3-large",
             usage=Usage(prompt_tokens=8, total_tokens=8),
         )
 
@@ -311,8 +312,8 @@ async def postgres_searcher(mock_session_env, mock_azure_credential, db_session,
     yield PostgresSearcher(
         db_session=db_session,
         openai_embed_client=openai_embed_client,
-        embed_deployment="text-embedding-ada-002",
-        embed_model="text-embedding-ada-002",
-        embed_dimensions=1536,
-        embedding_column="embedding_ada002",
+        embed_deployment="text-embedding-3-large",
+        embed_model="text-embedding-3-large",
+        embed_dimensions=1024,
+        embedding_column="embedding_3l",
     )
