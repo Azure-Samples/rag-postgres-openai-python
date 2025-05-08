@@ -117,6 +117,12 @@ class BrandFilter(Filter):
     value: str = Field(description="The brand name to compare against (e.g., 'AirStrider')")
 
 
+class SearchArguments(BaseModel):
+    search_query: str
+    price_filter: Optional[PriceFilter] = Field(default=None)
+    brand_filter: Optional[BrandFilter] = Field(default=None)
+
+
 class SearchResults(BaseModel):
     query: str
     """The original search query"""
