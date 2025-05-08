@@ -1,34 +1,76 @@
 [
-    {"role": "user", "content": "good options for ethiopian restaurants?"},
-    {"role": "assistant", "tool_calls": [
-        {
-            "id": "call_abc123",
-            "type": "function",
-            "function": {
-                "arguments": "{\"search_query\":\"ethiopian\"}",
-                "name": "search_database"
-            }
-        }
-    ]},
-    {
-        "role": "tool",
-        "tool_call_id": "call_abc123",
-        "content": "Search results for ethiopian: ..."
-    },
-    {"role": "user", "content": "are there any inexpensive chinese restaurants?"},
-    {"role": "assistant", "tool_calls": [
-        {
-            "id": "call_abc456",
-            "type": "function",
-            "function": {
-                "arguments": "{\"search_query\":\"chinese\",\"price_level_filter\":{\"comparison_operator\":\"<\",\"value\":3}}",
-                "name": "search_database"
-            }
-        }
-    ]},
-    {
-        "role": "tool",
-        "tool_call_id": "call_abc456",
-        "content": "Search results for chinese: ..."
-    }
+  {
+    "parts": [
+      {
+        "content": "good options for ethiopian restaurants?",
+        "timestamp": "2025-05-07T19:02:46.977501Z",
+        "part_kind": "user-prompt"
+      }
+    ],
+    "instructions": null,
+    "kind": "request"
+  },
+  {
+    "parts": [
+      {
+        "tool_name": "search_database",
+        "args": "{\"search_query\":\"ethiopian\"}",
+        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
+        "part_kind": "tool-call"
+      }
+    ],
+    "model_name": "gpt-4o-mini-2024-07-18",
+    "timestamp": "2025-05-07T19:02:47Z",
+    "kind": "response"
+  },
+  {
+    "parts": [
+      {
+        "tool_name": "search_database",
+        "content": "Search results for ethiopian: ...",
+        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
+        "timestamp": "2025-05-07T19:02:48.242408Z",
+        "part_kind": "tool-return"
+      }
+    ],
+    "instructions": null,
+    "kind": "request"
+  },
+  {
+    "parts": [
+      {
+        "content": "are there any inexpensive chinese restaurants?",
+        "timestamp": "2025-05-07T19:02:46.977501Z",
+        "part_kind": "user-prompt"
+      }
+    ],
+    "instructions": null,
+    "kind": "request"
+  },
+  {
+    "parts": [
+      {
+        "tool_name": "search_database",
+        "args": "{\"search_query\":\"chinese\",\"price_level_filter\":{\"comparison_operator\":\"<\",\"value\":3}}",
+        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
+        "part_kind": "tool-call"
+      }
+    ],
+    "model_name": "gpt-4o-mini-2024-07-18",
+    "timestamp": "2025-05-07T19:02:47Z",
+    "kind": "response"
+  },
+  {
+    "parts": [
+      {
+        "tool_name": "search_database",
+        "content": "Search results for chinese: ...",
+        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
+        "timestamp": "2025-05-07T19:02:48.242408Z",
+        "part_kind": "tool-return"
+      }
+    ],
+    "instructions": null,
+    "kind": "request"
+  }
 ]
