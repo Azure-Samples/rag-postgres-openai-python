@@ -36,6 +36,5 @@
         "htmlcov": true,
         ".mypy_cache": true,
         ".coverage": true
-    },
-    "python.REPL.enableREPLSmartSend": false
+    }
 }

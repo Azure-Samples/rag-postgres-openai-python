@@ -82,7 +82,7 @@ class AdvancedRAGChat(RAGChatBase):
         Search PostgreSQL database for relevant products based on user query
 
         Args:
-            search_query: Query string to use for full text search, e.g. 'red shoes'
+            search_query: English query string to use for full text search, e.g. 'red shoes'.
             price_filter: Filter search results based on price of the product
             brand_filter: Filter search results based on brand of the product
 
@@ -109,7 +109,7 @@ class AdvancedRAGChat(RAGChatBase):
     async def prepare_context(self) -> tuple[list[ItemPublic], list[ThoughtStep]]:
         few_shots = ModelMessagesTypeAdapter.validate_json(self.query_fewshots)
         user_query = f"Find search results for user query: {self.chat_params.original_user_query}"
-        results = await self.search_agent.run(  # type: ignore[call-overload]
+        results = await self.search_agent.run(
             user_query,
             message_history=few_shots + self.chat_params.past_messages,
             deps=self.chat_params,

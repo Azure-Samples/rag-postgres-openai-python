@@ -1,4 +1,3 @@
-import http.client
 import json
 import logging
 from collections.abc import AsyncGenerator
@@ -26,8 +25,6 @@ from fastapi_app.rag_simple import SimpleRAGChat
 
 router = fastapi.APIRouter()
 
-
-http.client.HTTPConnection.debuglevel = 1
 
 ERROR_FILTER = {"error": "Your message contains content that was flagged by the content filter."}
 

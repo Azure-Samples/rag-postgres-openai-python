@@ -58,17 +58,11 @@ def create_app(testing: bool = False):
     else:
         if not testing:
             load_dotenv(override=True)
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
 
-        # Enable detailed HTTP traffic logging
-        logging.getLogger("httpx").setLevel(logging.DEBUG)
-        logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.DEBUG)
-        logging.getLogger("azure.identity").setLevel(logging.DEBUG)
-        logging.getLogger("urllib3").setLevel(logging.DEBUG)
-
-        # Configure httpx logging to show full bodies
-        os.environ["HTTPX_LOG_LEVEL"] = "DEBUG"
-        os.environ["HTTPCORE_LOG_LEVEL"] = "DEBUG"
+    # Turn off particularly noisy INFO level logs from Azure Core SDK:
+    logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
+    logging.getLogger("azure.identity").setLevel(logging.WARNING)
 
     if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
         logger.info("Configuring Azure Monitor")
