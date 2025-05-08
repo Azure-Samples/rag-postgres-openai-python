@@ -41,17 +41,21 @@ class ChatRequest(BaseModel):
     context: ChatRequestContext
     sessionState: Optional[Any] = None
 
-
+      
 class ItemPublic(BaseModel):
     id: int
-    type: str
-    brand: str
     name: str
+    location: str
+    cuisine: str
+    rating: int
+    price_level: int
+    review_count: int
+    hours: int
+    tags: str
     description: str
-    price: float
-
-    def to_str_for_rag(self):
-        return f"Name:{self.name} Description:{self.description} Price:{self.price} Brand:{self.brand} Type:{self.type}"
+    menu_summary: str
+    top_reviews: str
+    vibe: str
 
 
 class ItemWithDistance(ItemPublic):
@@ -105,16 +109,16 @@ class Filter(BaseModel):
     value: Any
 
 
-class PriceFilter(Filter):
-    column: str = Field(default="price", description="The column to filter on (always 'price' for this filter)")
-    comparison_operator: str = Field(description="The operator for price comparison ('>', '<', '>=', '<=', '=')")
-    value: float = Field(description="The price value to compare against (e.g., 30.00)")
+class PriceLevelFilter(Filter):
+    column: str = Field(default="price_level", description="The column to filter on (always 'price_level' for this filter)")
+    comparison_operator: str = Field(description="The operator for price level comparison ('>', '<', '>=', '<=', '=')")
+    value: float = Field(description="Value to compare against, either 1, 2, 3, 4")
 
 
-class BrandFilter(Filter):
-    column: str = Field(default="brand", description="The column to filter on (always 'brand' for this filter)")
-    comparison_operator: str = Field(description="The operator for brand comparison ('=' or '!=')")
-    value: str = Field(description="The brand name to compare against (e.g., 'AirStrider')")
+class RatingFilter(Filter):
+    column: str = Field(default="rating", description="The column to filter on (always 'rating' for this filter)")
+    comparison_operator: str = Field(description="The operator for rating comparison ('>', '<', '>=', '<=', '=')")
+    value: str = Field(description="Value to compare against, either 0 1 2 3 4")
 
 
 class SearchResults(BaseModel):

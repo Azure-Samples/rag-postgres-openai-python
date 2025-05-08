@@ -2,7 +2,7 @@
   {
     "parts": [
       {
-        "content": "good options for climbing gear that can be used outside?",
+        "content": "good options for ethiopian restaurants?",
         "timestamp": "2025-05-07T19:02:46.977501Z",
         "part_kind": "user-prompt"
       }
@@ -14,7 +14,7 @@
     "parts": [
       {
         "tool_name": "search_database",
-        "args": "{\"search_query\":\"climbing gear outside\"}",
+        "args": "{\"search_query\":\"ethiopian\"}",
         "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
         "part_kind": "tool-call"
       }
@@ -27,7 +27,7 @@
     "parts": [
       {
         "tool_name": "search_database",
-        "content": "Search results for climbing gear that can be used outside: ...",
+        "content": "Search results for ethiopian: ...",
         "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
         "timestamp": "2025-05-07T19:02:48.242408Z",
         "part_kind": "tool-return"
@@ -39,7 +39,7 @@
   {
     "parts": [
       {
-        "content": "are there any shoes less than $50?",
+        "content": "are there any inexpensive chinese restaurants?",
         "timestamp": "2025-05-07T19:02:46.977501Z",
         "part_kind": "user-prompt"
       }
@@ -51,7 +51,7 @@
     "parts": [
       {
         "tool_name": "search_database",
-        "args": "{\"search_query\":\"shoes\",\"price_filter\":{\"comparison_operator\":\"<\",\"value\":50}}",
+        "args": "{\"search_query\":\"chinese\",\"price_level_filter\":{\"comparison_operator\":\"<\",\"value\":3}}",
         "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
         "part_kind": "tool-call"
       }
@@ -64,7 +64,7 @@
     "parts": [
       {
         "tool_name": "search_database",
-        "content": "Search results for shoes cheaper than 50: ...",
+        "content": "Search results for chinese: ...",
         "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
         "timestamp": "2025-05-07T19:02:48.242408Z",
         "part_kind": "tool-return"

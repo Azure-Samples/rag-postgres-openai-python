@@ -12,7 +12,7 @@ def build_search_function() -> list[ChatCompletionToolParam]:
             "type": "function",
             "function": {
                 "name": "search_database",
-                "description": "Search PostgreSQL database for relevant products based on user query",
+                "description": "Search PostgreSQL database for relevant restaurants based on user query",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -20,31 +20,31 @@ def build_search_function() -> list[ChatCompletionToolParam]:
                             "type": "string",
                             "description": "Query string to use for full text search, e.g. 'red shoes'",
                         },
-                        "price_filter": {
+                        "price_level_filter": {
                             "type": "object",
-                            "description": "Filter search results based on price of the product",
+                            "description": "Filter search results to a certain price level (from 1 $ to 4 $$$$, with 4 being most costly)",  # noqa: E501
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
-                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa
+                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa: E501
                                 },
                                 "value": {
                                     "type": "number",
-                                    "description": "Value to compare against, e.g. 30",
+                                    "description": "Value to compare against, either 1, 2, 3, 4",
                                 },
                             },
                         },
-                        "brand_filter": {
+                        "rating_filter": {
                             "type": "object",
-                            "description": "Filter search results based on brand of the product",
+                            "description": "Filter search results based on ratings of restaurant (from 1 to 5 stars, with 5 the best)",  # noqa: E501
                             "properties": {
                                 "comparison_operator": {
                                     "type": "string",
-                                    "description": "Operator to compare the column value, either '=' or '!='",
+                                    "description": "Operator to compare the column value, either '>', '<', '>=', '<=', '='",  # noqa: E501
                                 },
                                 "value": {
                                     "type": "string",
-                                    "description": "Value to compare against, e.g. AirStrider",
+                                    "description": "Value to compare against, either 0 1 2 3 4 5",
                                 },
                             },
                         },
@@ -69,22 +69,26 @@ def extract_search_arguments(original_user_query: str, chat_completion: ChatComp
                 arg = json.loads(function.arguments)
                 # Even though its required, search_query is not always specified
                 search_query = arg.get("search_query", original_user_query)
-                if "price_filter" in arg and arg["price_filter"] and isinstance(arg["price_filter"], dict):
-                    price_filter = arg["price_filter"]
+                if (
+                    "price_level_filter" in arg
+                    and arg["price_level_filter"]
+                    and isinstance(arg["price_level_filter"], dict)
+                ):
+                    price_level_filter = arg["price_level_filter"]
                     filters.append(
                         {
-                            "column": "price",
-                            "comparison_operator": price_filter["comparison_operator"],
-                            "value": price_filter["value"],
+                            "column": "price_level",
+                            "comparison_operator": price_level_filter["comparison_operator"],
+                            "value": price_level_filter["value"],
                         }
                     )
-                if "brand_filter" in arg and arg["brand_filter"] and isinstance(arg["brand_filter"], dict):
-                    brand_filter = arg["brand_filter"]
+                if "rating_filter" in arg and arg["rating_filter"] and isinstance(arg["rating_filter"], dict):
+                    rating_filter = arg["rating_filter"]
                     filters.append(
                         {
-                            "column": "brand",
-                            "comparison_operator": brand_filter["comparison_operator"],
-                            "value": brand_filter["value"],
+                            "column": "rating",
+                            "comparison_operator": rating_filter["comparison_operator"],
+                            "value": rating_filter["value"],
                         }
                     )
     elif query_text := response_message.content:
