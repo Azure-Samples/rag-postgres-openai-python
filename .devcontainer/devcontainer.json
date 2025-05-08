@@ -33,7 +33,8 @@
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
 				"ms-vscode.vscode-node-azure-pack",
-                "esbenp.prettier-vscode"
+				"esbenp.prettier-vscode",
+				"mechatroner.rainbow-csv"
 			],
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
