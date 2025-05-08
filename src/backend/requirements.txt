@@ -34,7 +34,7 @@ azure-core-tracing-opentelemetry==1.0.0b11
     # via azure-monitor-opentelemetry
 azure-identity==1.19.0
     # via fastapi-app (pyproject.toml)
-azure-monitor-opentelemetry==1.6.3
+azure-monitor-opentelemetry==1.6.8
     # via fastapi-app (pyproject.toml)
 azure-monitor-opentelemetry-exporter==1.0.0b32
     # via azure-monitor-opentelemetry
@@ -52,7 +52,7 @@ click==8.1.7
     # via uvicorn
 colorama==0.4.6
     # via griffe
-cryptography==44.0.1
+cryptography==44.0.3
     # via
     #   azure-identity
     #   msal
@@ -63,7 +63,7 @@ deprecated==1.2.15
     #   opentelemetry-semantic-conventions
 distro==1.9.0
     # via openai
-environs==11.2.1
+environs==14.1.1
     # via fastapi-app (pyproject.toml)
 eval-type-backport==0.2.2
     # via pydantic-ai-slim
@@ -319,7 +319,7 @@ typing-inspection==0.4.0
     # via
     #   pydantic-ai-slim
     #   pydantic-graph
-urllib3==1.26.20
+urllib3==2.4.0
     # via requests
 uvicorn==0.32.1
     # via fastapi-app (pyproject.toml)
