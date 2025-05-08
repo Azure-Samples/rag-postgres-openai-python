@@ -1,27 +1,28 @@
-import json
 import pathlib
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
+from typing import Union
 
 from openai.types.chat import ChatCompletionMessageParam
+from pydantic_ai.messages import ModelRequest, ModelResponse, TextPart, UserPromptPart
 
 from fastapi_app.api_models import (
     ChatParams,
     ChatRequestOverrides,
+    ItemPublic,
     RetrievalResponse,
     RetrievalResponseDelta,
     ThoughtStep,
 )
-from fastapi_app.postgres_models import Item
 
 
 class RAGChatBase(ABC):
-    current_dir = pathlib.Path(__file__).parent
-    query_prompt_template = open(current_dir / "prompts/query.txt").read()
-    query_fewshots = json.loads(open(current_dir / "prompts/query_fewshots.json").read())
-    answer_prompt_template = open(current_dir / "prompts/answer.txt").read()
+    prompts_dir = pathlib.Path(__file__).parent / "prompts/"
+    answer_prompt_template = open(prompts_dir / "answer.txt").read()
 
-    def get_params(self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides) -> ChatParams:
+    def get_chat_params(
+        self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides
+    ) -> ChatParams:
         response_token_limit = 1024
         prompt_template = overrides.prompt_template or self.answer_prompt_template
 
@@ -31,7 +32,19 @@ class RAGChatBase(ABC):
         original_user_query = messages[-1]["content"]
         if not isinstance(original_user_query, str):
             raise ValueError("The most recent message content must be a string.")
-        past_messages = messages[:-1]
+
+        # Convert to PydanticAI format:
+        past_messages: list[Union[ModelRequest, ModelResponse]] = []
+        for message in messages[:-1]:
+            content = message["content"]
+            if not isinstance(content, str):
+                raise ValueError("All messages must have string content.")
+            if message["role"] == "user":
+                past_messages.append(ModelRequest(parts=[UserPromptPart(content=content)]))
+            elif message["role"] == "assistant":
+                past_messages.append(ModelResponse(parts=[TextPart(content=content)]))
+            else:
+                raise ValueError(f"Cannot convert message: {message}")
 
         return ChatParams(
             top=overrides.top,
@@ -48,17 +61,17 @@ class RAGChatBase(ABC):
         )
 
     @abstractmethod
-    async def prepare_context(
-        self, chat_params: ChatParams
-    ) -> tuple[list[ChatCompletionMessageParam], list[Item], list[ThoughtStep]]:
+    async def prepare_context(self) -> tuple[list[ItemPublic], list[ThoughtStep]]:
         raise NotImplementedError
+
+    def prepare_rag_request(self, user_query, items: list[ItemPublic]) -> str:
+        sources_str = "\n".join([f"[{item.id}]:{item.to_str_for_rag()}" for item in items])
+        return f"{user_query}Sources:\n{sources_str}"
 
     @abstractmethod
     async def answer(
         self,
-        chat_params: ChatParams,
-        contextual_messages: list[ChatCompletionMessageParam],
-        results: list[Item],
+        items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
         raise NotImplementedError
@@ -66,9 +79,7 @@ class RAGChatBase(ABC):
     @abstractmethod
     async def answer_stream(
         self,
-        chat_params: ChatParams,
-        contextual_messages: list[ChatCompletionMessageParam],
-        results: list[Item],
+        items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
         raise NotImplementedError

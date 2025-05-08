@@ -121,6 +121,8 @@ async def chat_handler(
         rag_flow: Union[SimpleRAGChat, AdvancedRAGChat]
         if chat_request.context.overrides.use_advanced_flow:
             rag_flow = AdvancedRAGChat(
+                messages=chat_request.messages,
+                overrides=chat_request.context.overrides,
                 searcher=searcher,
                 openai_chat_client=openai_chat.client,
                 chat_model=context.openai_chat_model,
@@ -128,18 +130,16 @@ async def chat_handler(
             )
         else:
             rag_flow = SimpleRAGChat(
+                messages=chat_request.messages,
+                overrides=chat_request.context.overrides,
                 searcher=searcher,
                 openai_chat_client=openai_chat.client,
                 chat_model=context.openai_chat_model,
                 chat_deployment=context.openai_chat_deployment,
             )
 
-        chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
-
-        contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
-        response = await rag_flow.answer(
-            chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
-        )
+        items, thoughts = await rag_flow.prepare_context()
+        response = await rag_flow.answer(items=items, earlier_thoughts=thoughts)
         return response
     except Exception as e:
         if isinstance(e, APIError) and e.code == "content_filter":
@@ -169,6 +169,8 @@ async def chat_stream_handler(
     rag_flow: Union[SimpleRAGChat, AdvancedRAGChat]
     if chat_request.context.overrides.use_advanced_flow:
         rag_flow = AdvancedRAGChat(
+            messages=chat_request.messages,
+            overrides=chat_request.context.overrides,
             searcher=searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
@@ -176,25 +178,29 @@ async def chat_stream_handler(
         )
     else:
         rag_flow = SimpleRAGChat(
+            messages=chat_request.messages,
+            overrides=chat_request.context.overrides,
             searcher=searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
             chat_deployment=context.openai_chat_deployment,
         )
 
-    chat_params = rag_flow.get_params(chat_request.messages, chat_request.context.overrides)
-
-    # Intentionally do this before we stream down a response, to avoid using database connections during stream
-    # See https://github.com/tiangolo/fastapi/discussions/11321
     try:
-        contextual_messages, results, thoughts = await rag_flow.prepare_context(chat_params)
-        result = rag_flow.answer_stream(
-            chat_params=chat_params, contextual_messages=contextual_messages, results=results, earlier_thoughts=thoughts
-        )
+        # Intentionally do search we stream down the answer, to avoid using database connections during stream
+        # See https://github.com/tiangolo/fastapi/discussions/11321
+        items, thoughts = await rag_flow.prepare_context()
+        result = rag_flow.answer_stream(items, thoughts)
         return StreamingResponse(content=format_as_ndjson(result), media_type="application/x-ndjson")
     except Exception as e:
         if isinstance(e, APIError) and e.code == "content_filter":
             return StreamingResponse(
                 content=json.dumps(ERROR_FILTER) + "\n",
+                media_type="application/x-ndjson",
+            )
+        else:
+            logging.exception("Exception while generating response: %s", e)
+            return StreamingResponse(
+                content=json.dumps({"error": str(e)}, ensure_ascii=False) + "\n",
                 media_type="application/x-ndjson",
             )
