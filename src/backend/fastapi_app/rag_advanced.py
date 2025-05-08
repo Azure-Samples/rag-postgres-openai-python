@@ -11,13 +11,13 @@ from pydantic_ai.settings import ModelSettings
 
 from fastapi_app.api_models import (
     AIChatRoles,
-    BrandFilter,
     ChatRequestOverrides,
     Filter,
     ItemPublic,
     Message,
-    PriceFilter,
+    PriceLevelFilter,
     RAGContext,
+    RatingFilter,
     RetrievalResponse,
     RetrievalResponseDelta,
     SearchResults,
@@ -75,8 +75,8 @@ class AdvancedRAGChat(RAGChatBase):
         self,
         ctx: RunContext[ChatParams],
         search_query: str,
-        price_filter: Optional[PriceFilter] = None,
-        brand_filter: Optional[BrandFilter] = None,
+        price_filter: Optional[PriceLevelFilter] = None,
+        brand_filter: Optional[RatingFilter] = None,
     ) -> SearchResults:
         """
         Search PostgreSQL database for relevant products based on user query

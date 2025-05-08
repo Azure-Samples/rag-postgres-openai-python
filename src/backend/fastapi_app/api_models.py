@@ -41,7 +41,7 @@ class ChatRequest(BaseModel):
     context: ChatRequestContext
     sessionState: Optional[Any] = None
 
-      
+
 class ItemPublic(BaseModel):
     id: int
     name: str
@@ -50,12 +50,15 @@ class ItemPublic(BaseModel):
     rating: int
     price_level: int
     review_count: int
-    hours: int
-    tags: str
+    hours: str
+    tags: list[str]
     description: str
     menu_summary: str
     top_reviews: str
     vibe: str
+
+    def to_str_for_rag(self):
+        return f"Name:{self.name} Description:{self.description} Location:{self.location} Cuisine:{self.cuisine} Rating:{self.rating} Price Level:{self.price_level} Review Count:{self.review_count} Hours:{self.hours} Tags:{self.tags} Menu Summary:{self.menu_summary} Top Reviews:{self.top_reviews} Vibe:{self.vibe}"  # noqa: E501
 
 
 class ItemWithDistance(ItemPublic):
@@ -110,7 +113,9 @@ class Filter(BaseModel):
 
 
 class PriceLevelFilter(Filter):
-    column: str = Field(default="price_level", description="The column to filter on (always 'price_level' for this filter)")
+    column: str = Field(
+        default="price_level", description="The column to filter on (always 'price_level' for this filter)"
+    )
     comparison_operator: str = Field(description="The operator for price level comparison ('>', '<', '>=', '<=', '=')")
     value: float = Field(description="Value to compare against, either 1, 2, 3, 4")
 
