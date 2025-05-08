@@ -9,7 +9,7 @@ logger = logging.getLogger("ragapp")
 
 
 async def create_openai_chat_client(
-    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential],
+    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential, None],
 ) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
     openai_chat_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
@@ -29,7 +29,7 @@ async def create_openai_chat_client(
                 azure_deployment=azure_deployment,
                 api_key=api_key,
             )
-        else:
+        elif azure_credential:
             logger.info(
                 "Setting up Azure OpenAI client for chat completions using Azure Identity, endpoint %s, deployment %s",
                 azure_endpoint,
@@ -44,6 +44,8 @@ async def create_openai_chat_client(
                 azure_deployment=azure_deployment,
                 azure_ad_token_provider=token_provider,
             )
+        else:
+            raise ValueError("Azure OpenAI client requires either an API key or Azure Identity credential.")
     elif OPENAI_CHAT_HOST == "ollama":
         logger.info("Setting up OpenAI client for chat completions using Ollama")
         openai_chat_client = openai.AsyncOpenAI(
@@ -67,7 +69,7 @@ async def create_openai_chat_client(
 
 
 async def create_openai_embed_client(
-    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential],
+    azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential, None],
 ) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
     openai_embed_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
@@ -87,7 +89,7 @@ async def create_openai_embed_client(
                 azure_deployment=azure_deployment,
                 api_key=api_key,
             )
-        else:
+        elif azure_credential:
             logger.info(
                 "Setting up Azure OpenAI client for embeddings using Azure Identity, endpoint %s, deployment %s",
                 azure_endpoint,
@@ -102,6 +104,8 @@ async def create_openai_embed_client(
                 azure_deployment=azure_deployment,
                 azure_ad_token_provider=token_provider,
             )
+        else:
+            raise ValueError("Azure OpenAI client requires either an API key or Azure Identity credential.")
     elif OPENAI_EMBED_HOST == "ollama":
         logger.info("Setting up OpenAI client for embeddings using Ollama")
         openai_embed_client = openai.AsyncOpenAI(

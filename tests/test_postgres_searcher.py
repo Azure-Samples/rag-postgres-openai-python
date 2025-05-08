@@ -1,6 +1,6 @@
 import pytest
 
-from fastapi_app.api_models import ItemPublic
+from fastapi_app.api_models import BrandFilter, ItemPublic, PriceFilter
 from tests.data import test_data
 
 
@@ -10,9 +10,24 @@ def test_postgres_build_filter_clause_without_filters(postgres_searcher):
 
 
 def test_postgres_build_filter_clause_with_filters(postgres_searcher):
-    assert postgres_searcher.build_filter_clause([{"column": "id", "comparison_operator": "=", "value": 1}]) == (
-        "WHERE id = 1",
-        "AND id = 1",
+    assert postgres_searcher.build_filter_clause(
+        [
+            BrandFilter(comparison_operator="=", value="AirStrider"),
+        ]
+    ) == (
+        "WHERE brand = 'AirStrider'",
+        "AND brand = 'AirStrider'",
+    )
+
+
+def test_postgres_build_filter_clause_with_filters_numeric(postgres_searcher):
+    assert postgres_searcher.build_filter_clause(
+        [
+            PriceFilter(comparison_operator="<", value=30),
+        ]
+    ) == (
+        "WHERE price < 30.0",
+        "AND price < 30.0",
     )
 
 

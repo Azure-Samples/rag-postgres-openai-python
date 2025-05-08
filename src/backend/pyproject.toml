@@ -19,7 +19,7 @@ dependencies = [
     "opentelemetry-instrumentation-sqlalchemy",
     "opentelemetry-instrumentation-aiohttp-client",
     "opentelemetry-instrumentation-openai",
-    "pydantic-ai"
+    "pydantic-ai-slim[openai]"
 ]
 
 [build-system]

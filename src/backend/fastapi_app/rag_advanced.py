@@ -1,5 +1,5 @@
 from collections.abc import AsyncGenerator
-from typing import Optional, TypedDict, Union
+from typing import Optional, Union
 
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
@@ -11,49 +11,20 @@ from pydantic_ai.settings import ModelSettings
 
 from fastapi_app.api_models import (
     AIChatRoles,
+    BrandFilter,
     ChatRequestOverrides,
+    Filter,
     ItemPublic,
     Message,
+    PriceFilter,
     RAGContext,
     RetrievalResponse,
     RetrievalResponseDelta,
+    SearchResults,
     ThoughtStep,
 )
 from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.rag_base import ChatParams, RAGChatBase
-
-
-class PriceFilter(TypedDict):
-    column: str = "price"
-    """The column to filter on (always 'price' for this filter)"""
-
-    comparison_operator: str
-    """The operator for price comparison ('>', '<', '>=', '<=', '=')"""
-
-    value: float
-    """ The price value to compare against (e.g., 30.00) """
-
-
-class BrandFilter(TypedDict):
-    column: str = "brand"
-    """The column to filter on (always 'brand' for this filter)"""
-
-    comparison_operator: str
-    """The operator for brand comparison ('=' or '!=')"""
-
-    value: str
-    """The brand name to compare against (e.g., 'AirStrider')"""
-
-
-class SearchResults(TypedDict):
-    query: str
-    """The original search query"""
-
-    items: list[ItemPublic]
-    """List of items that match the search query and filters"""
-
-    filters: list[Union[PriceFilter, BrandFilter]]
-    """List of filters applied to the search results"""
 
 
 class AdvancedRAGChat(RAGChatBase):
@@ -79,9 +50,13 @@ class AdvancedRAGChat(RAGChatBase):
             chat_model if chat_deployment is None else chat_deployment,
             provider=OpenAIProvider(openai_client=openai_chat_client),
         )
-        self.search_agent = Agent(
+        self.search_agent = Agent[ChatParams, SearchResults](
             pydantic_chat_model,
-            model_settings=ModelSettings(temperature=0.0, max_tokens=500, seed=self.chat_params.seed),
+            model_settings=ModelSettings(
+                temperature=0.0,
+                max_tokens=500,
+                **({"seed": self.chat_params.seed} if self.chat_params.seed is not None else {}),
+            ),
             system_prompt=self.query_prompt_template,
             tools=[self.search_database],
             output_type=SearchResults,
@@ -92,7 +67,7 @@ class AdvancedRAGChat(RAGChatBase):
             model_settings=ModelSettings(
                 temperature=self.chat_params.temperature,
                 max_tokens=self.chat_params.response_token_limit,
-                seed=self.chat_params.seed,
+                **({"seed": self.chat_params.seed} if self.chat_params.seed is not None else {}),
             ),
         )
 
@@ -115,7 +90,7 @@ class AdvancedRAGChat(RAGChatBase):
             List of formatted items that match the search query and filters
         """
         # Only send non-None filters
-        filters = []
+        filters: list[Filter] = []
         if price_filter:
             filters.append(price_filter)
         if brand_filter:
@@ -134,12 +109,12 @@ class AdvancedRAGChat(RAGChatBase):
     async def prepare_context(self) -> tuple[list[ItemPublic], list[ThoughtStep]]:
         few_shots = ModelMessagesTypeAdapter.validate_json(self.query_fewshots)
         user_query = f"Find search results for user query: {self.chat_params.original_user_query}"
-        results = await self.search_agent.run(
+        results = await self.search_agent.run(  # type: ignore[call-overload]
             user_query,
             message_history=few_shots + self.chat_params.past_messages,
             deps=self.chat_params,
         )
-        items = results.output["items"]
+        items = results.output.items
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
@@ -148,12 +123,12 @@ class AdvancedRAGChat(RAGChatBase):
             ),
             ThoughtStep(
                 title="Search using generated search arguments",
-                description=results.output["query"],
+                description=results.output.query,
                 props={
                     "top": self.chat_params.top,
                     "vector_search": self.chat_params.enable_vector_search,
                     "text_search": self.chat_params.enable_text_search,
-                    "filters": results.output["filters"],
+                    "filters": results.output.filters,
                 },
             ),
             ThoughtStep(

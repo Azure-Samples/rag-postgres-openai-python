@@ -48,7 +48,7 @@ class SimpleRAGChat(RAGChatBase):
             model_settings=ModelSettings(
                 temperature=self.chat_params.temperature,
                 max_tokens=self.chat_params.response_token_limit,
-                seed=self.chat_params.seed,
+                **({"seed": self.chat_params.seed} if self.chat_params.seed is not None else {}),
             ),
         )
 

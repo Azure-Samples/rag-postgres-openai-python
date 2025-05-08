@@ -38,7 +38,7 @@ async def lifespan(app: fastapi.FastAPI) -> AsyncIterator[State]:
     if (
         os.getenv("OPENAI_CHAT_HOST") == "azure"
         or os.getenv("OPENAI_EMBED_HOST") == "azure"
-        or os.getenv("POSTGRES_HOST").endswith(".database.azure.com")
+        or os.getenv("POSTGRES_HOST", "").endswith(".database.azure.com")
     ):
         azure_credential = await get_azure_credential()
     engine = await create_postgres_engine_from_env(azure_credential)
