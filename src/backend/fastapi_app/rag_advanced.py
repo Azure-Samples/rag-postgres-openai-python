@@ -1,13 +1,18 @@
+import json
 from collections.abc import AsyncGenerator
 from typing import Optional, Union
 
+from agents import Agent, ModelSettings, OpenAIChatCompletionsModel, Runner, function_tool, set_tracing_disabled
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from openai.types.chat import ChatCompletionMessageParam
-from pydantic_ai import Agent, RunContext
-from pydantic_ai.messages import ModelMessagesTypeAdapter
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
-from pydantic_ai.settings import ModelSettings
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+)
+from openai.types.responses import (
+    EasyInputMessageParam,
+    ResponseFunctionToolCallParam,
+    ResponseTextDeltaEvent,
+)
+from openai.types.responses.response_input_item_param import FunctionCallOutput
 
 from fastapi_app.api_models import (
     AIChatRoles,
@@ -24,7 +29,9 @@ from fastapi_app.api_models import (
     ThoughtStep,
 )
 from fastapi_app.postgres_searcher import PostgresSearcher
-from fastapi_app.rag_base import ChatParams, RAGChatBase
+from fastapi_app.rag_base import RAGChatBase
+
+set_tracing_disabled(disabled=True)
 
 
 class AdvancedRAGChat(RAGChatBase):
@@ -46,34 +53,29 @@ class AdvancedRAGChat(RAGChatBase):
         self.model_for_thoughts = (
             {"model": chat_model, "deployment": chat_deployment} if chat_deployment else {"model": chat_model}
         )
-        pydantic_chat_model = OpenAIModel(
-            chat_model if chat_deployment is None else chat_deployment,
-            provider=OpenAIProvider(openai_client=openai_chat_client),
+        openai_agents_model = OpenAIChatCompletionsModel(
+            model=chat_model if chat_deployment is None else chat_deployment, openai_client=openai_chat_client
         )
-        self.search_agent = Agent[ChatParams, SearchResults](
-            pydantic_chat_model,
-            model_settings=ModelSettings(
-                temperature=0.0,
-                max_tokens=500,
-                **({"seed": self.chat_params.seed} if self.chat_params.seed is not None else {}),
-            ),
-            system_prompt=self.query_prompt_template,
-            tools=[self.search_database],
-            output_type=SearchResults,
+        self.search_agent = Agent(
+            name="Searcher",
+            instructions=self.query_prompt_template,
+            tools=[function_tool(self.search_database)],
+            tool_use_behavior="stop_on_first_tool",
+            model=openai_agents_model,
         )
         self.answer_agent = Agent(
-            pydantic_chat_model,
-            system_prompt=self.answer_prompt_template,
+            name="Answerer",
+            instructions=self.answer_prompt_template,
+            model=openai_agents_model,
             model_settings=ModelSettings(
                 temperature=self.chat_params.temperature,
                 max_tokens=self.chat_params.response_token_limit,
-                **({"seed": self.chat_params.seed} if self.chat_params.seed is not None else {}),
+                extra_body={"seed": self.chat_params.seed} if self.chat_params.seed is not None else {},
             ),
         )
 
     async def search_database(
         self,
-        ctx: RunContext[ChatParams],
         search_query: str,
         price_filter: Optional[PriceFilter] = None,
         brand_filter: Optional[BrandFilter] = None,
@@ -97,9 +99,9 @@ class AdvancedRAGChat(RAGChatBase):
             filters.append(brand_filter)
         results = await self.searcher.search_and_embed(
             search_query,
-            top=ctx.deps.top,
-            enable_vector_search=ctx.deps.enable_vector_search,
-            enable_text_search=ctx.deps.enable_text_search,
+            top=self.chat_params.top,
+            enable_vector_search=self.chat_params.enable_vector_search,
+            enable_text_search=self.chat_params.enable_text_search,
             filters=filters,
         )
         return SearchResults(
@@ -107,56 +109,78 @@ class AdvancedRAGChat(RAGChatBase):
         )
 
     async def prepare_context(self) -> tuple[list[ItemPublic], list[ThoughtStep]]:
-        few_shots = ModelMessagesTypeAdapter.validate_json(self.query_fewshots)
+        few_shots = json.loads(self.query_fewshots)
+        few_shot_inputs = []
+        for few_shot in few_shots:
+            if few_shot["role"] == "user":
+                message = EasyInputMessageParam(role="user", content=few_shot["content"])
+            elif few_shot["role"] == "assistant" and few_shot["tool_calls"] is not None:
+                message = ResponseFunctionToolCallParam(
+                    id="madeup",
+                    call_id=few_shot["tool_calls"][0]["id"],
+                    name=few_shot["tool_calls"][0]["function"]["name"],
+                    arguments=few_shot["tool_calls"][0]["function"]["arguments"],
+                    type="function_call",
+                )
+            elif few_shot["role"] == "tool" and few_shot["tool_call_id"] is not None:
+                message = FunctionCallOutput(
+                    id="madeupoutput",
+                    call_id=few_shot["tool_call_id"],
+                    output=few_shot["content"],
+                    type="function_call_output",
+                )
+            few_shot_inputs.append(message)
+
         user_query = f"Find search results for user query: {self.chat_params.original_user_query}"
-        results = await self.search_agent.run(
-            user_query,
-            message_history=few_shots + self.chat_params.past_messages,
-            deps=self.chat_params,
-        )
-        items = results.output.items
+        new_user_message = EasyInputMessageParam(role="user", content=user_query)
+        all_messages = few_shot_inputs + self.chat_params.past_messages + [new_user_message]
+
+        run_results = await Runner.run(self.search_agent, input=all_messages)
+        search_results = run_results.new_items[-1].output
+
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
-                description=results.all_messages(),
+                description=run_results.input,
                 props=self.model_for_thoughts,
             ),
             ThoughtStep(
                 title="Search using generated search arguments",
-                description=results.output.query,
+                description=search_results.query,
                 props={
                     "top": self.chat_params.top,
                     "vector_search": self.chat_params.enable_vector_search,
                     "text_search": self.chat_params.enable_text_search,
-                    "filters": results.output.filters,
+                    "filters": search_results.filters,
                 },
             ),
             ThoughtStep(
                 title="Search results",
-                description=items,
+                description=search_results.items,
             ),
         ]
-        return items, thoughts
+        return search_results.items, thoughts
 
     async def answer(
         self,
         items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
-        response = await self.answer_agent.run(
-            user_prompt=self.prepare_rag_request(self.chat_params.original_user_query, items),
-            message_history=self.chat_params.past_messages,
+        run_results = await Runner.run(
+            self.answer_agent,
+            input=self.chat_params.past_messages
+            + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],
         )
 
         return RetrievalResponse(
-            message=Message(content=str(response.output), role=AIChatRoles.ASSISTANT),
+            message=Message(content=str(run_results.final_output), role=AIChatRoles.ASSISTANT),
             context=RAGContext(
                 data_points={item.id: item for item in items},
                 thoughts=earlier_thoughts
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=response.all_messages(),
+                        description=run_results.input,
                         props=self.model_for_thoughts,
                     ),
                 ],
@@ -168,24 +192,27 @@ class AdvancedRAGChat(RAGChatBase):
         items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
-        async with self.answer_agent.run_stream(
-            self.prepare_rag_request(self.chat_params.original_user_query, items),
-            message_history=self.chat_params.past_messages,
-        ) as agent_stream_runner:
-            yield RetrievalResponseDelta(
-                context=RAGContext(
-                    data_points={item.id: item for item in items},
-                    thoughts=earlier_thoughts
-                    + [
-                        ThoughtStep(
-                            title="Prompt to generate answer",
-                            description=agent_stream_runner.all_messages(),
-                            props=self.model_for_thoughts,
-                        ),
-                    ],
-                ),
-            )
+        run_results = Runner.run_streamed(
+            self.answer_agent,
+            input=self.chat_params.past_messages
+            + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],
+        )
 
-            async for message in agent_stream_runner.stream_text(delta=True, debounce_by=None):
-                yield RetrievalResponseDelta(delta=Message(content=str(message), role=AIChatRoles.ASSISTANT))
-            return
+        yield RetrievalResponseDelta(
+            context=RAGContext(
+                data_points={item.id: item for item in items},
+                thoughts=earlier_thoughts
+                + [
+                    ThoughtStep(
+                        title="Prompt to generate answer",
+                        description=run_results.input,
+                        props=self.model_for_thoughts,
+                    ),
+                ],
+            ),
+        )
+
+        async for event in run_results.stream_events():
+            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+                yield RetrievalResponseDelta(delta=Message(content=str(event.data.delta), role=AIChatRoles.ASSISTANT))
+        return
