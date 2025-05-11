@@ -123,7 +123,7 @@ jobs:
             key: mypy${{ matrix.os }}-${{ matrix.python_version }}-${{ hashFiles('requirements-dev.txt', 'src/backend/requirements.txt', 'src/backend/pyproject.toml') }}
 
         - name: Run MyPy
-          run: python3 -m mypy .
+          run: python3 -m mypy . --python-version ${{ matrix.python_version }}
 
         - name: Run Pytest
           run: python3 -m pytest -s -vv --cov --cov-fail-under=85
