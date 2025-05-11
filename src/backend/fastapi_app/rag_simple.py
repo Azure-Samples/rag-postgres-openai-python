@@ -1,7 +1,7 @@
 from collections.abc import AsyncGenerator
 from typing import Optional, Union
 
-from agents import Agent, ModelSettings, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
+from agents import Agent, ItemHelpers, ModelSettings, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 from openai import AsyncAzureOpenAI, AsyncOpenAI
 from openai.types.responses import ResponseInputItemParam, ResponseTextDeltaEvent
 
@@ -98,7 +98,8 @@ class SimpleRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[{"content": self.answer_agent.instructions}] + run_results.input,
+                        description=[{"content": self.answer_prompt_template}]
+                        + ItemHelpers.input_to_new_input_list(run_results.input),
                         props=self.model_for_thoughts,
                     ),
                 ],
@@ -123,7 +124,8 @@ class SimpleRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[{"content": self.answer_agent.instructions}] + run_results.input,
+                        description=[{"content": self.answer_agent.instructions}]
+                        + ItemHelpers.input_to_new_input_list(run_results.input),
                         props=self.model_for_thoughts,
                     ),
                 ],

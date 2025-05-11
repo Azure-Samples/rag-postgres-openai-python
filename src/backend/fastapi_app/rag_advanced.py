@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from agents import (
     Agent,
+    ItemHelpers,
     ModelSettings,
     OpenAIChatCompletionsModel,
     Runner,
@@ -124,7 +125,8 @@ class AdvancedRAGChat(RAGChatBase):
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
-                description=[{"content": self.search_agent.instructions}] + run_results.input,
+                description=[{"content": self.query_prompt_template}]
+                + ItemHelpers.input_to_new_input_list(run_results.input),
                 props=self.model_for_thoughts,
             ),
             ThoughtStep(
@@ -163,7 +165,8 @@ class AdvancedRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[{"content": self.answer_agent.instructions}] + run_results.input,
+                        description=[{"content": self.answer_prompt_template}]
+                        + ItemHelpers.input_to_new_input_list(run_results.input),
                         props=self.model_for_thoughts,
                     ),
                 ],
@@ -178,7 +181,7 @@ class AdvancedRAGChat(RAGChatBase):
         run_results = Runner.run_streamed(
             self.answer_agent,
             input=self.chat_params.past_messages
-            + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],
+            + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],  # noqa
         )
 
         yield RetrievalResponseDelta(
@@ -188,7 +191,8 @@ class AdvancedRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=[{"content": self.answer_agent.instructions}] + run_results.input,
+                        description=[{"content": self.answer_prompt_template}]
+                        + ItemHelpers.input_to_new_input_list(run_results.input),
                         props=self.model_for_thoughts,
                     ),
                 ],
