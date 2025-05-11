@@ -5,6 +5,7 @@ from openai import AsyncAzureOpenAI, AsyncOpenAI
 from sqlalchemy import Float, Integer, column, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from fastapi_app.api_models import Filter
 from fastapi_app.embeddings import compute_text_embedding
 from fastapi_app.postgres_models import Item
 
@@ -26,21 +27,24 @@ class PostgresSearcher:
         self.embed_dimensions = embed_dimensions
         self.embedding_column = embedding_column
 
-    def build_filter_clause(self, filters) -> tuple[str, str]:
+    def build_filter_clause(self, filters: Optional[list[Filter]]) -> tuple[str, str]:
         if filters is None:
             return "", ""
         filter_clauses = []
         for filter in filters:
-            if isinstance(filter["value"], str):
-                filter["value"] = f"'{filter['value']}'"
-            filter_clauses.append(f"{filter['column']} {filter['comparison_operator']} {filter['value']}")
+            filter_value = f"'{filter.value}'" if isinstance(filter.value, str) else filter.value
+            filter_clauses.append(f"{filter.column} {filter.comparison_operator} {filter_value}")
         filter_clause = " AND ".join(filter_clauses)
         if len(filter_clause) > 0:
             return f"WHERE {filter_clause}", f"AND {filter_clause}"
         return "", ""
 
     async def search(
-        self, query_text: Optional[str], query_vector: list[float], top: int = 5, filters: Optional[list[dict]] = None
+        self,
+        query_text: Optional[str],
+        query_vector: list[float],
+        top: int = 5,
+        filters: Optional[list[Filter]] = None,
     ):
         filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
         table_name = Item.__tablename__
@@ -106,7 +110,7 @@ class PostgresSearcher:
         top: int = 5,
         enable_vector_search: bool = False,
         enable_text_search: bool = False,
-        filters: Optional[list[dict]] = None,
+        filters: Optional[list[Filter]] = None,
     ) -> list[Item]:
         """
         Search rows by query text. Optionally converts the query text to a vector if enable_vector_search is True.
