@@ -79,13 +79,13 @@ greenlet==3.1.1
     # via sqlalchemy
 griffe==1.7.3
     # via openai-agents
-h11==0.14.0
+h11==0.16.0
     # via
     #   httpcore
     #   uvicorn
-httpcore==1.0.7
+httpcore==1.0.9
     # via httpx
-httpx==0.28.0
+httpx==0.28.1
     # via openai
 idna==3.10
     # via
@@ -117,7 +117,7 @@ numpy==2.0.2
     # via pgvector
 oauthlib==3.2.2
     # via requests-oauthlib
-openai==1.77.0
+openai==1.78.0
     # via
     #   fastapi-app (pyproject.toml)
     #   openai-agents
