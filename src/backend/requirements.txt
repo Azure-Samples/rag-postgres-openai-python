@@ -65,12 +65,8 @@ distro==1.9.0
     # via openai
 environs==14.1.1
     # via fastapi-app (pyproject.toml)
-eval-type-backport==0.2.2
-    # via pydantic-ai-slim
 exceptiongroup==1.2.2
-    # via
-    #   anyio
-    #   pydantic-ai-slim
+    # via anyio
 fastapi==0.115.8
     # via fastapi-app (pyproject.toml)
 fixedint==0.1.6
@@ -82,7 +78,7 @@ frozenlist==1.5.0
 greenlet==3.1.1
     # via sqlalchemy
 griffe==1.7.3
-    # via pydantic-ai-slim
+    # via openai-agents
 h11==0.14.0
     # via
     #   httpcore
@@ -90,10 +86,7 @@ h11==0.14.0
 httpcore==1.0.7
     # via httpx
 httpx==0.28.0
-    # via
-    #   openai
-    #   pydantic-ai-slim
-    #   pydantic-graph
+    # via openai
 idna==3.10
     # via
     #   anyio
@@ -106,8 +99,6 @@ isodate==0.7.2
     # via msrest
 jiter==0.8.0
     # via openai
-logfire-api==3.14.1
-    # via pydantic-graph
 marshmallow==3.23.1
     # via environs
 msal==1.31.1
@@ -129,9 +120,8 @@ oauthlib==3.2.2
 openai==1.77.0
     # via
     #   fastapi-app (pyproject.toml)
-    #   openai-messages-token-helper
-    #   pydantic-ai-slim
-openai-messages-token-helper==0.1.11
+    #   openai-agents
+openai-agents==0.0.14
     # via fastapi-app (pyproject.toml)
 opentelemetry-api==1.30.0
     # via
@@ -153,7 +143,6 @@ opentelemetry-api==1.30.0
     #   opentelemetry-instrumentation-wsgi
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
-    #   pydantic-ai-slim
 opentelemetry-instrumentation==0.51b0
     # via
     #   opentelemetry-instrumentation-aiohttp-client
@@ -241,8 +230,6 @@ packaging==24.2
     #   opentelemetry-instrumentation-sqlalchemy
 pgvector==0.3.6
     # via fastapi-app (pyproject.toml)
-pillow==11.0.0
-    # via openai-messages-token-helper
 portalocker==2.10.1
     # via msal-extensions
 propcache==0.2.1
@@ -257,14 +244,9 @@ pydantic==2.10.2
     # via
     #   fastapi
     #   openai
-    #   pydantic-ai-slim
-    #   pydantic-graph
-pydantic-ai-slim==0.1.10
-    # via fastapi-app (pyproject.toml)
+    #   openai-agents
 pydantic-core==2.27.1
     # via pydantic
-pydantic-graph==0.1.10
-    # via pydantic-ai-slim
 pyjwt==2.10.1
     # via msal
 python-dotenv==1.0.1
@@ -278,6 +260,7 @@ requests==2.32.3
     #   azure-core
     #   msal
     #   msrest
+    #   openai-agents
     #   requests-oauthlib
     #   tiktoken
 requests-oauthlib==2.0.0
@@ -293,34 +276,32 @@ sqlalchemy==2.0.36
 starlette==0.41.3
     # via fastapi
 tiktoken==0.7.0
-    # via
-    #   fastapi-app (pyproject.toml)
-    #   openai-messages-token-helper
-    #   opentelemetry-instrumentation-openai
+    # via opentelemetry-instrumentation-openai
 tqdm==4.67.1
     # via openai
+types-requests==2.32.0.20250328
+    # via openai-agents
 typing-extensions==4.12.2
     # via
     #   anyio
     #   asgiref
     #   azure-core
     #   azure-identity
+    #   environs
     #   fastapi
     #   multidict
     #   openai
+    #   openai-agents
     #   opentelemetry-sdk
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
     #   starlette
-    #   typing-inspection
     #   uvicorn
-typing-inspection==0.4.0
-    # via
-    #   pydantic-ai-slim
-    #   pydantic-graph
 urllib3==2.4.0
-    # via requests
+    # via
+    #   requests
+    #   types-requests
 uvicorn==0.32.1
     # via fastapi-app (pyproject.toml)
 wrapt==1.17.0
