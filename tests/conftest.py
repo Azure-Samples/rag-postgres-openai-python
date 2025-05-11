@@ -8,7 +8,6 @@ import openai.resources
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
-from freezegun import freeze_time
 from openai.types import CreateEmbeddingResponse, Embedding
 from openai.types.chat import ChatCompletion, ChatCompletionChunk
 from openai.types.chat.chat_completion import (
@@ -334,13 +333,6 @@ def mock_openai_chatcompletion(monkeypatch_session):
     monkeypatch_session.setattr(openai.resources.chat.completions.AsyncCompletions, "create", mock_acreate)
 
     yield
-
-
-@pytest.fixture(autouse=True)
-def frozen_time():
-    """Freeze time for all tests to ensure consistent timestamps"""
-    with freeze_time("2024-01-01 12:00:00"):
-        yield
 
 
 @pytest.fixture(scope="function")

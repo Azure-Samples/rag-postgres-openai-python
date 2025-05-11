@@ -1,12 +1,9 @@
 from collections.abc import AsyncGenerator
 from typing import Optional, Union
 
+from agents import Agent, ItemHelpers, ModelSettings, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from openai.types.chat import ChatCompletionMessageParam
-from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.providers.openai import OpenAIProvider
-from pydantic_ai.settings import ModelSettings
+from openai.types.responses import ResponseInputItemParam, ResponseTextDeltaEvent
 
 from fastapi_app.api_models import (
     AIChatRoles,
@@ -21,12 +18,14 @@ from fastapi_app.api_models import (
 from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.rag_base import RAGChatBase
 
+set_tracing_disabled(disabled=True)
+
 
 class SimpleRAGChat(RAGChatBase):
     def __init__(
         self,
         *,
-        messages: list[ChatCompletionMessageParam],
+        messages: list[ResponseInputItemParam],
         overrides: ChatRequestOverrides,
         searcher: PostgresSearcher,
         openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
@@ -38,17 +37,17 @@ class SimpleRAGChat(RAGChatBase):
         self.model_for_thoughts = (
             {"model": chat_model, "deployment": chat_deployment} if chat_deployment else {"model": chat_model}
         )
-        pydantic_chat_model = OpenAIModel(
-            chat_model if chat_deployment is None else chat_deployment,
-            provider=OpenAIProvider(openai_client=openai_chat_client),
+        openai_agents_model = OpenAIChatCompletionsModel(
+            model=chat_model if chat_deployment is None else chat_deployment, openai_client=openai_chat_client
         )
         self.answer_agent = Agent(
-            pydantic_chat_model,
-            system_prompt=self.answer_prompt_template,
+            name="Answerer",
+            instructions=self.answer_prompt_template,
+            model=openai_agents_model,
             model_settings=ModelSettings(
                 temperature=self.chat_params.temperature,
                 max_tokens=self.chat_params.response_token_limit,
-                **({"seed": self.chat_params.seed} if self.chat_params.seed is not None else {}),
+                extra_body={"seed": self.chat_params.seed} if self.chat_params.seed is not None else {},
             ),
         )
 
@@ -85,19 +84,22 @@ class SimpleRAGChat(RAGChatBase):
         items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> RetrievalResponse:
-        response = await self.answer_agent.run(
-            user_prompt=self.prepare_rag_request(self.chat_params.original_user_query, items),
-            message_history=self.chat_params.past_messages,
+        run_results = await Runner.run(
+            self.answer_agent,
+            input=self.chat_params.past_messages
+            + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],
         )
+
         return RetrievalResponse(
-            message=Message(content=str(response.output), role=AIChatRoles.ASSISTANT),
+            message=Message(content=str(run_results.final_output), role=AIChatRoles.ASSISTANT),
             context=RAGContext(
                 data_points={item.id: item for item in items},
                 thoughts=earlier_thoughts
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=response.all_messages(),
+                        description=[{"content": self.answer_prompt_template}]
+                        + ItemHelpers.input_to_new_input_list(run_results.input),
                         props=self.model_for_thoughts,
                     ),
                 ],
@@ -109,24 +111,28 @@ class SimpleRAGChat(RAGChatBase):
         items: list[ItemPublic],
         earlier_thoughts: list[ThoughtStep],
     ) -> AsyncGenerator[RetrievalResponseDelta, None]:
-        async with self.answer_agent.run_stream(
-            self.prepare_rag_request(self.chat_params.original_user_query, items),
-            message_history=self.chat_params.past_messages,
-        ) as agent_stream_runner:
-            yield RetrievalResponseDelta(
-                context=RAGContext(
-                    data_points={item.id: item for item in items},
-                    thoughts=earlier_thoughts
-                    + [
-                        ThoughtStep(
-                            title="Prompt to generate answer",
-                            description=agent_stream_runner.all_messages(),
-                            props=self.model_for_thoughts,
-                        ),
-                    ],
-                ),
-            )
+        run_results = Runner.run_streamed(
+            self.answer_agent,
+            input=self.chat_params.past_messages
+            + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],
+        )
 
-            async for message in agent_stream_runner.stream_text(delta=True, debounce_by=None):
-                yield RetrievalResponseDelta(delta=Message(content=str(message), role=AIChatRoles.ASSISTANT))
-            return
+        yield RetrievalResponseDelta(
+            context=RAGContext(
+                data_points={item.id: item for item in items},
+                thoughts=earlier_thoughts
+                + [
+                    ThoughtStep(
+                        title="Prompt to generate answer",
+                        description=[{"content": self.answer_agent.instructions}]
+                        + ItemHelpers.input_to_new_input_list(run_results.input),
+                        props=self.model_for_thoughts,
+                    ),
+                ],
+            ),
+        )
+
+        async for event in run_results.stream_events():
+            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+                yield RetrievalResponseDelta(delta=Message(content=str(event.data.delta), role=AIChatRoles.ASSISTANT))
+        return

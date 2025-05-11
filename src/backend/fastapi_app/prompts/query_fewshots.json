@@ -1,76 +1,36 @@
 [
   {
-    "parts": [
-      {
-        "content": "good options for climbing gear that can be used outside?",
-        "timestamp": "2025-05-07T19:02:46.977501Z",
-        "part_kind": "user-prompt"
-      }
-    ],
-    "instructions": null,
-    "kind": "request"
+    "role": "user",
+    "content": "good options for climbing gear that can be used outside?"
   },
   {
-    "parts": [
-      {
-        "tool_name": "search_database",
-        "args": "{\"search_query\":\"climbing gear outside\"}",
-        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
-        "part_kind": "tool-call"
-      }
-    ],
-    "model_name": "gpt-4o-mini-2024-07-18",
-    "timestamp": "2025-05-07T19:02:47Z",
-    "kind": "response"
+    "id": "madeup",
+    "call_id": "call_abc123",
+    "name": "search_database",
+    "arguments": "{\"search_query\":\"climbing gear outside\"}",
+    "type": "function_call"
   },
   {
-    "parts": [
-      {
-        "tool_name": "search_database",
-        "content": "Search results for climbing gear that can be used outside: ...",
-        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
-        "timestamp": "2025-05-07T19:02:48.242408Z",
-        "part_kind": "tool-return"
-      }
-    ],
-    "instructions": null,
-    "kind": "request"
+    "id": "madeupoutput",
+    "call_id": "call_abc123",
+    "output": "Search results for climbing gear that can be used outside: ...",
+    "type": "function_call_output"
   },
   {
-    "parts": [
-      {
-        "content": "are there any shoes less than $50?",
-        "timestamp": "2025-05-07T19:02:46.977501Z",
-        "part_kind": "user-prompt"
-      }
-    ],
-    "instructions": null,
-    "kind": "request"
+    "role": "user",
+    "content": "are there any shoes less than $50?"
   },
   {
-    "parts": [
-      {
-        "tool_name": "search_database",
-        "args": "{\"search_query\":\"shoes\",\"price_filter\":{\"comparison_operator\":\"<\",\"value\":50}}",
-        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
-        "part_kind": "tool-call"
-      }
-    ],
-    "model_name": "gpt-4o-mini-2024-07-18",
-    "timestamp": "2025-05-07T19:02:47Z",
-    "kind": "response"
+    "id": "madeup",
+    "call_id": "call_abc456",
+    "name": "search_database",
+    "arguments": "{\"search_query\":\"shoes\",\"price_filter\":{\"comparison_operator\":\"<\",\"value\":50}}",
+    "type": "function_call"
   },
   {
-    "parts": [
-      {
-        "tool_name": "search_database",
-        "content": "Search results for shoes cheaper than 50: ...",
-        "tool_call_id": "call_4HeBCmo2uioV6CyoePEGyZPc",
-        "timestamp": "2025-05-07T19:02:48.242408Z",
-        "part_kind": "tool-return"
-      }
-    ],
-    "instructions": null,
-    "kind": "request"
+    "id": "madeupoutput",
+    "call_id": "call_abc456",
+    "output": "Search results for shoes cheaper than 50: ...",
+    "type": "function_call_output"
   }
 ]

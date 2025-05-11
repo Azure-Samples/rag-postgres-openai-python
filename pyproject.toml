@@ -7,7 +7,6 @@ lint.isort.known-first-party = ["fastapi_app"]
 
 [tool.mypy]
 check_untyped_defs = true
-python_version = 3.9
 exclude = [".venv/*"]
 
 [tool.pytest.ini_options]
