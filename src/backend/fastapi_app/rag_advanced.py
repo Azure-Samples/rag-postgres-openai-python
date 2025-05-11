@@ -124,7 +124,7 @@ class AdvancedRAGChat(RAGChatBase):
         thoughts = [
             ThoughtStep(
                 title="Prompt to generate search arguments",
-                description=run_results.input,
+                description=[{"content": self.search_agent.instructions}] + run_results.input,
                 props=self.model_for_thoughts,
             ),
             ThoughtStep(
@@ -163,7 +163,7 @@ class AdvancedRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=run_results.input,
+                        description=[{"content": self.answer_agent.instructions}] + run_results.input,
                         props=self.model_for_thoughts,
                     ),
                 ],
@@ -188,7 +188,7 @@ class AdvancedRAGChat(RAGChatBase):
                 + [
                     ThoughtStep(
                         title="Prompt to generate answer",
-                        description=run_results.input,
+                        description=[{"content": self.answer_agent.instructions}] + run_results.input,
                         props=self.model_for_thoughts,
                     ),
                 ],
