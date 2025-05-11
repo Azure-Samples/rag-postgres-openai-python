@@ -240,7 +240,7 @@ psutil==5.9.8
     # via azure-monitor-opentelemetry-exporter
 pycparser==2.22
     # via cffi
-pydantic==2.10.2
+pydantic==2.11.4
     # via
     #   fastapi
     #   openai
