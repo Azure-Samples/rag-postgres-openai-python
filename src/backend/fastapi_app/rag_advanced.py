@@ -2,17 +2,17 @@ import json
 from collections.abc import AsyncGenerator
 from typing import Optional, Union
 
-from agents import Agent, ModelSettings, OpenAIChatCompletionsModel, Runner, function_tool, set_tracing_disabled
+from agents import (
+    Agent,
+    ModelSettings,
+    OpenAIChatCompletionsModel,
+    Runner,
+    ToolCallOutputItem,
+    function_tool,
+    set_tracing_disabled,
+)
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from openai.types.chat import (
-    ChatCompletionMessageParam,
-)
-from openai.types.responses import (
-    EasyInputMessageParam,
-    ResponseFunctionToolCallParam,
-    ResponseTextDeltaEvent,
-)
-from openai.types.responses.response_input_item_param import FunctionCallOutput
+from openai.types.responses import EasyInputMessageParam, ResponseInputItemParam, ResponseTextDeltaEvent
 
 from fastapi_app.api_models import (
     AIChatRoles,
@@ -41,7 +41,7 @@ class AdvancedRAGChat(RAGChatBase):
     def __init__(
         self,
         *,
-        messages: list[ChatCompletionMessageParam],
+        messages: list[ResponseInputItemParam],
         overrides: ChatRequestOverrides,
         searcher: PostgresSearcher,
         openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
@@ -109,34 +109,17 @@ class AdvancedRAGChat(RAGChatBase):
         )
 
     async def prepare_context(self) -> tuple[list[ItemPublic], list[ThoughtStep]]:
-        few_shots = json.loads(self.query_fewshots)
-        few_shot_inputs = []
-        for few_shot in few_shots:
-            if few_shot["role"] == "user":
-                message = EasyInputMessageParam(role="user", content=few_shot["content"])
-            elif few_shot["role"] == "assistant" and few_shot["tool_calls"] is not None:
-                message = ResponseFunctionToolCallParam(
-                    id="madeup",
-                    call_id=few_shot["tool_calls"][0]["id"],
-                    name=few_shot["tool_calls"][0]["function"]["name"],
-                    arguments=few_shot["tool_calls"][0]["function"]["arguments"],
-                    type="function_call",
-                )
-            elif few_shot["role"] == "tool" and few_shot["tool_call_id"] is not None:
-                message = FunctionCallOutput(
-                    id="madeupoutput",
-                    call_id=few_shot["tool_call_id"],
-                    output=few_shot["content"],
-                    type="function_call_output",
-                )
-            few_shot_inputs.append(message)
-
+        few_shots: list[ResponseInputItemParam] = json.loads(self.query_fewshots)
         user_query = f"Find search results for user query: {self.chat_params.original_user_query}"
         new_user_message = EasyInputMessageParam(role="user", content=user_query)
-        all_messages = few_shot_inputs + self.chat_params.past_messages + [new_user_message]
+        all_messages = few_shots + self.chat_params.past_messages + [new_user_message]
 
         run_results = await Runner.run(self.search_agent, input=all_messages)
-        search_results = run_results.new_items[-1].output
+        most_recent_response = run_results.new_items[-1]
+        if isinstance(most_recent_response, ToolCallOutputItem):
+            search_results = most_recent_response.output
+        else:
+            raise ValueError("Error retrieving search results, model did not call tool properly")
 
         thoughts = [
             ThoughtStep(

@@ -3,8 +3,7 @@ from typing import Optional, Union
 
 from agents import Agent, ModelSettings, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 from openai import AsyncAzureOpenAI, AsyncOpenAI
-from openai.types.chat import ChatCompletionMessageParam
-from openai.types.responses import ResponseTextDeltaEvent
+from openai.types.responses import ResponseInputItemParam, ResponseTextDeltaEvent
 
 from fastapi_app.api_models import (
     AIChatRoles,
@@ -26,7 +25,7 @@ class SimpleRAGChat(RAGChatBase):
     def __init__(
         self,
         *,
-        messages: list[ChatCompletionMessageParam],
+        messages: list[ResponseInputItemParam],
         overrides: ChatRequestOverrides,
         searcher: PostgresSearcher,
         openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],

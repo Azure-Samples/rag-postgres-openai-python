@@ -42,48 +42,16 @@
                 "title": "Prompt to generate answer",
                 "description": [
                     {
-                        "parts": [
-                            {
-                                "content": "What is the capital of France?",
-                                "timestamp": "2024-01-01T12:00:00Z",
-                                "part_kind": "user-prompt"
-                            }
-                        ],
-                        "instructions": null,
-                        "kind": "request"
+                        "content": "What is the capital of France?",
+                        "role": "user"
                     },
                     {
-                        "parts": [
-                            {
-                                "content": "The capital of France is Paris.",
-                                "part_kind": "text"
-                            }
-                        ],
-                        "model_name": null,
-                        "timestamp": "2024-01-01T12:00:00Z",
-                        "kind": "response"
+                        "role": "assistant",
+                        "content": "The capital of France is Paris."
                     },
                     {
-                        "parts": [
-                            {
-                                "content": "What is the capital of France?Sources:\n[1]:Name:Wanderer Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for all your outdoor adventures. These boots are made with a waterproof leather upper and a durable rubber sole for superior traction. With their cushioned insole and padded collar, these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird Type:Footwear",
-                                "timestamp": "2024-01-01T12:00:00Z",
-                                "part_kind": "user-prompt"
-                            }
-                        ],
-                        "instructions": null,
-                        "kind": "request"
-                    },
-                    {
-                        "parts": [
-                            {
-                                "content": "The capital of France is Paris. [Benefit_Options-2.pdf].",
-                                "part_kind": "text"
-                            }
-                        ],
-                        "model_name": "test-model",
-                        "timestamp": "1970-01-01T00:00:00Z",
-                        "kind": "response"
+                        "content": "What is the capital of France?Sources:\n[1]:Name:Wanderer Black Hiking Boots Description:Daybird's Wanderer Hiking Boots in sleek black are perfect for all your outdoor adventures. These boots are made with a waterproof leather upper and a durable rubber sole for superior traction. With their cushioned insole and padded collar, these boots will keep you comfortable all day long. Price:109.99 Brand:Daybird Type:Footwear",
+                        "role": "user"
                     }
                 ],
                 "props": {

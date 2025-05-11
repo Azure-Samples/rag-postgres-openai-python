@@ -2,7 +2,7 @@ import pathlib
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.responses import ResponseInputItemParam
 
 from fastapi_app.api_models import (
     ChatParams,
@@ -18,16 +18,14 @@ class RAGChatBase(ABC):
     prompts_dir = pathlib.Path(__file__).parent / "prompts/"
     answer_prompt_template = open(prompts_dir / "answer.txt").read()
 
-    def get_chat_params(
-        self, messages: list[ChatCompletionMessageParam], overrides: ChatRequestOverrides
-    ) -> ChatParams:
+    def get_chat_params(self, messages: list[ResponseInputItemParam], overrides: ChatRequestOverrides) -> ChatParams:
         response_token_limit = 1024
         prompt_template = overrides.prompt_template or self.answer_prompt_template
 
         enable_text_search = overrides.retrieval_mode in ["text", "hybrid", None]
         enable_vector_search = overrides.retrieval_mode in ["vectors", "hybrid", None]
 
-        original_user_query = messages[-1]["content"]
+        original_user_query = messages[-1].get("content")
         if not isinstance(original_user_query, str):
             raise ValueError("The most recent message content must be a string.")
 
