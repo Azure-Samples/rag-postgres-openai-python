@@ -275,7 +275,7 @@ sqlalchemy==2.0.36
     # via fastapi-app (pyproject.toml)
 starlette==0.41.3
     # via fastapi
-tiktoken==0.7.0
+tiktoken==0.9.0
     # via opentelemetry-instrumentation-openai
 tqdm==4.67.1
     # via openai
