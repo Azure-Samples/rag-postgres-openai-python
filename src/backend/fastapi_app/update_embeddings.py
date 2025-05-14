@@ -29,6 +29,8 @@ async def update_embeddings(in_seed_data=False):
         embedding_column = os.getenv("AZURE_OPENAI_EMBEDDING_COLUMN", "embedding_3l")
     elif OPENAI_EMBED_HOST == "ollama":
         embedding_column = os.getenv("OLLAMA_EMBEDDING_COLUMN", "embedding_nomic")
+    elif OPENAI_EMBED_HOST == "github":
+        embedding_column = os.getenv("GITHUB_EMBEDDING_COLUMN", "embedding_3l")
     else:
         embedding_column = os.getenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_3l")
     logger.info(f"Updating embeddings in column: {embedding_column}")

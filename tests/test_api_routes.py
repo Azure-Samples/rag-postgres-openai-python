@@ -126,6 +126,29 @@ async def test_simple_chat_flow(test_client, snapshot):
 
 
 @pytest.mark.asyncio
+async def test_simple_chat_flow_message_history(test_client, snapshot):
+    """test the simple chat flow route with hybrid retrieval mode"""
+    response = test_client.post(
+        "/chat",
+        json={
+            "context": {
+                "overrides": {"top": 1, "use_advanced_flow": False, "retrieval_mode": "hybrid", "temperature": 0.3}
+            },
+            "messages": [
+                {"content": "What is the capital of France?", "role": "user"},
+                {"content": "The capital of France is Paris.", "role": "assistant"},
+                {"content": "What is the capital of France?", "role": "user"},
+            ],
+        },
+    )
+    response_data = response.json()
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/json"
+    snapshot.assert_match(json.dumps(response_data, indent=4), "simple_chat_flow_message_history_response.json")
+
+
+@pytest.mark.asyncio
 async def test_simple_chat_streaming_flow(test_client, snapshot):
     """test the simple chat streaming flow route with hybrid retrieval mode"""
     response = test_client.post(

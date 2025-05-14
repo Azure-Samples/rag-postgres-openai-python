@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from unittest import mock
@@ -13,6 +14,7 @@ from openai.types.chat.chat_completion import (
     ChatCompletionMessage,
     Choice,
 )
+from openai.types.chat.chat_completion_message_tool_call import ChatCompletionMessageToolCall, Function
 from openai.types.create_embedding_response import Usage
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -95,7 +97,7 @@ def mock_session_env_openai(monkeypatch_session):
         monkeypatch_session.setenv("OPENAICOM_KEY", "fakekey")
         monkeypatch_session.setenv("OPENAICOM_CHAT_MODEL", "gpt-3.5-turbo")
         monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL", "text-embedding-3-large")
-        monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL_DIMENSIONS", "1024")
+        monkeypatch_session.setenv("OPENAICOM_EMBED_DIMENSIONS", "1024")
         monkeypatch_session.setenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_3l")
 
         yield
@@ -232,6 +234,12 @@ def mock_openai_chatcompletion(monkeypatch_session):
                     }
                 )
 
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            return None
+
         def __aiter__(self):
             return self
 
@@ -244,9 +252,61 @@ def mock_openai_chatcompletion(monkeypatch_session):
     async def mock_acreate(*args, **kwargs):
         messages = kwargs["messages"]
         last_question = messages[-1]["content"]
-        if last_question == "Generate search query for: What is the capital of France?":
-            answer = "capital of France"
-        elif last_question == "Generate search query for: Are interest rates high?":
+        last_role = messages[-1]["role"]
+        if last_role == "tool":
+            items = json.loads(last_question)["items"]
+            arguments = {"query": "capital of France", "items": items, "filters": []}
+            return ChatCompletion(
+                object="chat.completion",
+                choices=[
+                    Choice(
+                        message=ChatCompletionMessage(
+                            role="assistant",
+                            tool_calls=[
+                                ChatCompletionMessageToolCall(
+                                    id="call_abc123final",
+                                    type="function",
+                                    function=Function(
+                                        name="final_result",
+                                        arguments=json.dumps(arguments),
+                                    ),
+                                )
+                            ],
+                        ),
+                        finish_reason="stop",
+                        index=0,
+                    )
+                ],
+                id="test-123final",
+                created=0,
+                model="test-model",
+            )
+        if last_question == "Find search results for user query: What is the capital of France?":
+            return ChatCompletion(
+                object="chat.completion",
+                choices=[
+                    Choice(
+                        message=ChatCompletionMessage(
+                            role="assistant",
+                            tool_calls=[
+                                ChatCompletionMessageToolCall(
+                                    id="call_abc123",
+                                    type="function",
+                                    function=Function(
+                                        name="search_database", arguments='{"search_query":"climbing gear outside"}'
+                                    ),
+                                )
+                            ],
+                        ),
+                        finish_reason="stop",
+                        index=0,
+                    )
+                ],
+                id="test-123",
+                created=0,
+                model="test-model",
+            )
+        elif last_question == "Find search results for user query: Are interest rates high?":
             answer = "interest rates"
         elif isinstance(last_question, list) and last_question[2].get("image_url"):
             answer = "From the provided sources, the impact of interest rates and GDP growth on "

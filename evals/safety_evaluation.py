@@ -1,9 +1,11 @@
 import argparse
 import asyncio
+import datetime
 import logging
 import os
 import pathlib
 import sys
+from typing import Optional
 
 import requests
 from azure.ai.evaluation import AzureAIProject
@@ -52,7 +54,7 @@ async def callback(
     return {"messages": messages + [message]}
 
 
-async def run_simulator(target_url: str, max_simulations: int):
+async def run_simulator(target_url: str, max_simulations: int, scan_name: Optional[str] = None):
     credential = get_azure_credential()
     azure_ai_project: AzureAIProject = {
         "subscription_id": os.getenv("AZURE_SUBSCRIPTION_ID"),
@@ -64,26 +66,25 @@ async def run_simulator(target_url: str, max_simulations: int):
         credential=credential,
         risk_categories=[
             RiskCategory.Violence,
-            # RiskCategory.HateUnfairness,
-            # RiskCategory.Sexual,
-            # RiskCategory.SelfHarm,
+            RiskCategory.HateUnfairness,
+            RiskCategory.Sexual,
+            RiskCategory.SelfHarm,
         ],
         num_objectives=1,
     )
+    if scan_name is None:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        scan_name = f"Safety evaluation {timestamp}"
     await model_red_team.scan(
         target=lambda messages, stream=False, session_state=None, context=None: callback(messages, target_url),
-        scan_name="Advanced-Callback-Scan",
+        scan_name=scan_name,
         attack_strategies=[
-            AttackStrategy.EASY,  # Group of easy complexity attacks
-            # AttackStrategy.MODERATE,  # Group of moderate complexity attacks
-            # AttackStrategy.CharacterSpace,  # Add character spaces
-            # AttackStrategy.ROT13,  # Use ROT13 encoding
-            # AttackStrategy.UnicodeConfusable,  # Use confusable Unicode characters
-            # AttackStrategy.CharSwap,  # Swap characters in prompts
-            # AttackStrategy.Morse,  # Encode prompts in Morse code
-            # AttackStrategy.Leetspeak,  # Use Leetspeak
-            # AttackStrategy.Url,  # Use URLs in prompts
-            # AttackStrategy.Binary,  # Encode prompts in binary
+            AttackStrategy.DIFFICULT,
+            AttackStrategy.Baseline,
+            AttackStrategy.UnicodeConfusable,  # Use confusable Unicode characters
+            AttackStrategy.Morse,  # Encode prompts in Morse code
+            AttackStrategy.Leetspeak,  # Use Leetspeak
+            AttackStrategy.Url,  # Use URLs in prompts
         ],
         output_path="Advanced-Callback-Scan.json",
     )
@@ -97,11 +98,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--max_simulations", type=int, default=200, help="Maximum number of simulations (question/response pairs)."
     )
+    # argument for the name
+    parser.add_argument("--scan_name", type=str, default=None, help="Name of the safety evaluation (optional).")
     args = parser.parse_args()
 
     # Configure logging to show tracebacks for warnings and above
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.WARNING,
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(rich_tracebacks=False, show_path=True)],
@@ -109,8 +112,7 @@ if __name__ == "__main__":
 
     # Set urllib3 and azure libraries to WARNING level to see connection issues
     logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.getLogger("azure").setLevel(logging.DEBUG)
-    logging.getLogger("RedTeamLogger").setLevel(logging.DEBUG)
+    logging.getLogger("azure").setLevel(logging.WARNING)
 
     # Set our application logger to INFO level
     logger.setLevel(logging.INFO)
@@ -118,7 +120,7 @@ if __name__ == "__main__":
     load_azd_env()
 
     try:
-        asyncio.run(run_simulator(args.target_url, args.max_simulations))
+        asyncio.run(run_simulator(args.target_url, args.max_simulations, args.scan_name))
     except Exception:
         logging.exception("Unhandled exception in safety evaluation")
         sys.exit(1)

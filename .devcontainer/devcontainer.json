@@ -29,13 +29,18 @@
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
+				"ms-python.vscode-python-envs",
 				"charliermarsh.ruff",
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
+				"esbenp.prettier-vscode",
+				"mechatroner.rainbow-csv",
 				"ms-vscode.vscode-node-azure-pack",
 				"esbenp.prettier-vscode",
 				"twixes.pypi-assistant",
-				"ms-python.vscode-python-envs"
+				"ms-python.vscode-python-envs",
+				"teamsdevapp.vscode-ai-foundry",
+				"ms-windows-ai-studio.windows-ai-studio"
 			],
 			// Set *default* container specific settings.json values on container create.
 			"settings": {

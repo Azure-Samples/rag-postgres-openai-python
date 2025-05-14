@@ -2,7 +2,7 @@
 #    uv pip compile pyproject.toml -o requirements.txt --python-version 3.9
 aiohappyeyeballs==2.4.4
     # via aiohttp
-aiohttp==3.11.14
+aiohttp==3.11.18
     # via fastapi-app (pyproject.toml)
 aiosignal==1.3.1
     # via aiohttp
@@ -34,7 +34,7 @@ azure-core-tracing-opentelemetry==1.0.0b11
     # via azure-monitor-opentelemetry
 azure-identity==1.19.0
     # via fastapi-app (pyproject.toml)
-azure-monitor-opentelemetry==1.6.3
+azure-monitor-opentelemetry==1.6.8
     # via fastapi-app (pyproject.toml)
 azure-monitor-opentelemetry-exporter==1.0.0b32
     # via azure-monitor-opentelemetry
@@ -50,7 +50,9 @@ charset-normalizer==3.4.0
     # via requests
 click==8.1.7
     # via uvicorn
-cryptography==44.0.1
+colorama==0.4.6
+    # via griffe
+cryptography==44.0.3
     # via
     #   azure-identity
     #   msal
@@ -61,7 +63,7 @@ deprecated==1.2.15
     #   opentelemetry-semantic-conventions
 distro==1.9.0
     # via openai
-environs==11.2.1
+environs==14.1.1
     # via fastapi-app (pyproject.toml)
 exceptiongroup==1.2.2
     # via anyio
@@ -75,13 +77,15 @@ frozenlist==1.5.0
     #   aiosignal
 greenlet==3.1.1
     # via sqlalchemy
-h11==0.14.0
+griffe==1.7.3
+    # via openai-agents
+h11==0.16.0
     # via
     #   httpcore
     #   uvicorn
-httpcore==1.0.7
+httpcore==1.0.9
     # via httpx
-httpx==0.28.0
+httpx==0.28.1
     # via openai
 idna==3.10
     # via
@@ -90,9 +94,7 @@ idna==3.10
     #   requests
     #   yarl
 importlib-metadata==8.4.0
-    # via
-    #   opentelemetry-api
-    #   opentelemetry-instrumentation-flask
+    # via opentelemetry-api
 isodate==0.7.2
     # via msrest
 jiter==0.8.0
@@ -115,11 +117,11 @@ numpy==2.0.2
     # via pgvector
 oauthlib==3.2.2
     # via requests-oauthlib
-openai==1.55.3
+openai==1.78.0
     # via
     #   fastapi-app (pyproject.toml)
-    #   openai-messages-token-helper
-openai-messages-token-helper==0.1.11
+    #   openai-agents
+openai-agents==0.0.14
     # via fastapi-app (pyproject.toml)
 opentelemetry-api==1.30.0
     # via
@@ -193,6 +195,7 @@ opentelemetry-sdk==1.30.0
     #   opentelemetry-resource-detector-azure
 opentelemetry-semantic-conventions==0.51b0
     # via
+    #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-aiohttp-client
     #   opentelemetry-instrumentation-asgi
     #   opentelemetry-instrumentation-dbapi
@@ -222,12 +225,11 @@ opentelemetry-util-http==0.51b0
 packaging==24.2
     # via
     #   marshmallow
+    #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-flask
     #   opentelemetry-instrumentation-sqlalchemy
 pgvector==0.3.6
     # via fastapi-app (pyproject.toml)
-pillow==11.0.0
-    # via openai-messages-token-helper
 portalocker==2.10.1
     # via msal-extensions
 propcache==0.2.1
@@ -242,6 +244,7 @@ pydantic==2.10.2
     # via
     #   fastapi
     #   openai
+    #   openai-agents
 pydantic-core==2.27.1
     # via pydantic
 pyjwt==2.10.1
@@ -257,12 +260,11 @@ requests==2.32.3
     #   azure-core
     #   msal
     #   msrest
+    #   openai-agents
     #   requests-oauthlib
     #   tiktoken
 requests-oauthlib==2.0.0
     # via msrest
-setuptools==75.6.0
-    # via opentelemetry-instrumentation
 six==1.16.0
     # via azure-core
 sniffio==1.3.1
@@ -274,29 +276,32 @@ sqlalchemy==2.0.36
 starlette==0.41.3
     # via fastapi
 tiktoken==0.7.0
-    # via
-    #   fastapi-app (pyproject.toml)
-    #   openai-messages-token-helper
-    #   opentelemetry-instrumentation-openai
+    # via opentelemetry-instrumentation-openai
 tqdm==4.67.1
     # via openai
+types-requests==2.32.0.20250328
+    # via openai-agents
 typing-extensions==4.12.2
     # via
     #   anyio
     #   asgiref
     #   azure-core
     #   azure-identity
+    #   environs
     #   fastapi
     #   multidict
     #   openai
+    #   openai-agents
     #   opentelemetry-sdk
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
     #   starlette
     #   uvicorn
-urllib3==2.2.3
-    # via requests
+urllib3==2.4.0
+    # via
+    #   requests
+    #   types-requests
 uvicorn==0.32.1
     # via fastapi-app (pyproject.toml)
 wrapt==1.17.0
