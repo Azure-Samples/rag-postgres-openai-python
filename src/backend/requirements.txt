@@ -222,7 +222,7 @@ opentelemetry-util-http==0.51b0
     #   opentelemetry-instrumentation-urllib
     #   opentelemetry-instrumentation-urllib3
     #   opentelemetry-instrumentation-wsgi
-packaging==24.2
+packaging==25.0
     # via
     #   marshmallow
     #   opentelemetry-instrumentation
