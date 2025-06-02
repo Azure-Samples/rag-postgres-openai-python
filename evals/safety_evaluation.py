@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--questions_per_category",
         type=int,
-        default=1,
+        default=5,
         help="Number of questions per risk category to ask during the scan.",
     )
     parser.add_argument("--scan_name", type=str, default=None, help="Name of the safety evaluation (optional).")
