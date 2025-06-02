@@ -5,7 +5,7 @@ When deploying a RAG app to production, you should evaluate the safety of the an
 * [Deploy an Azure AI project](#deploy-an-azure-ai-project)
 * [Setup the evaluation environment](#setup-the-evaluation-environment)
 * [Run red teaming agent](#run-red-teaming-agent)
-* [Review the red teaming results](#review-the-red-team-results)
+* [Review the red teaming results](#review-the-red-teaming-results)
 
 ## Deploy an Azure AI project
 
@@ -90,9 +90,9 @@ In addition to the results in Azure AI Foundry, you can also review the results 
 
 Each file in this directory corresponds to a single red teaming scan, and contains the following fields:
 
-* `redteaming_scorecard`: A summary of the scan results, including the attack success rate and the number of questions asked.
-* `redteaming_parameters`: The parameters used for the scan, including the risk categories and attack strategies.
-* `redteaming_data`: A list of the questions asked during the scan, along with the answers received from your app.
+* `scorecard`: A summary of the scan results, including the attack success rate and the number of questions asked.
+* `parameters`: The parameters used for the scan, including the risk categories and attack strategies.
+* `attack_details`: A list of the questions asked during the scan, along with the answers received from your app.
 * `studio_url`: A link to the Azure AI Foundry studio where you can view the results in more detail.
 
 Learn more in the [Red Teaming Agent documentation](https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/run-scans-ai-red-teaming-agent#results-from-your-automated-scans).
