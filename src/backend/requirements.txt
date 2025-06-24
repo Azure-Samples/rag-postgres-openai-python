@@ -255,7 +255,7 @@ python-dotenv==1.0.1
     #   environs
 regex==2024.11.6
     # via tiktoken
-requests==2.32.3
+requests==2.32.4
     # via
     #   azure-core
     #   msal
