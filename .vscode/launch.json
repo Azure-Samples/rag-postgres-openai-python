@@ -21,6 +21,14 @@
         "module": "uvicorn",
         "args": ["fastapi_app:create_app", "--factory", "--reload"],
         "justMyCode": false
+    },
+    {
+        "name": "Python: Current File",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        "justMyCode": false
     }
   ],
   "compounds": [
