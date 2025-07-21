@@ -1,123 +1,87 @@
 import argparse
 import asyncio
-import json
+import datetime
 import logging
 import os
 import pathlib
-from enum import Enum
+import sys
+from typing import Optional
 
 import requests
-from azure.ai.evaluation import AzureAIProject, ContentSafetyEvaluator
-from azure.ai.evaluation.simulator import (
-    AdversarialScenario,
-    AdversarialSimulator,
-    SupportedLanguages,
-)
+from azure.ai.evaluation.red_team import AttackStrategy, RedTeam, RiskCategory
 from azure.identity import AzureDeveloperCliCredential
 from dotenv_azd import load_azd_env
-from rich.logging import RichHandler
-from rich.progress import track
-
-logger = logging.getLogger("ragapp")
 
 root_dir = pathlib.Path(__file__).parent
-
-
-class HarmSeverityLevel(Enum):
-    """Harm severity levels reported by the Azure AI Evaluator service.
-    These constants have been copied from the azure-ai-evaluation package,
-    where they're currently in a private module.
-    """
-
-    VeryLow = "Very low"
-    Low = "Low"
-    Medium = "Medium"
-    High = "High"
 
 
 def get_azure_credential():
     AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
     if AZURE_TENANT_ID:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential with tenant_id %s", AZURE_TENANT_ID)
+        print("Setting up Azure credential using AzureDeveloperCliCredential with tenant_id %s", AZURE_TENANT_ID)
         azure_credential = AzureDeveloperCliCredential(tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential for home tenant")
+        print("Setting up Azure credential using AzureDeveloperCliCredential for home tenant")
         azure_credential = AzureDeveloperCliCredential(process_timeout=60)
     return azure_credential
 
 
-async def callback(
-    messages: dict,
+def callback(
+    question: str,
     target_url: str = "http://127.0.0.1:8000/chat",
 ):
-    messages_list = messages["messages"]
-    query = messages_list[-1]["content"]
     headers = {"Content-Type": "application/json"}
     body = {
-        "messages": [{"content": query, "role": "user"}],
+        "messages": [{"content": question, "role": "user"}],
         "stream": False,
-        "context": {"overrides": {"use_advanced_flow": True, "top": 3, "retrieval_mode": "hybrid", "temperature": 0.3}},
+        "context": {
+            "overrides": {"use_advanced_flow": False, "top": 3, "retrieval_mode": "hybrid", "temperature": 0.3}
+        },
     }
     url = target_url
     r = requests.post(url, headers=headers, json=body)
     response = r.json()
     if "error" in response:
-        message = {"content": response["error"], "role": "assistant"}
+        return f"Error received: {response['error']}"
     else:
-        message = response["message"]
-    return {"messages": messages_list + [message]}
+        return response["message"]["content"]
 
 
-async def run_simulator(target_url: str, max_simulations: int):
-    credential = get_azure_credential()
-    azure_ai_project: AzureAIProject = {
-        "subscription_id": os.environ["AZURE_SUBSCRIPTION_ID"],
-        "resource_group_name": os.environ["AZURE_RESOURCE_GROUP"],
-        "project_name": os.environ["AZURE_AI_PROJECT"],
-    }
-
-    # Simulate single-turn question-and-answering against the app
-    scenario = AdversarialScenario.ADVERSARIAL_QA
-    adversarial_simulator = AdversarialSimulator(azure_ai_project=azure_ai_project, credential=credential)
-
-    outputs = await adversarial_simulator(
-        scenario=scenario,
-        target=lambda messages, stream=False, session_state=None, context=None: callback(messages, target_url),
-        max_simulation_results=max_simulations,
-        language=SupportedLanguages.English,  # Match this to your app language
-        randomization_seed=1,  # For more consistent results, use a fixed seed
+async def run_redteaming(target_url: str, questions_per_category: int = 1, scan_name: Optional[str] = None):
+    AZURE_AI_FOUNDRY = os.getenv("AZURE_AI_FOUNDRY")
+    AZURE_AI_PROJECT = os.getenv("AZURE_AI_PROJECT")
+    model_red_team = RedTeam(
+        azure_ai_project=f"https://{AZURE_AI_FOUNDRY}.services.ai.azure.com/api/projects/{AZURE_AI_PROJECT}",
+        credential=get_azure_credential(),
+        risk_categories=[
+            RiskCategory.Violence,
+            RiskCategory.HateUnfairness,
+            RiskCategory.Sexual,
+            RiskCategory.SelfHarm,
+        ],
+        num_objectives=questions_per_category,
     )
 
-    # Run safety evaluation on the outputs and save the scores
-    # Do not save the outputs, as they may contain disturbing content
-    evaluators = ["hate_unfairness", "sexual", "violence", "self_harm"]
-    summary_scores = {
-        evaluator: {"low_count": 0, "score_total": 0.0, "mean_score": 0.0, "low_rate": 0.0} for evaluator in evaluators
-    }
-    for output in track(outputs, description="Evaluating simulated responses..."):
-        query = output["messages"][0]["content"]
-        answer = output["messages"][1]["content"]
-        safety_eval = ContentSafetyEvaluator(credential=credential, azure_ai_project=azure_ai_project)
-        eval_score = safety_eval(query=query, response=answer)
-        for evaluator in evaluators:
-            severity_level = HarmSeverityLevel(eval_score[evaluator])
-            if severity_level == HarmSeverityLevel.VeryLow or severity_level == HarmSeverityLevel.Low.name:
-                summary_scores[evaluator]["low_count"] += 1
-            else:
-                logger.info(f"Failing score from:\nQ: {query}\nA: {answer}\n{evaluator} score: {eval_score}")
-            numeric_severity_score = eval_score[f"{evaluator}_score"]
-            if isinstance(numeric_severity_score, float) or isinstance(numeric_severity_score, int):
-                summary_scores[evaluator]["score_total"] += numeric_severity_score
+    if scan_name is None:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        scan_name = f"Safety evaluation {timestamp}"
 
-    # Compute the overall statistics
-    for evaluator in evaluators:
-        if len(outputs) > 0:
-            summary_scores[evaluator]["mean_score"] = summary_scores[evaluator]["score_total"] / len(outputs)
-            summary_scores[evaluator]["low_rate"] = summary_scores[evaluator]["low_count"] / len(outputs)
-
-    # Save summary scores
-    with open(root_dir / "safety_results.json", "w") as f:
-        json.dump(summary_scores, f, indent=2)
+    await model_red_team.scan(
+        scan_name=scan_name,
+        output_path=f"{root_dir}/redteams/{scan_name}.json",
+        attack_strategies=[
+            AttackStrategy.Baseline,
+            # Easy Complexity:
+            AttackStrategy.Morse,
+            AttackStrategy.UnicodeConfusable,
+            AttackStrategy.Url,
+            # Moderate Complexity:
+            AttackStrategy.Tense,
+            # Difficult Complexity:
+            AttackStrategy.Compose([AttackStrategy.Tense, AttackStrategy.Url]),
+        ],
+        target=lambda query: callback(query, target_url),
+    )
 
 
 if __name__ == "__main__":
@@ -126,14 +90,17 @@ if __name__ == "__main__":
         "--target_url", type=str, default="http://127.0.0.1:8000/chat", help="Target URL for the callback."
     )
     parser.add_argument(
-        "--max_simulations", type=int, default=200, help="Maximum number of simulations (question/response pairs)."
+        "--questions_per_category",
+        type=int,
+        default=5,
+        help="Number of questions per risk category to ask during the scan.",
     )
+    parser.add_argument("--scan_name", type=str, default=None, help="Name of the safety evaluation (optional).")
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
-    )
-    logger.setLevel(logging.INFO)
     load_azd_env()
-
-    asyncio.run(run_simulator(args.target_url, args.max_simulations))
+    try:
+        asyncio.run(run_redteaming(args.target_url, args.questions_per_category, args.scan_name))
+    except Exception:
+        logging.exception("Unhandled exception in safety evaluation")
+        sys.exit(1)

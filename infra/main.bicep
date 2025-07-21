@@ -408,15 +408,81 @@ module openAI 'core/ai/cognitiveservices.bicep' = if (deployAzureOpenAI) {
   }
 }
 
-module ai 'core/ai/ai-environment.bicep' = if (useAiProject) {
+module storage 'br/public:avm/res/storage/storage-account:0.9.1' = if (useAiProject) {
+  name: 'storage'
+  scope: resourceGroup
+  params: {
+    name: '${take(replace(prefix, '-', ''), 17)}storage'
+    location: location
+    tags: tags
+    kind: 'StorageV2'
+    skuName: 'Standard_LRS'
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
+    allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
+    roleAssignments: [
+      {
+        principalId: principalId
+        principalType: 'User'
+        roleDefinitionIdOrName: 'Storage Blob Data Contributor'
+      }
+    ]
+    blobServices: {
+      containers: [
+        {
+          name: 'default'
+          publicAccess: 'None'
+        }
+      ]
+      cors: {
+        corsRules: [
+          {
+          allowedOrigins: [
+            'https://mlworkspace.azure.ai'
+            'https://ml.azure.com'
+            'https://*.ml.azure.com'
+            'https://ai.azure.com'
+            'https://*.ai.azure.com'
+            'https://mlworkspacecanary.azure.ai'
+            'https://mlworkspace.azureml-test.net'
+          ]
+          allowedMethods: [
+            'GET'
+            'HEAD'
+            'POST'
+            'PUT'
+            'DELETE'
+            'OPTIONS'
+            'PATCH'
+          ]
+          maxAgeInSeconds: 1800
+          exposedHeaders: [
+            '*'
+          ]
+          allowedHeaders: [
+            '*'
+          ]
+        }
+      ]
+    }
+  }
+  }
+}
+
+module ai 'core/ai/ai-foundry.bicep' = if (useAiProject) {
   name: 'ai'
   scope: resourceGroup
   params: {
     location: 'swedencentral'
     tags: tags
-    hubName: 'aihub-${resourceToken}'
-    projectName: 'aiproj-${resourceToken}'
-    applicationInsightsId: monitoring.outputs.applicationInsightsId
+    foundryName: 'aifoundry-${resourceToken}'
+    projectName: 'aiproject-${resourceToken}'
+    storageAccountName: storage.outputs.name
+    principalId: principalId
+    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
   }
 }
 
@@ -426,10 +492,21 @@ module openAIRoleUser 'core/security/role.bicep' = {
   name: 'openai-role-user'
   params: {
     principalId: principalId
-    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd' // Cognitive Services OpenAI User
     principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
   }
 }
+
+module azureAiUserRole 'core/security/role.bicep' = if (useAiProject && resourceGroup.name != openAIResourceGroup.name) {
+  name: 'azureai-role-user'
+  scope: resourceGroup
+  params: {
+    principalId: principalId
+    roleDefinitionId: '53ca6127-db72-4b80-b1b0-d745d6d5456d' // Azure AI User
+    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
+  }
+}
+
 
 // Backend roles
 module openAIRoleBackend 'core/security/role.bicep' = {
@@ -439,6 +516,17 @@ module openAIRoleBackend 'core/security/role.bicep' = {
     principalId: web.outputs.SERVICE_WEB_IDENTITY_PRINCIPAL_ID
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'ServicePrincipal'
+  }
+}
+
+// Application Insights Reader role for web app
+module appInsightsReaderRole 'core/security/role.bicep' = {
+  scope: resourceGroup
+  name: 'appinsights-reader-role'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '43d0d8ad-25c7-4714-9337-8ba259a9fe05' // Application Insights Component Reader
+    principalType: 'User'
   }
 }
 
@@ -484,6 +572,7 @@ output AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY string = deployAzureOpenAI ? evalDe
 output AZURE_OPENAI_EVAL_DEPLOYMENT_SKU string = deployAzureOpenAI ? evalDeploymentSku : ''
 output AZURE_OPENAI_EVAL_MODEL string = deployAzureOpenAI ? evalModelName : ''
 
+output AZURE_AI_FOUNDRY string = useAiProject ? ai.outputs.foundryName : ''
 output AZURE_AI_PROJECT string = useAiProject ? ai.outputs.projectName : ''
 
 output POSTGRES_HOST string = postgresServer.outputs.POSTGRES_DOMAIN_NAME
