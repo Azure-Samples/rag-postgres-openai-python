@@ -1,4 +1,4 @@
-git+https://github.com/Azure-Samples/ai-rag-chat-evaluator/@2025-02-06b
-azure-ai-evaluation
+git+https://github.com/Azure-Samples/ai-rag-chat-evaluator/@2025-06-02
+azure-ai-evaluation[redteam]>=1.8.0
 rich
 dotenv-azd
