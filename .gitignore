@@ -149,3 +149,6 @@ static/
 
 # Playwright test trace
 test-results/
+
+# Test virtual environments
+test_venv*/
