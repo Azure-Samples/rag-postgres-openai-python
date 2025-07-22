@@ -187,7 +187,7 @@ opentelemetry-instrumentation-django==0.52b1
     # via azure-monitor-opentelemetry
 opentelemetry-instrumentation-fastapi==0.52b1
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-flask==0.52b1
+opentelemetry-instrumentation-flask==0.56b0
     # via azure-monitor-opentelemetry
 opentelemetry-instrumentation-openai==0.41.0
     # via fastapi-app (pyproject.toml)
