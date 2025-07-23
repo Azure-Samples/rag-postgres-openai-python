@@ -43,7 +43,7 @@ azure-identity==1.23.1
     #   azure-monitor-opentelemetry-exporter
 azure-monitor-opentelemetry==1.6.12
     # via fastapi-app (pyproject.toml)
-azure-monitor-opentelemetry-exporter==1.0.0b39
+azure-monitor-opentelemetry-exporter==1.0.0b40
     # via azure-monitor-opentelemetry
 backports-datetime-fromisoformat==2.0.3
     # via marshmallow
