@@ -91,21 +91,7 @@ jobs:
       - name: Install azd
         uses: Azure/setup-azd@v2.1.0
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Set az account
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            az account set --subscription ${{env.AZURE_SUBSCRIPTION_ID}}
-
       - name: Log in with Azure (Federated Credentials)
-        if: ${{ env.AZURE_CLIENT_ID != '' }}
         run: |
           azd auth login `
             --client-id "$Env:AZURE_CLIENT_ID" `
