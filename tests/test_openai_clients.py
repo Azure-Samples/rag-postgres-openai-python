@@ -32,7 +32,7 @@ async def test_github_models_configuration(monkeypatch):
     monkeypatch.setenv("OPENAI_CHAT_HOST", "github")
     monkeypatch.setenv("OPENAI_EMBED_HOST", "github")
     monkeypatch.setenv("GITHUB_TOKEN", "fake-token")
-    # Don't set GITHUB_BASE_URL or GITHUB_MODEL to test defaults
+    # Don't set GITHUB_MODEL to test defaults
     
     # Test chat client configuration
     chat_client = await create_openai_chat_client(None)
@@ -57,7 +57,6 @@ async def test_github_models_with_custom_values(monkeypatch):
     monkeypatch.setenv("OPENAI_CHAT_HOST", "github")
     monkeypatch.setenv("OPENAI_EMBED_HOST", "github")
     monkeypatch.setenv("GITHUB_TOKEN", "fake-token")
-    monkeypatch.setenv("GITHUB_BASE_URL", "https://custom.github.ai/inference")
     monkeypatch.setenv("GITHUB_MODEL", "openai/gpt-4")
     monkeypatch.setenv("GITHUB_EMBED_MODEL", "openai/text-embedding-ada-002")
     
