@@ -53,7 +53,7 @@ async def common_parameters():
         embedding_column = os.getenv("OLLAMA_EMBEDDING_COLUMN") or "embedding_nomic"
     elif OPENAI_EMBED_HOST == "github":
         openai_embed_deployment = None
-        openai_embed_model = os.getenv("GITHUB_EMBED_MODEL") or "text-embedding-3-large"
+        openai_embed_model = os.getenv("GITHUB_EMBED_MODEL") or "openai/text-embedding-3-large"
         openai_embed_dimensions = int(os.getenv("GITHUB_EMBED_DIMENSIONS", 1024))
         embedding_column = os.getenv("GITHUB_EMBEDDING_COLUMN") or "embedding_3l"
     else:
@@ -70,7 +70,7 @@ async def common_parameters():
         openai_embed_model = os.getenv("OLLAMA_EMBED_MODEL") or "nomic-embed-text"
     elif OPENAI_CHAT_HOST == "github":
         openai_chat_deployment = None
-        openai_chat_model = os.getenv("GITHUB_MODEL") or "gpt-4o"
+        openai_chat_model = os.getenv("GITHUB_MODEL") or "openai/gpt-4o"
     else:
         openai_chat_deployment = None
         openai_chat_model = os.getenv("OPENAICOM_CHAT_MODEL") or "gpt-3.5-turbo"
