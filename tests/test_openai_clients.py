@@ -33,17 +33,17 @@ async def test_github_models_configuration(monkeypatch):
     monkeypatch.setenv("OPENAI_EMBED_HOST", "github")
     monkeypatch.setenv("GITHUB_TOKEN", "fake-token")
     # Don't set GITHUB_MODEL to test defaults
-    
+
     # Test chat client configuration
     chat_client = await create_openai_chat_client(None)
     assert str(chat_client.base_url).rstrip("/") == "https://models.github.ai/inference"
     assert chat_client.api_key == "fake-token"
-    
-    # Test embed client configuration  
+
+    # Test embed client configuration
     embed_client = await create_openai_embed_client(None)
     assert str(embed_client.base_url).rstrip("/") == "https://models.github.ai/inference"
     assert embed_client.api_key == "fake-token"
-        
+
     # Test that dependencies use correct defaults
     context = await common_parameters()
     assert context.openai_chat_model == "openai/gpt-4o"
@@ -59,7 +59,7 @@ async def test_github_models_with_custom_values(monkeypatch):
     monkeypatch.setenv("GITHUB_TOKEN", "fake-token")
     monkeypatch.setenv("GITHUB_MODEL", "openai/gpt-4")
     monkeypatch.setenv("GITHUB_EMBED_MODEL", "openai/text-embedding-ada-002")
-    
+
     # Test that dependencies use custom values
     context = await common_parameters()
     assert context.openai_chat_model == "openai/gpt-4"
