@@ -89,7 +89,7 @@ jobs:
           cache-dependency-glob: "requirements**.txt"
 
       - name: Install azd
-        uses: Azure/setup-azd@v2.1.0
+        uses: Azure/setup-azd@v2.2.0
 
       - name: Log in with Azure (Federated Credentials)
         run: |
