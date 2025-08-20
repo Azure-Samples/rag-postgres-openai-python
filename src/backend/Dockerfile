@@ -1,9 +1,7 @@
 FROM python:3.12-bullseye
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends postgresql-client \
-    && apt-get update && apt-get install -y xdg-utils \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+# Removed postgresql-client and xdg-utils packages as they are not used by the backend
+# The backend uses SQLAlchemy/asyncpg for PostgreSQL connections, not CLI tools
 
 RUN python -m pip install --upgrade pip
 
