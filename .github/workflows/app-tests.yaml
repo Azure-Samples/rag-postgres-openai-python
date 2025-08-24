@@ -40,7 +40,7 @@ jobs:
       POSTGRES_DATABASE: postgres
       POSTGRES_SSL: disable
     steps:
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v5
 
         - name: (MacOS) Install postgreSQL and pgvector using brew
           if: matrix.os == 'macos-13' || matrix.os == 'macos-latest-xlarge'
