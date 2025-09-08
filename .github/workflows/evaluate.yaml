@@ -114,7 +114,7 @@ jobs:
           python ./src/backend/fastapi_app/setup_postgres_seeddata.py
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 18
 
