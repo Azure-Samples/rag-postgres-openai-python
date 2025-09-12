@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 name: rag-postgres-openai-python
 metadata:
-    template: rag-postgres-openai-python@0.0.1
+    template: rag-postgres-openai-python@0.0.2
 requiredVersions:
-    azd: ">= 1.10.0"
+    azd: ">= 1.17.0"
 services:
     web:
         project: ./src/backend
@@ -36,25 +36,3 @@ hooks:
             run: ./scripts/setup_postgres_database.sh;./scripts/setup_postgres_azurerole.sh;./scripts/setup_postgres_seeddata.sh
             interactive: true
             continueOnError: false
-pipeline:
-  variables:
-    - DEPLOY_AZURE_OPENAI
-    - OPENAI_CHAT_HOST
-    - OPENAI_EMBED_HOST
-    - AZURE_OPENAI_ENDPOINT
-    - AZURE_OPENAI_VERSION
-    - AZURE_OPENAI_CHAT_DEPLOYMENT
-    - AZURE_OPENAI_CHAT_MODEL
-    - AZURE_OPENAI_CHAT_DEPLOYMENT_VERSION
-    - AZURE_OPENAI_CHAT_DEPLOYMENT_CAPACITY
-    - AZURE_OPENAI_EVAL_DEPLOYMENT_SKU
-    - AZURE_OPENAI_EMBED_DEPLOYMENT
-    - AZURE_OPENAI_EMBED_MODEL
-    - AZURE_OPENAI_EMBED_DEPLOYMENT_VERSION
-    - AZURE_OPENAI_EMBED_DEPLOYMENT_CAPACITY
-    - AZURE_OPENAI_EMBED_DEPLOYMENT_SKU
-    - AZURE_OPENAI_EMBED_DIMENSIONS
-    - AZURE_OPENAI_EMBEDDING_COLUMN
-    - AZURE_OPENAI_EVAL_DEPLOYMENT
-    - AZURE_OPENAI_EVAL_MODEL
-    - USE_AI_PROJECT
