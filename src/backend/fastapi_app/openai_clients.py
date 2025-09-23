@@ -10,23 +10,22 @@ logger = logging.getLogger("ragapp")
 
 async def create_openai_chat_client(
     azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential, None],
-) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
-    openai_chat_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
+) -> openai.AsyncOpenAI:
+    openai_chat_client: openai.AsyncOpenAI
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_CHAT_HOST == "azure":
-        api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-10-21"
         azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
         azure_deployment = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
+        # Use default API version for Azure OpenAI
+        api_version = "2024-10-21"
         if api_key := os.getenv("AZURE_OPENAI_KEY"):
             logger.info(
                 "Setting up Azure OpenAI client for chat completions using API key, endpoint %s, deployment %s",
                 azure_endpoint,
                 azure_deployment,
             )
-            openai_chat_client = openai.AsyncAzureOpenAI(
-                api_version=api_version,
-                azure_endpoint=azure_endpoint,
-                azure_deployment=azure_deployment,
+            openai_chat_client = openai.AsyncOpenAI(
+                base_url=f"{azure_endpoint.rstrip('/')}/openai/deployments/{azure_deployment}?api-version={api_version}",
                 api_key=api_key,
             )
         elif azure_credential:
@@ -38,11 +37,11 @@ async def create_openai_chat_client(
             token_provider = azure.identity.get_bearer_token_provider(
                 azure_credential, "https://cognitiveservices.azure.com/.default"
             )
-            openai_chat_client = openai.AsyncAzureOpenAI(
-                api_version=api_version,
-                azure_endpoint=azure_endpoint,
-                azure_deployment=azure_deployment,
-                azure_ad_token_provider=token_provider,
+            # Get the initial token from the provider
+            initial_token = token_provider()
+            openai_chat_client = openai.AsyncOpenAI(
+                base_url=f"{azure_endpoint.rstrip('/')}/openai/deployments/{azure_deployment}?api-version={api_version}",
+                api_key=initial_token,
             )
         else:
             raise ValueError("Azure OpenAI client requires either an API key or Azure Identity credential.")
@@ -69,23 +68,22 @@ async def create_openai_chat_client(
 
 async def create_openai_embed_client(
     azure_credential: Union[azure.identity.AzureDeveloperCliCredential, azure.identity.ManagedIdentityCredential, None],
-) -> Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]:
-    openai_embed_client: Union[openai.AsyncAzureOpenAI, openai.AsyncOpenAI]
+) -> openai.AsyncOpenAI:
+    openai_embed_client: openai.AsyncOpenAI
     OPENAI_EMBED_HOST = os.getenv("OPENAI_EMBED_HOST")
     if OPENAI_EMBED_HOST == "azure":
-        api_version = os.environ["AZURE_OPENAI_VERSION"] or "2024-03-01-preview"
         azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
         azure_deployment = os.environ["AZURE_OPENAI_EMBED_DEPLOYMENT"]
+        # Use default API version for Azure OpenAI
+        api_version = "2024-03-01-preview"
         if api_key := os.getenv("AZURE_OPENAI_KEY"):
             logger.info(
                 "Setting up Azure OpenAI client for embeddings using API key, endpoint %s, deployment %s",
                 azure_endpoint,
                 azure_deployment,
             )
-            openai_embed_client = openai.AsyncAzureOpenAI(
-                api_version=api_version,
-                azure_endpoint=azure_endpoint,
-                azure_deployment=azure_deployment,
+            openai_embed_client = openai.AsyncOpenAI(
+                base_url=f"{azure_endpoint.rstrip('/')}/openai/deployments/{azure_deployment}?api-version={api_version}",
                 api_key=api_key,
             )
         elif azure_credential:
@@ -97,11 +95,11 @@ async def create_openai_embed_client(
             token_provider = azure.identity.get_bearer_token_provider(
                 azure_credential, "https://cognitiveservices.azure.com/.default"
             )
-            openai_embed_client = openai.AsyncAzureOpenAI(
-                api_version=api_version,
-                azure_endpoint=azure_endpoint,
-                azure_deployment=azure_deployment,
-                azure_ad_token_provider=token_provider,
+            # Get the initial token from the provider
+            initial_token = token_provider()
+            openai_embed_client = openai.AsyncOpenAI(
+                base_url=f"{azure_endpoint.rstrip('/')}/openai/deployments/{azure_deployment}?api-version={api_version}",
+                api_key=initial_token,
             )
         else:
             raise ValueError("Azure OpenAI client requires either an API key or Azure Identity credential.")
