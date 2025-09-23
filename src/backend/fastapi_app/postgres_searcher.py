@@ -1,7 +1,7 @@
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
-from openai import AsyncAzureOpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from sqlalchemy import Float, Integer, column, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,7 +14,7 @@ class PostgresSearcher:
     def __init__(
         self,
         db_session: AsyncSession,
-        openai_embed_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
+        openai_embed_client: AsyncOpenAI,
         embed_deployment: Optional[str],  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
         embed_dimensions: Optional[int],

@@ -5,7 +5,7 @@ from typing import Annotated, Optional, Union
 
 import azure.identity
 from fastapi import Depends, Request
-from openai import AsyncAzureOpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
@@ -17,7 +17,7 @@ class OpenAIClient(BaseModel):
     OpenAI client
     """
 
-    client: Union[AsyncOpenAI, AsyncAzureOpenAI]
+    client: AsyncOpenAI
     model_config = {"arbitrary_types_allowed": True}
 
 

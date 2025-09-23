@@ -1,8 +1,8 @@
 from collections.abc import AsyncGenerator
-from typing import Optional, Union
+from typing import Optional
 
 from agents import Agent, ItemHelpers, ModelSettings, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
-from openai import AsyncAzureOpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from openai.types.responses import ResponseInputItemParam, ResponseTextDeltaEvent
 
 from fastapi_app.api_models import (
@@ -28,7 +28,7 @@ class SimpleRAGChat(RAGChatBase):
         messages: list[ResponseInputItemParam],
         overrides: ChatRequestOverrides,
         searcher: PostgresSearcher,
-        openai_chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
+        openai_chat_client: AsyncOpenAI,
         chat_model: str,
         chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
     ):
