@@ -28,8 +28,6 @@ jobs:
       SERVICE_WEB_RESOURCE_EXISTS: ${{ vars.SERVICE_WEB_RESOURCE_EXISTS }}
       AZURE_OPENAI_LOCATION: ${{ vars.AZURE_OPENAI_LOCATION }}
       DEPLOY_AZURE_OPENAI: ${{ vars.DEPLOY_AZURE_OPENAI }}
-      AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
-      AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
       OPENAI_CHAT_HOST: ${{ vars.OPENAI_CHAT_HOST }}
       AZURE_OPENAI_CHAT_MODEL: ${{ vars.AZURE_OPENAI_CHAT_MODEL }}
       AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ vars.AZURE_OPENAI_CHAT_DEPLOYMENT }}
@@ -51,10 +49,12 @@ jobs:
       AZURE_OPENAI_EMBED_DIMENSIONS: ${{ vars.AZURE_OPENAI_EMBED_DIMENSIONS }}
       OPENAICOM_KEY: ${{ secrets.OPENAICOM_KEY }}
       USE_AI_PROJECT: ${{ vars.USE_AI_PROJECT }}
+      # optional params - uncomment only when it is set
+      AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+        
       - name: Install azd
         uses: Azure/setup-azd@v2.1.0
 
@@ -70,11 +70,12 @@ jobs:
             --federated-credential-provider "github" `
             --tenant-id "$Env:AZURE_TENANT_ID"
         shell: pwsh
-
+      
       - name: Provision Infrastructure
         run: azd provision --no-prompt
-        env:
-          AZD_INITIAL_ENVIRONMENT_CONFIG: ${{ secrets.AZD_INITIAL_ENVIRONMENT_CONFIG }}
+        # Note: Uncomment this only if you have set AZURE_OPENAI_KEY (this is an optional input parameter to azd provision)
+        # env:
+        #   AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
 
       - name: Deploy Application
         run: azd deploy --no-prompt
