@@ -207,6 +207,8 @@ param useAiProject bool = false
 
 param webAppExists bool = false
 
+var principalType = empty(runningOnGh) ? 'User' : 'ServicePrincipal'
+
 var resourceToken = toLower(uniqueString(subscription().id, name, location))
 var prefix = '${toLower(name)}-${resourceToken}'
 var tags = { 'azd-env-name': name }
@@ -219,8 +221,6 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 
 var postgresServerName = '${prefix}-postgresql'
 var postgresDatabaseName = 'postgres'
-var postgresEntraAdministratorObjectId = principalId
-var postgresEntraAdministratorType = empty(runningOnGh) ? 'User' : 'ServicePrincipal'
 var postgresEntraAdministratorName = 'admin${uniqueString(resourceGroup.id, principalId)}'
 
 module postgresServer 'core/database/postgresql/flexibleserver.bicep' = {
@@ -240,8 +240,8 @@ module postgresServer 'core/database/postgresql/flexibleserver.bicep' = {
     version: '15'
     authType: 'EntraOnly'
     entraAdministratorName: postgresEntraAdministratorName
-    entraAdministratorObjectId: postgresEntraAdministratorObjectId
-    entraAdministratorType: postgresEntraAdministratorType
+    entraAdministratorObjectId: principalId
+    entraAdministratorType: principalType
     allowAzureIPsFirewall: true
     allowAllIPsFirewall: true // Necessary for post-provision script, can be disabled after
   }
@@ -542,7 +542,7 @@ module ai 'core/ai/ai-foundry.bicep' = if (useAiProject) {
     projectName: 'aiproject-${resourceToken}'
     storageAccountName: storage.outputs.name
     principalId: principalId
-    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
+    principalType: principalType
   }
 }
 
@@ -553,7 +553,7 @@ module openAIRoleUser 'core/security/role.bicep' = {
   params: {
     principalId: principalId
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd' // Cognitive Services OpenAI User
-    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
+    principalType: principalType
   }
 }
 
@@ -563,7 +563,7 @@ module azureAiUserRole 'core/security/role.bicep' = if (useAiProject && resource
   params: {
     principalId: principalId
     roleDefinitionId: '53ca6127-db72-4b80-b1b0-d745d6d5456d' // Azure AI User
-    principalType: empty(runningOnGh) ? 'User' : 'ServicePrincipal'
+    principalType: principalType
   }
 }
 
@@ -586,7 +586,7 @@ module appInsightsReaderRole 'core/security/role.bicep' = {
   params: {
     principalId: principalId
     roleDefinitionId: '43d0d8ad-25c7-4714-9337-8ba259a9fe05' // Application Insights Component Reader
-    principalType: 'User'
+    principalType: principalType
   }
 }
 
