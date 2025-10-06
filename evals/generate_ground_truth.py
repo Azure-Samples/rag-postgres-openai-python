@@ -3,11 +3,10 @@ import logging
 import os
 from collections.abc import Generator
 from pathlib import Path
-from typing import Union
 
 from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provider
 from dotenv_azd import load_azd_env
-from openai import AzureOpenAI, OpenAI
+from openai import OpenAI
 from openai.types.chat import ChatCompletionToolParam
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -78,26 +77,32 @@ def answer_formatter(answer, source) -> str:
     return f"{answer} [{source['id']}]"
 
 
-def get_openai_client() -> tuple[Union[AzureOpenAI, OpenAI], str]:
+def get_openai_client() -> tuple[OpenAI, str]:
     """Return an OpenAI client based on the environment variables"""
-    openai_client: Union[AzureOpenAI, OpenAI]
+    openai_client: OpenAI
     OPENAI_CHAT_HOST = os.getenv("OPENAI_CHAT_HOST")
     if OPENAI_CHAT_HOST == "azure":
         if api_key := os.getenv("AZURE_OPENAI_KEY"):
             logger.info("Using Azure OpenAI Service with API Key from AZURE_OPENAI_KEY")
-            openai_client = AzureOpenAI(
-                api_version=os.environ["AZURE_OPENAI_VERSION"],
-                azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+            azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
+            azure_deployment = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
+            api_version = "2024-10-21"
+            openai_client = OpenAI(
+                base_url=f"{azure_endpoint.rstrip('/')}/openai/deployments/{azure_deployment}?api-version={api_version}",
                 api_key=api_key,
             )
         else:
             logger.info("Using Azure OpenAI Service with Azure Developer CLI Credential")
             azure_credential = AzureDeveloperCliCredential(process_timeout=60, tenant_id=os.environ["AZURE_TENANT_ID"])
             token_provider = get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.com/.default")
-            openai_client = AzureOpenAI(
-                api_version=os.environ["AZURE_OPENAI_VERSION"],
-                azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
-                azure_ad_token_provider=token_provider,
+            azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
+            azure_deployment = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
+            api_version = "2024-10-21"
+            # Get the initial token from the provider
+            initial_token = token_provider()
+            openai_client = OpenAI(
+                base_url=f"{azure_endpoint.rstrip('/')}/openai/deployments/{azure_deployment}?api-version={api_version}",
+                api_key=initial_token,
             )
         model = os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"]
     elif OPENAI_CHAT_HOST == "ollama":

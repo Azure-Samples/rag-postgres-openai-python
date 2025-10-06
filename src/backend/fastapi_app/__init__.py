@@ -2,12 +2,12 @@ import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import TypedDict, Union
+from typing import TypedDict
 
 import fastapi
 from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
-from openai import AsyncAzureOpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from opentelemetry.instrumentation.openai import OpenAIInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -27,8 +27,8 @@ logger = logging.getLogger("ragapp")
 class State(TypedDict):
     sessionmaker: async_sessionmaker[AsyncSession]
     context: FastAPIAppContext
-    chat_client: Union[AsyncOpenAI, AsyncAzureOpenAI]
-    embed_client: Union[AsyncOpenAI, AsyncAzureOpenAI]
+    chat_client: AsyncOpenAI
+    embed_client: AsyncOpenAI
 
 
 @asynccontextmanager
