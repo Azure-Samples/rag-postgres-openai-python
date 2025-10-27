@@ -4,7 +4,7 @@ When deploying a RAG app to production, you should evaluate the safety of the an
 
 * [Deploy an Azure AI project](#deploy-an-azure-ai-project)
 * [Setup the evaluation environment](#setup-the-evaluation-environment)
-* [Run red teaming agent](#run-red-teaming-agent)
+* [Run the red teaming agent](#run-the-red-teaming-agent)
 * [Review the red teaming results](#review-the-red-teaming-results)
 
 ## Deploy an Azure AI project
