@@ -118,7 +118,7 @@ jsonschema-specifications==2025.4.1
     # via jsonschema
 marshmallow==4.0.0
     # via environs
-mcp==1.11.0
+mcp==1.23.0
     # via openai-agents
 msal==1.32.3
     # via
