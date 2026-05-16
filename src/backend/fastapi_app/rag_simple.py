@@ -1,7 +1,15 @@
 from collections.abc import AsyncGenerator
 from typing import Optional
 
-from agents import Agent, ItemHelpers, ModelSettings, OpenAIResponsesModel, Runner, set_tracing_disabled
+from agents import (
+    Agent,
+    ItemHelpers,
+    ModelSettings,
+    OpenAIResponsesModel,
+    RawResponsesStreamEvent,
+    Runner,
+    set_tracing_disabled,
+)
 from openai import AsyncOpenAI
 from openai.types.responses import ResponseInputItemParam, ResponseTextDeltaEvent
 
@@ -131,6 +139,6 @@ class SimpleRAGChat(RAGChatBase):
         )
 
         async for event in run_results.stream_events():
-            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            if isinstance(event, RawResponsesStreamEvent) and isinstance(event.data, ResponseTextDeltaEvent):
                 yield RetrievalResponseDelta(type="response.output_text.delta", delta=str(event.data.delta))
         return

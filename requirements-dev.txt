@@ -1,6 +1,6 @@
 -r src/backend/requirements.txt
 ruff
-mypy
+ty
 types-requests
 pre-commit
 pip-tools
