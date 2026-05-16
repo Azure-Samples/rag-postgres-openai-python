@@ -7,6 +7,7 @@ from agents import (
     ItemHelpers,
     ModelSettings,
     OpenAIResponsesModel,
+    RawResponsesStreamEvent,
     Runner,
     ToolCallOutputItem,
     function_tool,
@@ -198,6 +199,6 @@ class AdvancedRAGChat(RAGChatBase):
         )
 
         async for event in run_results.stream_events():
-            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+            if isinstance(event, RawResponsesStreamEvent) and isinstance(event.data, ResponseTextDeltaEvent):
                 yield RetrievalResponseDelta(type="response.output_text.delta", delta=str(event.data.delta))
         return

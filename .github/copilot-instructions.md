@@ -98,10 +98,8 @@ Use "Frontend & Backend" configuration in the VS Code Run & Debug menu.
 ```bash
 ruff check .          # Lint code (takes <1 second)
 ruff format .          # Format code (takes <1 second)
-mypy . --python-version 3.12  # Type check (takes ~42 seconds)
+ty check . --python-version 3.12  # Type check
 ```
-
-**NOTE**: MyPy may show 1 minor import error in `evals/safety_evaluation.py` which is expected and safe to ignore.
 
 ### Testing (NEVER CANCEL - full test suite takes ~25 seconds)
 ```bash
@@ -123,7 +121,7 @@ pytest tests/e2e.py --tracing=retain-on-failure
 - **Dependencies install**: 90 seconds (use 180+ second timeout)
 - **Frontend npm install**: 22 seconds (use 60+ second timeout)
 - **Frontend build**: 12 seconds (use 30+ second timeout)
-- **MyPy type checking**: 42 seconds (use 90+ second timeout)
+- **ty type checking**: use 90+ second timeout
 - **Full test suite**: 25 seconds (use 60+ second timeout)
 - **Playwright E2E tests**: 2+ minutes (use 300+ second timeout)
 
@@ -138,7 +136,7 @@ pytest tests/e2e.py --tracing=retain-on-failure
 
 2. **Type check (if Python changes)**:
    ```bash
-   mypy . --python-version 3.12
+   ty check . --python-version 3.12
    ```
 
 3. **Run relevant tests**:
@@ -194,7 +192,7 @@ pytest tests/e2e.py --tracing=retain-on-failure
 - `main.bicep` - Main infrastructure definition
 
 ### Configuration Files
-- `pyproject.toml` - Python project config (ruff, mypy, pytest)
+- `pyproject.toml` - Python project config (ruff, ty, pytest)
 - `requirements-dev.txt` - Development dependencies
 - `azure.yaml` - Azure Developer CLI configuration
 - `.env.sample` - Environment variable template
@@ -248,7 +246,7 @@ The GitHub Actions require:
 - Python 3.10+ with specific versions (3.10, 3.11, 3.12)
 - PostgreSQL with pgvector extension
 - Node.js 18+
-- All code passes `ruff check`, `ruff format --check`, and `mypy`
+- All code passes `ruff check`, `ruff format --check`, and `ty check`
 
 ## Load Testing
 

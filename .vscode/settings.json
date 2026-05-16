@@ -34,7 +34,6 @@
         ".pytest_cache": true,
         "__pycache__": true,
         "htmlcov": true,
-        ".mypy_cache": true,
         ".coverage": true
     },
     "python-envs.defaultEnvManager": "ms-python.python:system"
