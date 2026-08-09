@@ -95,3 +95,21 @@ index_nomic = Index(
     postgresql_with={"m": 16, "ef_construction": 64},
     postgresql_ops={"embedding_nomic": "vector_cosine_ops"},
 )
+
+cars_table_name = Car.__tablename__
+
+cars_index_3l = Index(
+    f"hnsw_index_for_cosine_{cars_table_name}_embedding_3l",
+    Car.embedding_3l,
+    postgresql_using="hnsw",
+    postgresql_with={"m": 16, "ef_construction": 64},
+    postgresql_ops={"embedding_3l": "vector_cosine_ops"},
+)
+
+cars_index_nomic = Index(
+    f"hnsw_index_for_cosine_{cars_table_name}_embedding_nomic",
+    Car.embedding_nomic,
+    postgresql_using="hnsw",
+    postgresql_with={"m": 16, "ef_construction": 64},
+    postgresql_ops={"embedding_nomic": "vector_cosine_ops"},
+)
