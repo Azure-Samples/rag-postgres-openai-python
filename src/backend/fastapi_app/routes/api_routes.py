@@ -18,7 +18,7 @@ from fastapi_app.api_models import (
     RetrievalResponseDelta,
 )
 from fastapi_app.dependencies import ChatClient, CommonDeps, DBSession, EmbeddingsClient
-from fastapi_app.postgres_models import Item
+from fastapi_app.postgres_models import Car, Item
 from fastapi_app.postgres_searcher import PostgresSearcher
 from fastapi_app.rag_advanced import AdvancedRAGChat
 from fastapi_app.rag_simple import SimpleRAGChat
@@ -117,6 +117,16 @@ async def chat_handler(
             embed_model=context.openai_embed_model,
             embed_dimensions=context.openai_embed_dimensions,
             embedding_column=context.embedding_column,
+            db_model=Item,
+        )
+        cars_searcher = PostgresSearcher(
+            db_session=database_session,
+            openai_embed_client=openai_embed.client,
+            embed_deployment=context.openai_embed_deployment,
+            embed_model=context.openai_embed_model,
+            embed_dimensions=context.openai_embed_dimensions,
+            embedding_column=context.embedding_column,
+            db_model=Car,
         )
         rag_flow: Union[SimpleRAGChat, AdvancedRAGChat]
         if chat_request.context.overrides.use_advanced_flow:
@@ -124,6 +134,7 @@ async def chat_handler(
                 messages=chat_request.input,
                 overrides=chat_request.context.overrides,
                 searcher=searcher,
+                cars_searcher=cars_searcher,
                 openai_chat_client=openai_chat.client,
                 chat_model=context.openai_chat_model,
                 chat_deployment=context.openai_chat_deployment,
@@ -164,6 +175,16 @@ async def chat_stream_handler(
         embed_model=context.openai_embed_model,
         embed_dimensions=context.openai_embed_dimensions,
         embedding_column=context.embedding_column,
+        db_model=Item,
+    )
+    cars_searcher = PostgresSearcher(
+        db_session=database_session,
+        openai_embed_client=openai_embed.client,
+        embed_deployment=context.openai_embed_deployment,
+        embed_model=context.openai_embed_model,
+        embed_dimensions=context.openai_embed_dimensions,
+        embedding_column=context.embedding_column,
+        db_model=Car,
     )
 
     rag_flow: Union[SimpleRAGChat, AdvancedRAGChat]
@@ -172,6 +193,7 @@ async def chat_stream_handler(
             messages=chat_request.input,
             overrides=chat_request.context.overrides,
             searcher=searcher,
+            cars_searcher=cars_searcher,
             openai_chat_client=openai_chat.client,
             chat_model=context.openai_chat_model,
             chat_deployment=context.openai_chat_deployment,
