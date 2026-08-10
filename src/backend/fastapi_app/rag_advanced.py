@@ -44,11 +44,13 @@ class AdvancedRAGChat(RAGChatBase):
         messages: list[ResponseInputItemParam],
         overrides: ChatRequestOverrides,
         searcher: PostgresSearcher,
+        cars_searcher: PostgresSearcher,
         openai_chat_client: AsyncOpenAI,
         chat_model: str,
         chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
     ):
         self.searcher = searcher
+        self.cars_searcher = cars_searcher
         self.chat_params = self.get_chat_params(messages, overrides)
         self.model_for_thoughts = (
             {"model": chat_model, "deployment": chat_deployment} if chat_deployment else {"model": chat_model}
@@ -59,7 +61,7 @@ class AdvancedRAGChat(RAGChatBase):
         self.search_agent = Agent(
             name="Searcher",
             instructions=self.query_prompt_template,
-            tools=[function_tool(self.search_database)],
+            tools=[function_tool(self.search_items), function_tool(self.search_cars)],
             tool_use_behavior="stop_on_first_tool",
             model=openai_agents_model,
         )
@@ -73,30 +75,64 @@ class AdvancedRAGChat(RAGChatBase):
             ),
         )
 
-    async def search_database(
+    async def search_items(
         self,
         search_query: str,
         price_filter: Optional[PriceFilter] = None,
         brand_filter: Optional[BrandFilter] = None,
     ) -> SearchResults:
         """
-        Search PostgreSQL database for relevant products based on user query
+        Search the items database for products like clothing, footwear, outdoor gear, and accessories.
+        Use this tool when the user asks about general products, apparel, shoes, or equipment.
 
         Args:
-            search_query: English query string to use for full text search, e.g. 'red shoes'.
+            search_query: English query string to use for full text search, e.g. 'red hiking boots'.
             price_filter: Filter search results based on price of the product
             brand_filter: Filter search results based on brand of the product
 
         Returns:
             List of formatted items that match the search query and filters
         """
-        # Only send non-None filters
         filters: list[Filter] = []
         if price_filter:
             filters.append(price_filter)
         if brand_filter:
             filters.append(brand_filter)
         results = await self.searcher.search_and_embed(
+            search_query,
+            top=self.chat_params.top,
+            enable_vector_search=self.chat_params.enable_vector_search,
+            enable_text_search=self.chat_params.enable_text_search,
+            filters=filters,
+        )
+        return SearchResults(
+            query=search_query, items=[ItemPublic.model_validate(item.to_dict()) for item in results], filters=filters
+        )
+
+    async def search_cars(
+        self,
+        search_query: str,
+        price_filter: Optional[PriceFilter] = None,
+        brand_filter: Optional[BrandFilter] = None,
+    ) -> SearchResults:
+        """
+        Search the cars database for vehicles like sedans, SUVs, hatchbacks, crossovers, and electric cars.
+        Use this tool when the user asks about cars, vehicles, mileage, engine specs, or automobile brands.
+
+        Args:
+            search_query: English query string to use for full text search, e.g. 'luxury SUV with sunroof'.
+            price_filter: Filter search results based on price of the car
+            brand_filter: Filter search results based on car brand (e.g. 'Hyundai', 'Toyota', 'BMW')
+
+        Returns:
+            List of cars that match the search query and filters
+        """
+        filters: list[Filter] = []
+        if price_filter:
+            filters.append(price_filter)
+        if brand_filter:
+            filters.append(brand_filter)
+        results = await self.cars_searcher.search_and_embed(
             search_query,
             top=self.chat_params.top,
             enable_vector_search=self.chat_params.enable_vector_search,

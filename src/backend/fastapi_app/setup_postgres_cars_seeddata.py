@@ -14,32 +14,32 @@ from fastapi_app.postgres_engine import (
     create_postgres_engine_from_args,
     create_postgres_engine_from_env,
 )
-from fastapi_app.postgres_models import Item
+from fastapi_app.postgres_models import Car
 
 logger = logging.getLogger("ragapp")
 
 
 async def seed_data(engine):
-    # Check if Item table exists
+    # Check if cars table exists
     async with engine.begin() as conn:
-        table_name = Item.__tablename__
+        table_name = Car.__tablename__
         result = await conn.execute(
             text(
                 f"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{table_name}')"  # noqa
             )
         )
         if not result.scalar():
-            logger.error(f" {table_name} table does not exist. Please run the database setup script first.")
+            logger.error(f"{table_name} table does not exist. Please run the database setup script first.")
             return
 
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
-        # Insert the objects from the JSON file into the database
         current_dir = os.path.dirname(os.path.realpath(__file__))
-        with open(os.path.join(current_dir, "seed_data.json")) as f:
+        with open(os.path.join(current_dir, "cars_seed_data.json")) as f:
             seed_data_objects = json.load(f)
             for seed_data_object in seed_data_objects:
-                db_item = await session.execute(select(Item).filter(Item.id == seed_data_object["id"]))
-                if db_item.scalars().first():
+                db_car = await session.execute(select(Car).filter(Car.id == seed_data_object["id"]))
+                if db_car.scalars().first():
+                    logger.info(f"Car with id {seed_data_object['id']} already exists, skipping.")
                     continue
                 attrs = {key: value for key, value in seed_data_object.items()}
                 attrs["embedding_3l"] = np.array(seed_data_object["embedding_3l"]) if seed_data_object.get("embedding_3l") is not None else None
@@ -56,7 +56,7 @@ async def seed_data(engine):
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="Create database schema")
+    parser = argparse.ArgumentParser(description="Seed cars data")
     parser.add_argument("--host", type=str, help="Postgres host")
     parser.add_argument("--username", type=str, help="Postgres username")
     parser.add_argument("--password", type=str, help="Postgres password")
@@ -64,7 +64,6 @@ async def main():
     parser.add_argument("--sslmode", type=str, help="Postgres sslmode")
     parser.add_argument("--tenant-id", type=str, help="Azure tenant ID", default=None)
 
-    # if no args are specified, use environment variables
     args = parser.parse_args()
     if args.host is None:
         engine = await create_postgres_engine_from_env()
