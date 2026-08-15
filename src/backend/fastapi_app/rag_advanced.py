@@ -152,7 +152,9 @@ class AdvancedRAGChat(RAGChatBase):
         run_results = await Runner.run(self.search_agent, input=all_messages)
         most_recent_response = run_results.new_items[-1]
         if isinstance(most_recent_response, ToolCallOutputItem):
-            search_results = most_recent_response.output
+            output = most_recent_response.output
+            # The agents SDK serializes Pydantic models to a JSON string — parse it back
+            search_results = SearchResults.model_validate_json(output) if isinstance(output, str) else output
         else:
             raise ValueError("Error retrieving search results, model did not call tool properly")
 
