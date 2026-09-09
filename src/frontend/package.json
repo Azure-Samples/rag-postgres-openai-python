@@ -18,7 +18,7 @@
     "@fluentui/react-components": "^9.37.3",
     "@fluentui/react-icons": "^2.0.221",
     "@react-spring/web": "^9.7.3",
-    "dompurify": "^3.2.4",
+    "dompurify": "^3.4.13",
     "marked": "^9.1.6",
     "ndjson-readablestream": "^1.4.0",
     "react": "^18.2.0",
