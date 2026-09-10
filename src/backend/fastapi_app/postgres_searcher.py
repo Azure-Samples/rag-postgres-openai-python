@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi_app.api_models import Filter
 from fastapi_app.embeddings import compute_text_embedding
-from fastapi_app.postgres_models import Item
+from fastapi_app.postgres_models import Base, Item
 
 
 class PostgresSearcher:
@@ -19,6 +19,7 @@ class PostgresSearcher:
         embed_model: str,
         embed_dimensions: Optional[int],
         embedding_column: str,
+        db_model: type[Base] = Item,  # which table to search; defaults to Item for backward compatibility
     ):
         self.db_session = db_session
         self.openai_embed_client = openai_embed_client
@@ -26,6 +27,7 @@ class PostgresSearcher:
         self.embed_deployment = embed_deployment
         self.embed_dimensions = embed_dimensions
         self.embedding_column = embedding_column
+        self.db_model = db_model
 
     def build_filter_clause(self, filters: Optional[list[Filter]]) -> tuple[str, str]:
         if filters is None:
@@ -47,7 +49,7 @@ class PostgresSearcher:
         filters: Optional[list[Filter]] = None,
     ):
         filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
-        table_name = Item.__tablename__
+        table_name = self.db_model.__tablename__
         vector_query = f"""
             SELECT id, RANK () OVER (ORDER BY {self.embedding_column} <=> :embedding) AS rank
                 FROM {table_name}
@@ -100,7 +102,7 @@ class PostgresSearcher:
         # Convert results to SQLAlchemy models
         row_models = []
         for id, _ in results[:top]:
-            item = await self.db_session.execute(select(Item).where(Item.id == id))
+            item = await self.db_session.execute(select(self.db_model).where(self.db_model.id == id))
             row_models.append(item.scalar())
         return row_models
 
