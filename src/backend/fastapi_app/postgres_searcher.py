@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from openai import AsyncAzureOpenAI, AsyncOpenAI
@@ -11,6 +11,11 @@ from fastapi_app.postgres_models import Item
 
 
 class PostgresSearcher:
+    FILTER_OPERATORS = {
+        "brand": {"=", "!="},
+        "price": {"=", "<", "<=", ">", ">="},
+    }
+
     def __init__(
         self,
         db_session: AsyncSession,
@@ -27,17 +32,22 @@ class PostgresSearcher:
         self.embed_dimensions = embed_dimensions
         self.embedding_column = embedding_column
 
-    def build_filter_clause(self, filters: Optional[list[Filter]]) -> tuple[str, str]:
+    def build_filter_clause(self, filters: Optional[list[Filter]]) -> tuple[str, str, dict[str, Any]]:
         if filters is None:
-            return "", ""
+            return "", "", {}
         filter_clauses = []
-        for filter in filters:
-            filter_value = f"'{filter.value}'" if isinstance(filter.value, str) else filter.value
-            filter_clauses.append(f"{filter.column} {filter.comparison_operator} {filter_value}")
+        filter_params = {}
+        for index, search_filter in enumerate(filters):
+            allowed_operators = self.FILTER_OPERATORS.get(search_filter.column)
+            if allowed_operators is None or search_filter.comparison_operator not in allowed_operators:
+                raise ValueError(f"Unsupported filter: {search_filter.column} {search_filter.comparison_operator}")
+            parameter_name = f"filter_{index}"
+            filter_clauses.append(f"{search_filter.column} {search_filter.comparison_operator} :{parameter_name}")
+            filter_params[parameter_name] = search_filter.value
         filter_clause = " AND ".join(filter_clauses)
         if len(filter_clause) > 0:
-            return f"WHERE {filter_clause}", f"AND {filter_clause}"
-        return "", ""
+            return f"WHERE {filter_clause}", f"AND {filter_clause}", filter_params
+        return "", "", {}
 
     async def search(
         self,
@@ -46,7 +56,7 @@ class PostgresSearcher:
         top: int = 5,
         filters: Optional[list[Filter]] = None,
     ):
-        filter_clause_where, filter_clause_and = self.build_filter_clause(filters)
+        filter_clause_where, filter_clause_and, filter_params = self.build_filter_clause(filters)
         table_name = Item.__tablename__
         vector_query = f"""
             SELECT id, RANK () OVER (ORDER BY {self.embedding_column} <=> :embedding) AS rank
@@ -93,7 +103,7 @@ class PostgresSearcher:
         results = (
             await self.db_session.execute(
                 sql,
-                {"embedding": np.array(query_vector), "query": query_text, "k": 60},
+                {"embedding": np.array(query_vector), "query": query_text, "k": 60, **filter_params},
             )
         ).fetchall()
 

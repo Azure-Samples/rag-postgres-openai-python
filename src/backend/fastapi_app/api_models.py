@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from openai.types.responses import ResponseInputItemParam
 from pydantic import BaseModel, Field
@@ -90,14 +90,16 @@ class Filter(BaseModel):
 
 
 class PriceFilter(Filter):
-    column: str = Field(default="price", description="The column to filter on (always 'price' for this filter)")
-    comparison_operator: str = Field(description="The operator for price comparison ('>', '<', '>=', '<=', '=')")
+    column: Literal["price"] = Field(default="price", description="The column to filter on (always 'price')")
+    comparison_operator: Literal[">", "<", ">=", "<=", "="] = Field(
+        description="The operator for price comparison ('>', '<', '>=', '<=', '=')"
+    )
     value: float = Field(description="The price value to compare against (e.g., 30.00)")
 
 
 class BrandFilter(Filter):
-    column: str = Field(default="brand", description="The column to filter on (always 'brand' for this filter)")
-    comparison_operator: str = Field(description="The operator for brand comparison ('=' or '!=')")
+    column: Literal["brand"] = Field(default="brand", description="The column to filter on (always 'brand')")
+    comparison_operator: Literal["=", "!="] = Field(description="The operator for brand comparison ('=' or '!=')")
     value: str = Field(description="The brand name to compare against (e.g., 'AirStrider')")
 
 
