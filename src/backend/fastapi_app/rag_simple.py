@@ -95,7 +95,24 @@ class SimpleRAGChat(RAGChatBase):
             + [{"content": self.prepare_rag_request(self.chat_params.original_user_query, items), "role": "user"}],
         )
 
-        return RetrievalResponse(
+        # Calculate retrieval confidence
+        top_score = 0.0
+        avg_score = 0.0
+        scored_items = []
+        
+        for item in items:
+            if hasattr(item, "score") and isinstance(item.score, (int, float)):
+                scored_items.append(float(item.score))
+        
+        if scored_items:
+            top_score = max(scored_items)
+            avg_score = sum(scored_items) / len(scored_items)
+
+        # Configurable threshold (can be set via environment or config)
+        confidence_threshold = getattr(self, 'confidence_threshold', 0.7)
+        low_confidence = top_score < confidence_threshold and bool(scored_items)
+
+        response = RetrievalResponse(
             output_text=str(run_results.final_output),
             context=RAGContext(
                 data_points={item.id: item for item in items},
@@ -110,6 +127,24 @@ class SimpleRAGChat(RAGChatBase):
                 ],
             ),
         )
+
+        # Add retrieval confidence metadata (optional, non-breaking)
+        if scored_items:
+            response.context.thoughts.append(
+                ThoughtStep(
+                    title="Retrieval Confidence (experimental)",
+                    description=f"Top score: {top_score:.3f}, Avg score: {avg_score:.3f}, Threshold: {confidence_threshold}",
+                    props={
+                        "top_score": top_score,
+                        "avg_score": avg_score,
+                        "threshold": confidence_threshold,
+                        "confidence_level": "low" if low_confidence else "high",
+                        "scored_items_count": len(scored_items),
+                    },
+                )
+            )
+
+        return response
 
     async def answer_stream(
         self,
