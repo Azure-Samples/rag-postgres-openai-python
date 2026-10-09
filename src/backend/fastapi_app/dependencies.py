@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import AsyncGenerator
-from typing import Annotated, Optional
+from typing import Annotated
 
 import azure.identity.aio
 from fastapi import Depends, Request
@@ -28,9 +28,9 @@ class FastAPIAppContext(BaseModel):
 
     openai_chat_model: str
     openai_embed_model: str
-    openai_embed_dimensions: Optional[int]
-    openai_chat_deployment: Optional[str]
-    openai_embed_deployment: Optional[str]
+    openai_embed_dimensions: int | None
+    openai_chat_deployment: str | None
+    openai_embed_deployment: str | None
     embedding_column: str
 
 

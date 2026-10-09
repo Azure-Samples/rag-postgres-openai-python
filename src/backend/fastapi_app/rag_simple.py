@@ -1,5 +1,4 @@
 from collections.abc import AsyncGenerator
-from typing import Optional
 
 from agents import (
     Agent,
@@ -36,7 +35,7 @@ class SimpleRAGChat(RAGChatBase):
         searcher: PostgresSearcher,
         openai_chat_client: AsyncOpenAI,
         chat_model: str,
-        chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
+        chat_deployment: str | None,  # Not needed for non-Azure OpenAI
     ):
         self.searcher = searcher
         self.chat_params = self.get_chat_params(messages, overrides)
