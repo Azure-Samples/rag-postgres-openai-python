@@ -1,11 +1,11 @@
 from enum import Enum
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from openai.types.responses import ResponseInputItemParam
 from pydantic import BaseModel, Field
 
 
-class RetrievalMode(str, Enum):
+class RetrievalMode(str, Enum):  # noqa: UP042 - Preserve Enum's string representation.
     TEXT = "text"
     VECTORS = "vectors"
     HYBRID = "hybrid"
@@ -16,7 +16,7 @@ class ChatRequestOverrides(BaseModel):
     temperature: float = 0.3
     retrieval_mode: RetrievalMode = RetrievalMode.HYBRID
     use_advanced_flow: bool = True
-    prompt_template: Optional[str] = None
+    prompt_template: str | None = None
 
 
 class ChatRequestContext(BaseModel):
@@ -70,8 +70,8 @@ class RetrievalResponse(BaseModel):
 
 class RetrievalResponseDelta(BaseModel):
     type: str
-    delta: Optional[str] = None
-    context: Optional[RAGContext] = None
+    delta: str | None = None
+    context: RAGContext | None = None
 
 
 class ChatParams(ChatRequestOverrides):

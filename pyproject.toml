@@ -1,12 +1,13 @@
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py311"
 lint.select = ["E", "F", "I", "UP"]
 lint.ignore = ["D203"]
 lint.isort.known-first-party = ["fastapi_app"]
 
 [tool.ty.environment]
 root = ["./src/backend", "."]
+python-version = "3.11"
 
 [tool.ty.analysis]
 allowed-unresolved-imports = [

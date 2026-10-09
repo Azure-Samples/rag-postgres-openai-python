@@ -10,7 +10,7 @@ RAG on PostgreSQL is a Python FastAPI backend with React TypeScript frontend tha
 
 Install the following tools before beginning development:
 
-- **Python 3.10+** (3.12 recommended)
+- **Python 3.11+** (3.12 recommended)
 - **Node.js 18+** for frontend development
 - **PostgreSQL 14+** with pgvector extension
 - **Azure Developer CLI (azd)** for deployment
@@ -243,7 +243,7 @@ The application supports multiple OpenAI providers:
 
 ### CI/CD Pipeline Requirements
 The GitHub Actions require:
-- Python 3.10+ with specific versions (3.10, 3.11, 3.12)
+- Python 3.11+ with specific versions (3.11, 3.12)
 - PostgreSQL with pgvector extension
 - Node.js 18+
 - All code passes `ruff check`, `ruff format --check`, and `ty check`

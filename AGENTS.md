@@ -13,10 +13,10 @@ When adding new azd environment variables, update:
 
 1. Update the version constraint in src/backend/pyproject.toml
 
-2. Re-compile src/backend/requirements.txt from the src folder:
+2. Re-compile src/backend/requirements.txt from the src/backend folder:
 
     ```shell
-    uv pip compile pyproject.toml -o requirements.txt --python-version 3.10
+    uv pip compile pyproject.toml -o requirements.txt --python-version 3.11
     ```
 
 3. Reinstall with:

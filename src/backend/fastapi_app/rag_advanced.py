@@ -1,6 +1,5 @@
 import json
 from collections.abc import AsyncGenerator
-from typing import Optional
 
 from agents import (
     Agent,
@@ -46,7 +45,7 @@ class AdvancedRAGChat(RAGChatBase):
         searcher: PostgresSearcher,
         openai_chat_client: AsyncOpenAI,
         chat_model: str,
-        chat_deployment: Optional[str],  # Not needed for non-Azure OpenAI
+        chat_deployment: str | None,  # Not needed for non-Azure OpenAI
     ):
         self.searcher = searcher
         self.chat_params = self.get_chat_params(messages, overrides)
@@ -76,8 +75,8 @@ class AdvancedRAGChat(RAGChatBase):
     async def search_database(
         self,
         search_query: str,
-        price_filter: Optional[PriceFilter] = None,
-        brand_filter: Optional[BrandFilter] = None,
+        price_filter: PriceFilter | None = None,
+        brand_filter: BrandFilter | None = None,
     ) -> SearchResults:
         """
         Search PostgreSQL database for relevant products based on user query
