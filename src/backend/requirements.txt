@@ -132,7 +132,7 @@ multidict==6.6.3
     #   yarl
 numpy==2.2.6
     # via pgvector
-oauthlib==3.3.1
+oauthlib==4.0.0
     # via requests-oauthlib
 openai==2.31.0
     # via
