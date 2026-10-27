@@ -47,7 +47,7 @@ azure-monitor-opentelemetry-exporter==1.0.0b40
     # via azure-monitor-opentelemetry
 backports-datetime-fromisoformat==2.0.3
     # via marshmallow
-certifi==2025.7.14
+certifi==2026.10.18
     # via
     #   httpcore
     #   httpx
