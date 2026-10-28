@@ -354,7 +354,7 @@ var webAppEnv = union(azureOpenAIKeyEnv, openAIComKeyEnv, [
   }
   {
     name: 'OPENAICOM_CHAT_MODEL'
-    value: openAIChatHost == 'openaicom' ? 'gpt-3.5-turbo' : ''
+    value: openAIChatHost == 'openaicom' ? 'gpt-5.4' : ''
   }
   {
     name: 'OPENAI_EMBED_HOST'

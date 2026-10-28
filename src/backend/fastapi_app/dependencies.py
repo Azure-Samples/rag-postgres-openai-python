@@ -65,7 +65,7 @@ async def common_parameters():
         openai_embed_model = os.getenv("OLLAMA_EMBED_MODEL") or "nomic-embed-text"
     else:
         openai_chat_deployment = None
-        openai_chat_model = os.getenv("OPENAICOM_CHAT_MODEL") or "gpt-3.5-turbo"
+        openai_chat_model = os.getenv("OPENAICOM_CHAT_MODEL") or "gpt-5.4"
     return FastAPIAppContext(
         openai_chat_model=openai_chat_model,
         openai_embed_model=openai_embed_model,

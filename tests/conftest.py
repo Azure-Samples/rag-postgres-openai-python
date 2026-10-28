@@ -97,7 +97,7 @@ def mock_session_env_openai(monkeypatch_session):
         monkeypatch_session.setenv("OPENAI_CHAT_HOST", "openai")
         monkeypatch_session.setenv("OPENAI_EMBED_HOST", "openai")
         monkeypatch_session.setenv("OPENAICOM_KEY", "fakekey")
-        monkeypatch_session.setenv("OPENAICOM_CHAT_MODEL", "gpt-3.5-turbo")
+        monkeypatch_session.setenv("OPENAICOM_CHAT_MODEL", "gpt-5.4")
         monkeypatch_session.setenv("OPENAICOM_EMBED_MODEL", "text-embedding-3-large")
         monkeypatch_session.setenv("OPENAICOM_EMBED_DIMENSIONS", "1024")
         monkeypatch_session.setenv("OPENAICOM_EMBEDDING_COLUMN", "embedding_3l")

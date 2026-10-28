@@ -26,11 +26,18 @@ async def test_get_common_parameters_ollama(mock_session_env_ollama):
 @pytest.mark.asyncio
 async def test_get_common_parameters_openai(mock_session_env_openai):
     result = await common_parameters()
-    assert result.openai_chat_model == "gpt-3.5-turbo"
+    assert result.openai_chat_model == "gpt-5.4"
     assert result.openai_embed_model == "text-embedding-3-large"
     assert result.openai_embed_dimensions == 1024
     assert result.openai_chat_deployment is None
     assert result.openai_embed_deployment is None
+
+
+@pytest.mark.asyncio
+async def test_get_common_parameters_openai_default_chat_model(mock_session_env_openai, monkeypatch):
+    monkeypatch.delenv("OPENAICOM_CHAT_MODEL", raising=False)
+    result = await common_parameters()
+    assert result.openai_chat_model == "gpt-5.4"
 
 
 @pytest.mark.asyncio
