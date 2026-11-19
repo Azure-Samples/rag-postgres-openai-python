@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from openai import AsyncOpenAI
 
@@ -7,8 +7,8 @@ async def compute_text_embedding(
     q: str,
     openai_client: AsyncOpenAI,
     embed_model: str,
-    embed_deployment: Optional[str] = None,
-    embedding_dimensions: Optional[int] = None,
+    embed_deployment: str | None = None,
+    embedding_dimensions: int | None = None,
 ) -> list[float]:
     SUPPORTED_DIMENSIONS_MODEL = {
         "text-embedding-ada-002": False,

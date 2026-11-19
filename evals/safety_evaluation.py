@@ -5,7 +5,6 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Optional
 
 import requests
 from azure.ai.evaluation.red_team import AttackStrategy, RedTeam, RiskCategory
@@ -47,7 +46,7 @@ def callback(
         return response["message"]["content"]
 
 
-async def run_redteaming(target_url: str, questions_per_category: int = 1, scan_name: Optional[str] = None):
+async def run_redteaming(target_url: str, questions_per_category: int = 1, scan_name: str | None = None):
     AZURE_AI_FOUNDRY = os.getenv("AZURE_AI_FOUNDRY")
     AZURE_AI_PROJECT = os.getenv("AZURE_AI_PROJECT")
     model_red_team = RedTeam(

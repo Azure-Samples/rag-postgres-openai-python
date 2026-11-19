@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any
 
 import numpy as np
 from openai import AsyncAzureOpenAI, AsyncOpenAI
@@ -19,10 +19,10 @@ class PostgresSearcher:
     def __init__(
         self,
         db_session: AsyncSession,
-        openai_embed_client: Union[AsyncOpenAI, AsyncAzureOpenAI],
-        embed_deployment: Optional[str],  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
+        openai_embed_client: AsyncOpenAI | AsyncAzureOpenAI,
+        embed_deployment: str | None,  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embed_model: str,
-        embed_dimensions: Optional[int],
+        embed_dimensions: int | None,
         embedding_column: str,
     ):
         self.db_session = db_session
@@ -32,7 +32,7 @@ class PostgresSearcher:
         self.embed_dimensions = embed_dimensions
         self.embedding_column = embedding_column
 
-    def build_filter_clause(self, filters: Optional[list[Filter]]) -> tuple[str, str, dict[str, Any]]:
+    def build_filter_clause(self, filters: list[Filter] | None) -> tuple[str, str, dict[str, Any]]:
         if filters is None:
             return "", "", {}
         filter_clauses = []
@@ -51,10 +51,10 @@ class PostgresSearcher:
 
     async def search(
         self,
-        query_text: Optional[str],
+        query_text: str | None,
         query_vector: list[float],
         top: int = 5,
-        filters: Optional[list[Filter]] = None,
+        filters: list[Filter] | None = None,
     ):
         filter_clause_where, filter_clause_and, filter_params = self.build_filter_clause(filters)
         table_name = Item.__tablename__
@@ -116,11 +116,11 @@ class PostgresSearcher:
 
     async def search_and_embed(
         self,
-        query_text: Optional[str] = None,
+        query_text: str | None = None,
         top: int = 5,
         enable_vector_search: bool = False,
         enable_text_search: bool = False,
-        filters: Optional[list[Filter]] = None,
+        filters: list[Filter] | None = None,
     ) -> list[Item]:
         """
         Search rows by query text. Optionally converts the query text to a vector if enable_vector_search is True.
