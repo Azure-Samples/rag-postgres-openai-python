@@ -2,7 +2,7 @@
 #    uv pip compile pyproject.toml -o requirements.txt --python-version 3.10
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.14
+aiohttp==3.14.4
     # via fastapi-app (pyproject.toml)
 aiosignal==1.4.0
     # via aiohttp
