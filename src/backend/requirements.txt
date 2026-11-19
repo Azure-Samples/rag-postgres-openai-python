@@ -138,7 +138,7 @@ openai==2.31.0
     # via
     #   fastapi-app (pyproject.toml)
     #   openai-agents
-openai-agents==0.13.6
+openai-agents==0.22.0
     # via fastapi-app (pyproject.toml)
 opentelemetry-api==1.31.1
     # via
