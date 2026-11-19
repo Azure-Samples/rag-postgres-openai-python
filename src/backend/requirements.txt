@@ -265,7 +265,7 @@ pydantic-core==2.41.5
     # via pydantic
 pydantic-settings==2.10.1
     # via mcp
-pyjwt==2.10.1
+pyjwt==2.15.0
     # via
     #   mcp
     #   msal
