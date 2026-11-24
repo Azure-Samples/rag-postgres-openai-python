@@ -274,7 +274,7 @@ python-dotenv==1.1.1
     #   fastapi-app (pyproject.toml)
     #   environs
     #   pydantic-settings
-python-multipart==0.0.20
+python-multipart==0.0.31
     # via mcp
 referencing==0.36.2
     # via
