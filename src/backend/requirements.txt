@@ -269,7 +269,7 @@ pyjwt==2.10.1
     # via
     #   mcp
     #   msal
-python-dotenv==1.1.1
+python-dotenv==1.2.2
     # via
     #   fastapi-app (pyproject.toml)
     #   environs
